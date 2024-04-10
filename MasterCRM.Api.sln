@@ -1,6 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterCRM.Api", "MasterCRM.Api\MasterCRM.Api.csproj", "{BEFF3A54-B7CC-4301-AC36-D910560C6DBE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterCRM.Api", "src\MasterCRM.Api\MasterCRM.Api.csproj", "{BEFF3A54-B7CC-4301-AC36-D910560C6DBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterCRM.Domain", "src\MasterCRM.Domain\MasterCRM.Domain.csproj", "{5C89538F-EBB7-429D-AC6F-29A395665181}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterCRM.Application", "src\MasterCRM.Application\MasterCRM.Application.csproj", "{1851C30C-DA36-4908-A637-62A50931B974}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterCRM.Infrastructure", "src\MasterCRM.Infrastructure\MasterCRM.Infrastructure.csproj", "{D6A9C3D4-A423-4A6B-BE03-11AE1025061D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +18,17 @@ Global
 		{BEFF3A54-B7CC-4301-AC36-D910560C6DBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEFF3A54-B7CC-4301-AC36-D910560C6DBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEFF3A54-B7CC-4301-AC36-D910560C6DBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C89538F-EBB7-429D-AC6F-29A395665181}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C89538F-EBB7-429D-AC6F-29A395665181}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C89538F-EBB7-429D-AC6F-29A395665181}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C89538F-EBB7-429D-AC6F-29A395665181}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1851C30C-DA36-4908-A637-62A50931B974}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1851C30C-DA36-4908-A637-62A50931B974}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1851C30C-DA36-4908-A637-62A50931B974}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1851C30C-DA36-4908-A637-62A50931B974}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6A9C3D4-A423-4A6B-BE03-11AE1025061D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6A9C3D4-A423-4A6B-BE03-11AE1025061D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6A9C3D4-A423-4A6B-BE03-11AE1025061D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6A9C3D4-A423-4A6B-BE03-11AE1025061D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

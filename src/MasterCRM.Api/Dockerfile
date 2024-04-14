@@ -5,10 +5,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["MasterCRM.Api/MasterCRM.Api.csproj", "MasterCRM.Api/"]
-RUN dotnet restore "MasterCRM.Api/MasterCRM.Api.csproj"
+COPY ["src/MasterCRM.Api/MasterCRM.Api.csproj", "src/MasterCRM.Api/"]
+RUN dotnet restore "src/MasterCRM.Api/MasterCRM.Api.csproj"
 COPY . .
-WORKDIR "/src/MasterCRM.Api"
+WORKDIR "/src/src/MasterCRM.Api"
 RUN dotnet build "MasterCRM.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish

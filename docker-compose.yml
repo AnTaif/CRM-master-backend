@@ -1,0 +1,27 @@
+﻿networks:
+  mastercrm-dev:
+    driver: bridge
+services:
+  mastercrm.api:
+    container_name: mastercrm.api
+    image: mastercrm.api
+    build:
+      context: .
+      dockerfile: src/MasterCRM.Api/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+  mastercrm.db:
+    container_name: mastercrm.db
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: e6WRC(vPwCt94SNh
+      POSTGRES_DB: master-crm-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+volumes:
+  postgres-data:

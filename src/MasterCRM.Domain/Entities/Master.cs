@@ -19,4 +19,6 @@ public class Master : BaseEntity<Guid>
     public string Email { get; init; }
     
     public string PasswordHash { get; init; }
+    
+    public virtual List<FeedBack> FeedBacks { get; init; }
 }

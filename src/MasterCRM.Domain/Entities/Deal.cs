@@ -3,12 +3,12 @@ using MasterCRM.Domain.Enums;
 
 namespace MasterCRM.Domain.Entities;
 
-public class Order : BaseEntity<Guid>
+public class Deal : BaseEntity<Guid>
 {
     public required Guid MasterId { get; init; }
     public virtual Master Master { get; init; }
     
-    public virtual List<OrderProduct> OrderProducts { get; init; }
+    public virtual List<DealProduct> DealProducts { get; init; }
     
     public required Guid CustomerId { get; init; }
     
@@ -20,7 +20,7 @@ public class Order : BaseEntity<Guid>
     
     public string PostalCode { get; init; }
     
-    public string OrderRequirements { get; init; }
+    public string Requirements { get; init; }
     
     public DateTime CreatedAt { get; init; }
 }

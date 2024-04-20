@@ -2,7 +2,7 @@ using MasterCRM.Domain.Common;
 
 namespace MasterCRM.Domain.Entities;
 
-public class Customer : BaseEntity<Guid>
+public class Client : BaseEntity<Guid>
 {
     public Guid MasterId { get; init; }
     public virtual Master Master { get; init; }

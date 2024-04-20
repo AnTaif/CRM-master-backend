@@ -9,9 +9,9 @@ public class CrmDbContext : DbContext
     
     public DbSet<Product> Products { get; set; } = null!;
 
-    public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<Deal> Deals { get; set; } = null!;
 
-    public DbSet<Customer> Customers { get; set; } = null!;
+    public DbSet<Client> Clients { get; set; } = null!;
 
     public CrmDbContext(DbContextOptions<CrmDbContext> options) : base(options)
     {

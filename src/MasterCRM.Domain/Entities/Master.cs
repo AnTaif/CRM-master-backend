@@ -4,8 +4,8 @@ namespace MasterCRM.Domain.Entities;
 
 public class Master : BaseEntity<Guid>
 {
-    public virtual List<Order> Orders { get; init; }
-    public virtual List<Customer> Customers { get; init; }
+    public virtual List<Deal> Orders { get; init; }
+    public virtual List<Client> Customers { get; init; }
     public virtual List<Product> Products { get; init; }
     
     public string FirstName { get; init; }

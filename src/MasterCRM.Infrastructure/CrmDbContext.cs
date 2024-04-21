@@ -1,9 +1,10 @@
 using MasterCRM.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Infrastructure;
 
-public class CrmDbContext : DbContext
+public class CrmDbContext : IdentityDbContext<Master>
 {
     public DbSet<Master> Masters { get; set; } = null!; // Identity model
     

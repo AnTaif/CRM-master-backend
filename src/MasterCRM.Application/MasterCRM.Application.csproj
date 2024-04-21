@@ -7,7 +7,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Interfaces\" />
       <Folder Include="Services\Website\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MasterCRM.Domain\MasterCRM.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Identity">
+        <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.1\Microsoft.AspNetCore.Identity.dll</HintPath>
+      </Reference>
     </ItemGroup>
 </Project>

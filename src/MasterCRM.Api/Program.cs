@@ -1,13 +1,36 @@
-using MasterCRM.Infrastructure;
+using MasterCRM.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("OpenPolicy", policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+    options.AddPolicy("FrontendPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
+builder.Services.AddAuthentication().AddBearerToken();
+builder.Services.AddAuthorization();
+
+builder.Services.AddAuth();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
 builder.Services.AddInfrastructureLayer(connectionString);
+
+builder.Services.AddApplicationLayer();
+
 
 var app = builder.Build();
 
@@ -19,8 +42,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/just", () => "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+app.UseAuthentication();
+app.UseAuthorization();
 
-//app.MapControllers();
+app.MapControllers();
 
 app.Run();

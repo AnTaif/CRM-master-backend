@@ -1,15 +1,18 @@
 using MasterCRM.Domain.Common;
 using MasterCRM.Domain.Enums;
+using MasterCRM.Domain.Interfaces;
 
 namespace MasterCRM.Domain.Entities;
 
-public class Deal : BaseEntity<Guid>
+public class Deal : IEntity<Guid>
 {
+    public new Guid Id { get; init; }
+    
     public required Guid MasterId { get; init; }
-    public virtual Master Master { get; init; }
+    //public virtual Master Master { get; init; }
     
-    public virtual List<DealProduct> DealProducts { get; init; }
-    
+    public virtual List<DealProduct> DealProducts { get; init; } = null!;
+
     public required Guid CustomerId { get; init; }
     
     public required int TotalAmount { get; init; }

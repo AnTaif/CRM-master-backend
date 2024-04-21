@@ -1,9 +1,12 @@
 using MasterCRM.Domain.Common;
+using MasterCRM.Domain.Interfaces;
 
 namespace MasterCRM.Domain.Entities;
 
-public class DealProduct : BaseEntity<Guid>
+public class DealProduct : IEntity<Guid>
 {
+    public new Guid Id { get; init; }
+    
     public Guid ProductId { get; init; }
     public virtual Product Product { get; init; }
     

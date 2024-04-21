@@ -2,7 +2,7 @@ namespace MasterCRM.Application.Services.User.Responses;
 
 public record LoginResponse
 {
-    public required Guid Id { get; init; }
+    public required string Id { get; init; }
     
     public required string FullName { get; init; }
     

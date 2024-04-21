@@ -2,7 +2,7 @@ namespace MasterCRM.Application.Services.User.Responses;
 
 public record RegisterUserResponse
 {
-    public required Guid Id { get; init; }
+    public required string Id { get; init; }
     
     public required string FullName { get; init; }
     

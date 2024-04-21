@@ -1,8 +1,8 @@
-using MasterCRM.Application.Services.Deal.Dto;
+using MasterCRM.Application.Services.Order.Dto;
 
-namespace MasterCRM.Application.Services.Deal.Requests;
+namespace MasterCRM.Application.Services.Order.Requests;
 
-public record ChangeDealRequest
+public record ChangeOrderRequest
 {
     public required Guid Id { get; init; }
     
@@ -15,8 +15,8 @@ public record ChangeDealRequest
     public required string? Comment { get; init; }
     
     // Client info
-    public required ChangeDealClientDto? Client { get; init; }
+    public required ChangeOrderClientDto? Client { get; init; }
     
     // Products info
-    public required IEnumerable<CreateDealProductDto>? DealProducts { get; init; }
+    public required IEnumerable<CreateOrderProductDto>? OrderProducts { get; init; }
 }

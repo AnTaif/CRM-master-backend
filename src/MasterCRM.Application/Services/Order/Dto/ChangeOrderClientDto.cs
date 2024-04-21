@@ -1,6 +1,6 @@
-namespace MasterCRM.Application.Services.Deal.Dto;
+namespace MasterCRM.Application.Services.Order.Dto;
 
-public record ChangeDealClientDto
+public record ChangeOrderClientDto
 {
     public required string? FullName { get; init; }
     

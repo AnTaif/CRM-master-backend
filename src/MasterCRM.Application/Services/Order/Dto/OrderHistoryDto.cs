@@ -1,6 +1,6 @@
-namespace MasterCRM.Application.Services.Deal.Dto;
+namespace MasterCRM.Application.Services.Order.Dto;
 
-public record DealHistoryDto
+public record OrderHistoryDto
 {
     public required Guid Id { get; init; }
     

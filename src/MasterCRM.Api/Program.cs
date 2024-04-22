@@ -36,6 +36,7 @@ builder.Services.AddInfrastructureLayer(connectionString);
 
 builder.Services.AddApplicationLayer();
 
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Development.Docker"))

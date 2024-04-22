@@ -16,6 +16,6 @@ public class CrmDbContext : IdentityDbContext<Master>
 
     public CrmDbContext(DbContextOptions<CrmDbContext> options) : base(options)
     {
-        //Database.EnsureCreated();
+        Database.EnsureCreated();
     }
 }

@@ -26,15 +26,19 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddAuth();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
+var hostName = "localhost";
+if (builder.Environment.EnvironmentName == "Development.Docker")
+{
+    hostName = "mastercrm.db";
+}
+var connectionString = $"Host={hostName};" + builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddInfrastructureLayer(connectionString);
 
 builder.Services.AddApplicationLayer();
 
-
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Development.Docker"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();

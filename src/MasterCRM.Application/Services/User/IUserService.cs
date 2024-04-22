@@ -6,15 +6,15 @@ namespace MasterCRM.Application.Interfaces;
 
 public interface IUserService
 {
-    public Task<GetUserInfoResponse> GetInfoAsync(Guid id);
+    public Task<GetUserInfoResponse?> GetInfoAsync(string id);
 
-    public Task<bool> ChangeInfoAsync(Guid id, ChangeUserInfoRequest request);
+    public Task<bool> TryChangeInfoAsync(string id, ChangeUserInfoRequest request);
     
     public Task<SignInResult> RegisterAsync(RegisterUserRequest request);
     
     public Task<SignInResult> LoginAsync(LoginRequest request);
+        
+    //public Task<bool> TryChangeEmailAsync(Guid id, ChangeEmailRequest request);
     
-    public Task<bool> TryChangeEmailAsync(Guid id, ChangeEmailRequest request);
-    
-    public Task<bool> TryChangePasswordAsync(Guid id, ChangePasswordRequest request);
+    public Task<bool> TryChangePasswordAsync(string id, ChangePasswordRequest request);
 }

@@ -4,11 +4,11 @@ namespace MasterCRM.Domain.Entities;
 
 public class Master : IdentityUser
 {
-    public string FirstName { get; init; } = null!;
+    public string FirstName { get;  set; } = null!;
 
-    public string LastName { get; init; } = null!;
+    public string LastName { get;  set; } = null!;
 
-    public string? MiddleName { get; init; }
+    public string? MiddleName { get;  set; }
     
     public Guid WebsiteId { get; init; }
     //public virtual Website { get; init; }
@@ -23,14 +23,14 @@ public class Master : IdentityUser
     //
     // public virtual List<FeedBack> FeedBacks { get; init; } = null!;
     
-    public string? VkLink { get; init; }
+    public string? VkLink { get;  set; }
     
-    public string? TelegramLink { get; init; }
+    public string? TelegramLink { get;  set; }
 
     public string GetFullName()
     {
         var fullName = $"{LastName} {FirstName}";
-        if (string.IsNullOrEmpty(MiddleName))
+        if (!string.IsNullOrEmpty(MiddleName))
             fullName += $" {MiddleName}";
     
         return fullName;

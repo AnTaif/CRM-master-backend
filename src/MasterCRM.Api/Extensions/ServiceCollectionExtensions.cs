@@ -11,8 +11,11 @@ namespace MasterCRM.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddAuth(this IServiceCollection services)
+    public static IServiceCollection AddCustomAuth(this IServiceCollection services)
     {
+        services.AddAuthentication().AddBearerToken();
+        services.AddAuthorization();
+        
         services.AddIdentity<Master, IdentityRole>(options =>
         {
             options.Password.RequiredLength = 8;
@@ -25,14 +28,34 @@ public static class ServiceCollectionExtensions
         })
         .AddEntityFrameworkStores<CrmDbContext>()
         .AddDefaultTokenProviders();
+
+        return services;
     }
 
-    public static void AddApplicationLayer(this IServiceCollection services)
+    public static IServiceCollection AddCustomCors(this IServiceCollection services, string[]? origins)
+    {
+        services.AddCors(options =>
+        {
+            options.AddPolicy("FrontendPolicy", policy =>
+            {
+                if (origins != null)
+                    policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod();
+                else
+                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+            });
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
     {
         services.AddTransient<IUserService, UserService>();
+
+        return services;
     }
     
-    public static void AddInfrastructureLayer(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services, string connectionString)
     {
         services.AddDbContext<CrmDbContext>(options =>
         {
@@ -42,5 +65,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRepository<Client, Guid>, ClientRepository>();
         services.AddTransient<IRepository<Order, Guid>, OrderRepository>();
         services.AddTransient<IRepository<Product, Guid>, ProductRepository>();
+
+        return services;
     }
 }

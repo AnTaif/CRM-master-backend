@@ -7,39 +7,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("OpenPolicy", policy =>
-    {
-        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-    });
-    options.AddPolicy("FrontendPolicy", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+var corsOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]?>();
+builder.Services.AddCustomCors(corsOrigins);
 
-builder.Services.AddAuthentication().AddBearerToken();
-builder.Services.AddAuthorization();
+builder.Services.AddCustomAuth();
 
-builder.Services.AddAuth();
-
-var hostName = "localhost";
-if (builder.Environment.EnvironmentName == "Development.Docker")
-{
-    hostName = "mastercrm.db";
-}
+// Changing database host depending on the running environment (Docker or Locally)
+var hostName = Environment.GetEnvironmentVariable("DB_CONTAINER") ?? "localhost";
 var connectionString = $"Host={hostName};" + builder.Configuration.GetConnectionString("DefaultConnection")!;
+
 builder.Services.AddInfrastructureLayer(connectionString);
-
 builder.Services.AddApplicationLayer();
-
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Development.Docker"))
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

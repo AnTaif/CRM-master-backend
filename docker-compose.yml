@@ -11,8 +11,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      ASPNETCORE_ENVIRONMENT: Development,
-      DOTNET_ENVIRONMENT: "Development.Docker"
+      ASPNETCORE_ENVIRONMENT: Development
+      DB_CONTAINER: "mastercrm.db"
   mastercrm.db:
     container_name: mastercrm.db
     image: postgres:latest

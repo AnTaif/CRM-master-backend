@@ -1,5 +1,4 @@
 using System.Text.Json.Nodes;
-using MasterCRM.Application.Interfaces;
 using MasterCRM.Application.Services.User.Requests;
 using MasterCRM.Application.Services.User.Responses;
 using MasterCRM.Domain.Entities;
@@ -113,6 +112,11 @@ public class UserService(
         return result.Succeeded;
     }
 
+    /// <summary>
+    /// Checks silent token and login if user with vkId was found in database,
+    /// otherwise - getting user's profile and register a new user with the received info 
+    /// </summary>
+    /// <param name="queryPayload">Query payload from VK Id response</param>
     public async Task<VkLoginResponse?> VkLoginAsync(string queryPayload)
     {
         var payload = JsonNode.Parse(queryPayload);
@@ -139,35 +143,33 @@ public class UserService(
 
         if (user == null)
         {
-            // Пользователь не найден - необходима регистрация
+            // User not found - registration is required
             var accessToken = exchangeTokenResponse.AccessToken;
             var userInfo = await vkontakteService.GetProfileInfoAsync(accessToken);
 
             if (userInfo == null)
                 throw new Exception();
-    
-            return new VkLoginResponse(true, $"{userInfo.FirstName} {userInfo.LastName}", email, phone, vkId);
             
             var newUser = new Master
             {
                 UserName = exchangeTokenResponse.Email,
                 Email = exchangeTokenResponse.Email,
-                PhoneNumber = exchangeTokenResponse.Phone ?? "123",
+                PhoneNumber = exchangeTokenResponse.Phone ?? "",
                 FirstName = userInfo.FirstName,
                 LastName = userInfo.LastName,
                 VkId = vkId,
             };
-
+            
             var newUserResult = await userManager.CreateAsync(newUser);
             if (!newUserResult.Succeeded)
                 throw new Exception();
             
             await signInManager.SignInAsync(newUser, true, "vk");
+    
+            return new VkLoginResponse(false, $"{userInfo.FirstName} {userInfo.LastName}", email, phone, vkId);
         }
         
         await signInManager.SignInAsync(user, true, "vk");
-        return new VkLoginResponse(false, null, null, null, null);
+        return new VkLoginResponse(true, null, null, null, null);
     }
 }
-
-public record VkLoginResponse(bool HaveAccount, string? FullName, string? Email, string? Phone, int? VkId);

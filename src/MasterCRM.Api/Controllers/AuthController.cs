@@ -1,6 +1,6 @@
-using MasterCRM.Application.Interfaces;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Application.Services.User.Requests;
+using MasterCRM.Application.Services.User.Responses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using LoginRequest = MasterCRM.Application.Services.User.Requests.LoginRequest;

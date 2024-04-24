@@ -1,4 +1,3 @@
-using MasterCRM.Application.Interfaces;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;

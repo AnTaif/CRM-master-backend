@@ -1,9 +1,8 @@
-using MasterCRM.Application.Services.User;
 using MasterCRM.Application.Services.User.Requests;
 using MasterCRM.Application.Services.User.Responses;
 using Microsoft.AspNetCore.Identity;
 
-namespace MasterCRM.Application.Interfaces;
+namespace MasterCRM.Application.Services.User;
 
 public interface IUserService
 {

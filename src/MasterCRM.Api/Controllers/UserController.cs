@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using MasterCRM.Application.Interfaces;
+using MasterCRM.Application.Services.User;
 using MasterCRM.Application.Services.User.Requests;
 using MasterCRM.Application.Services.User.Responses;
 using Microsoft.AspNetCore.Authorization;

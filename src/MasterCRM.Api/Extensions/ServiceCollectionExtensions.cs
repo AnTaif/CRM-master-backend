@@ -39,9 +39,9 @@ public static class ServiceCollectionExtensions
             options.AddPolicy("FrontendPolicy", policy =>
             {
                 if (origins != null)
-                    policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod();
+                    policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
                 else
-                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials();
             });
         });
 
@@ -55,8 +55,18 @@ public static class ServiceCollectionExtensions
         return services;
     }
     
-    public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddInfrastructureLayer(
+        this IServiceCollection services, ConfigurationManager configuration)
     {
+        // Changing database host depending on the running environment (Docker or Locally)
+        var dbHost = Environment.GetEnvironmentVariable("DB_CONTAINER") ?? "localhost";
+        const int dbPort = 5432;
+        var dbName = Environment.GetEnvironmentVariable("DATABASE_NAME")!;
+        var dbUser = Environment.GetEnvironmentVariable("DATABASE_USER")!;
+        var dbPassword = Environment.GetEnvironmentVariable("DATABASE_PASSWORD")!;
+            
+        var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
+        
         services.AddDbContext<CrmDbContext>(options =>
         {
             options.UseNpgsql(connectionString);

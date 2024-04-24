@@ -1,6 +1,9 @@
+using DotNetEnv;
 using MasterCRM.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load("../../.env");
 
 builder.Services.AddControllers();
 
@@ -12,11 +15,7 @@ builder.Services.AddCustomCors(corsOrigins);
 
 builder.Services.AddCustomAuth();
 
-// Changing database host depending on the running environment (Docker or Locally)
-var hostName = Environment.GetEnvironmentVariable("DB_CONTAINER") ?? "localhost";
-var connectionString = $"Host={hostName};" + builder.Configuration.GetConnectionString("DefaultConnection")!;
-
-builder.Services.AddInfrastructureLayer(connectionString);
+builder.Services.AddInfrastructureLayer(builder.Configuration);
 builder.Services.AddApplicationLayer();
 
 var app = builder.Build();

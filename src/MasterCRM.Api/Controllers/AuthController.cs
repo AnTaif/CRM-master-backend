@@ -1,4 +1,5 @@
 using MasterCRM.Application.Interfaces;
+using MasterCRM.Application.Services.User;
 using MasterCRM.Application.Services.User.Requests;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,9 +16,9 @@ public class AuthController(IUserService userService) : ControllerBase
     [ProducesResponseType(typeof(IdentityResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> Register(RegisterUserRequest request)
     {
-        var res = await userService.RegisterAsync(request);
+        var result = await userService.RegisterAsync(request);
 
-        if (!res.Succeeded)
+        if (!result.Succeeded)
             return BadRequest();
 
         return NoContent();
@@ -27,11 +28,24 @@ public class AuthController(IUserService userService) : ControllerBase
     [ProducesResponseType(typeof(SignInResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> Login(LoginRequest request)
     {
-        var res = await userService.LoginAsync(request);
+        var result = await userService.LoginAsync(request);
 
-        if (!res.Succeeded)
+        if (!result.Succeeded)
             return BadRequest();
 
         return NoContent();
+    }
+
+    [HttpGet("externalLogin")]
+    public async Task<ActionResult<VkLoginResponse>> ExternalLogin()
+    {
+        var payloadEncoded = HttpContext.Request.Query["payload"].ToString();
+
+        if (string.IsNullOrEmpty(payloadEncoded))
+            return BadRequest("Payload parameter not found or empty.");
+
+        var response = await userService.VkLoginAsync(payloadEncoded);
+
+        return Ok(response);
     }
 }

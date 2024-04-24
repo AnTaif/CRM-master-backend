@@ -26,6 +26,8 @@ public class Master : IdentityUser
     public string? VkLink { get;  set; }
     
     public string? TelegramLink { get;  set; }
+    
+    public int? VkId { get; set; }
 
     public string GetFullName()
     {

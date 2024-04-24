@@ -1,3 +1,4 @@
+using MasterCRM.Application.Services.User;
 using MasterCRM.Application.Services.User.Requests;
 using MasterCRM.Application.Services.User.Responses;
 using Microsoft.AspNetCore.Identity;
@@ -17,4 +18,6 @@ public interface IUserService
     //public Task<bool> TryChangeEmailAsync(Guid id, ChangeEmailRequest request);
     
     public Task<bool> TryChangePasswordAsync(string id, ChangePasswordRequest request);
+
+    public Task<VkLoginResponse?> VkLoginAsync(string queryPayload);
 }

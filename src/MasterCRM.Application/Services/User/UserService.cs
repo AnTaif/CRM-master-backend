@@ -1,12 +1,18 @@
+using System.Text.Json.Nodes;
 using MasterCRM.Application.Interfaces;
 using MasterCRM.Application.Services.User.Requests;
 using MasterCRM.Application.Services.User.Responses;
 using MasterCRM.Domain.Entities;
+using MasterCRM.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Application.Services.User;
 
-public class UserService(UserManager<Master> userManager, SignInManager<Master> signInManager) : IUserService
+public class UserService(
+    UserManager<Master> userManager, 
+    SignInManager<Master> signInManager, 
+    IVkontakteService vkontakteService) : IUserService
 {
     public async Task<GetUserInfoResponse?> GetInfoAsync(string id)
     {
@@ -106,4 +112,62 @@ public class UserService(UserManager<Master> userManager, SignInManager<Master> 
 
         return result.Succeeded;
     }
+
+    public async Task<VkLoginResponse?> VkLoginAsync(string queryPayload)
+    {
+        var payload = JsonNode.Parse(queryPayload);
+
+        if (payload == null)
+            throw new Exception();
+        
+        var silentToken = payload["token"]?.ToString();
+        var uuid = payload["uuid"]?.ToString();
+
+        if (silentToken == null || uuid == null)
+            throw new Exception();
+
+        var exchangeTokenResponse = await vkontakteService.ExchangeSilentTokenAsync(silentToken, uuid);
+
+        if (exchangeTokenResponse == null)
+            throw new Exception();
+        
+        var vkId = exchangeTokenResponse.UserId;
+        var email = exchangeTokenResponse.Email;
+        var phone = exchangeTokenResponse.Phone;
+
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.VkId == vkId);
+
+        if (user == null)
+        {
+            // Пользователь не найден - необходима регистрация
+            var accessToken = exchangeTokenResponse.AccessToken;
+            var userInfo = await vkontakteService.GetProfileInfoAsync(accessToken);
+
+            if (userInfo == null)
+                throw new Exception();
+    
+            return new VkLoginResponse(true, $"{userInfo.FirstName} {userInfo.LastName}", email, phone, vkId);
+            
+            var newUser = new Master
+            {
+                UserName = exchangeTokenResponse.Email,
+                Email = exchangeTokenResponse.Email,
+                PhoneNumber = exchangeTokenResponse.Phone ?? "123",
+                FirstName = userInfo.FirstName,
+                LastName = userInfo.LastName,
+                VkId = vkId,
+            };
+
+            var newUserResult = await userManager.CreateAsync(newUser);
+            if (!newUserResult.Succeeded)
+                throw new Exception();
+            
+            await signInManager.SignInAsync(newUser, true, "vk");
+        }
+        
+        await signInManager.SignInAsync(user, true, "vk");
+        return new VkLoginResponse(false, null, null, null, null);
+    }
 }
+
+public record VkLoginResponse(bool HaveAccount, string? FullName, string? Email, string? Phone, int? VkId);

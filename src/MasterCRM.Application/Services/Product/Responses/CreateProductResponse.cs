@@ -14,7 +14,5 @@ public record CreateProductResponse
         
     public required string Dimensions { get; init; }
     
-    public required int StockQuantity { get; init; }
-    
     public required string ImageSrc { get; init; }
 }

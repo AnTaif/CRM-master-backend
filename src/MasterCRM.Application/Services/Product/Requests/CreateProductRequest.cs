@@ -11,6 +11,4 @@ public record CreateProductRequest
     public required string Material { get; init; }
         
     public required string Dimensions { get; init; }
-    
-    public required int StockQuantity { get; init; }
 }

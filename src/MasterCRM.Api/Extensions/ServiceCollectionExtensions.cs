@@ -1,4 +1,5 @@
 using MasterCRM.Application.Interfaces;
+using MasterCRM.Application.Services.Product;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;
@@ -51,6 +52,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
     {
         services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IProductService, ProductService>();
 
         return services;
     }
@@ -74,7 +76,7 @@ public static class ServiceCollectionExtensions
         
         services.AddTransient<IRepository<Client, Guid>, ClientRepository>();
         services.AddTransient<IRepository<Order, Guid>, OrderRepository>();
-        services.AddTransient<IRepository<Product, Guid>, ProductRepository>();
+        services.AddTransient<IProductRepository, ProductRepository>();
 
         return services;
     }

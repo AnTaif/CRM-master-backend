@@ -13,6 +13,7 @@ namespace MasterCRM.Api.Controllers;
 public class ProductController(IProductService productService) : ControllerBase
 {
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -23,17 +24,13 @@ public class ProductController(IProductService productService) : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<ActionResult<ProductDto>> Get([FromRoute] Guid id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
         var response = await productService.GetProductByIdAsync(id);
 
         if (response == null)
             return NotFound();
-
-        if (userId != response.UserId)
-            return Forbid();
 
         return Ok(response);
     }

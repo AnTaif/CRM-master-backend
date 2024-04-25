@@ -1,22 +1,21 @@
 using System.Security.Claims;
 using MasterCRM.Application.Services.Product;
+using MasterCRM.Application.Services.Product.Dto;
 using MasterCRM.Application.Services.Product.Requests;
-using MasterCRM.Application.Services.Product.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MasterCRM.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("products")]
 public class ProductController(IProductService productService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetProductResponse>>> GetProducts()
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        if (userId == null)
-            return Forbid();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         
         var response = await productService.GetAllProductsAsync(userId);
 
@@ -24,12 +23,9 @@ public class ProductController(IProductService productService) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<GetProductResponse>> Get([FromRoute] Guid id)
+    public async Task<ActionResult<ProductDto>> Get([FromRoute] Guid id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (userId == null)
-            return Forbid();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var response = await productService.GetProductByIdAsync(id);
 
@@ -43,14 +39,18 @@ public class ProductController(IProductService productService) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateProductRequest request)
+    public async Task<ActionResult<ProductDto>> Create([FromForm]CreateProductRequest request, IEnumerable<IFormFile> formFiles)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        if (userId == null)
-            return Forbid();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        var response = await productService.CreateAsync(userId, request);
+        var fileRequests = formFiles.Select(formFile =>
+        {
+            var fileExtension = Path.GetExtension(formFile.FileName);
+            var fileStream = formFile.OpenReadStream();
+            return new UploadPhotoRequest(fileStream, fileExtension);
+        });
+        
+        var response = await productService.CreateAsync(userId, request, fileRequests);
 
         return Ok(response);
     }
@@ -58,10 +58,7 @@ public class ProductController(IProductService productService) : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Change(Guid id, ChangeProductRequest request)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        if (userId == null)
-            return Forbid();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         
         var product = await productService.GetProductByIdAsync(id);
 
@@ -82,10 +79,7 @@ public class ProductController(IProductService productService) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        if (userId == null)
-            return Forbid();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         
         var product = await productService.GetProductByIdAsync(id);
 

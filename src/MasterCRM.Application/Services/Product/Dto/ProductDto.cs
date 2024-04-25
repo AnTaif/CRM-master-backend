@@ -1,8 +1,10 @@
-namespace MasterCRM.Application.Services.Product.Responses;
+namespace MasterCRM.Application.Services.Product.Dto;
 
-public record CreateProductResponse
+public record ProductDto
 {
     public required Guid Id { get; init; }
+    
+    public required string UserId { get; init; }
     
     public required string Name { get; init; }
     
@@ -14,5 +16,5 @@ public record CreateProductResponse
         
     public required string Dimensions { get; init; }
     
-    public required string ImageSrc { get; init; }
+    public required List<ProductPhotoDto> Photos { get; init; }
 }

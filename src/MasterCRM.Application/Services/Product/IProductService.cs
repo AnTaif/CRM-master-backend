@@ -1,17 +1,22 @@
+using MasterCRM.Application.Services.Product.Dto;
 using MasterCRM.Application.Services.Product.Requests;
-using MasterCRM.Application.Services.Product.Responses;
 
 namespace MasterCRM.Application.Services.Product;
 
 public interface IProductService
 {
-    public Task<IEnumerable<GetProductResponse>> GetAllProductsAsync(string userId);
+    public Task<IEnumerable<ProductDto>> GetAllProductsAsync(string userId);
     
-    public Task<GetProductResponse?> GetProductByIdAsync(Guid productId);
+    public Task<ProductDto?> GetProductByIdAsync(Guid productId);
 
-    public Task<CreateProductResponse> CreateAsync(string userId, CreateProductRequest request);
+    public Task<List<ProductPhotoDto>?> AddPhotosToProductAsync(Guid productId, IEnumerable<UploadPhotoRequest> request);
 
-    public Task<ChangeProductResponse?> ChangeAsync(Guid productId, ChangeProductRequest request);
+    public Task<ProductDto> CreateAsync(
+        string userId, CreateProductRequest request, IEnumerable<UploadPhotoRequest> photoRequests);
+
+    public Task<ProductDto?> ChangeAsync(Guid productId, ChangeProductRequest request);
 
     public Task<bool> TryDeleteAsync(Guid productId);
+
+    public Task<bool> TryDeletePhotoAsync(Guid productId, Guid photoId);
 }

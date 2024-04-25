@@ -1,3 +1,5 @@
+using MasterCRM.Domain.Entities;
+
 namespace MasterCRM.Application.Services.Product;
 
 public interface IProductRepository

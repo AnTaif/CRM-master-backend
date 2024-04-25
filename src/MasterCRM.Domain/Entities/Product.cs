@@ -19,6 +19,6 @@ public class Product : BaseEntity<Guid>
     public double Price { get; set; }
     
     public DateTime CreationDate { get; set; }
-    
-    public string ImageSrc { get; set; }
+
+    public virtual List<ProductPhoto> Photos { get; set; } = null!;
 }

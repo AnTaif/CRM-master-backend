@@ -58,7 +58,7 @@ public static class ServiceCollectionExtensions
     }
     
     public static IServiceCollection AddInfrastructureLayer(
-        this IServiceCollection services, ConfigurationManager configuration)
+        this IServiceCollection services, ConfigurationManager configuration, string uploadsPath)
     {
         // Changing database host depending on the running environment (Docker or Locally)
         var dbHost = Environment.GetEnvironmentVariable("DB_CONTAINER") ?? "localhost";
@@ -77,6 +77,10 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRepository<Client, Guid>, ClientRepository>();
         services.AddTransient<IRepository<Order, Guid>, OrderRepository>();
         services.AddTransient<IProductRepository, ProductRepository>();
+        
+        // TODO: refactor hardcoded url
+        services.AddTransient<IFileStorage, RootFileStorage>(_ => 
+            new RootFileStorage(uploadsPath, "http://localhost:8080/uploads/"));
 
         return services;
     }

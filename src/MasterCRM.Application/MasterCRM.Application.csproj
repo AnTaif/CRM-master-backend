@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Folder Include="Services\Product\Responses\" />
       <Folder Include="Services\Website\" />
     </ItemGroup>
 

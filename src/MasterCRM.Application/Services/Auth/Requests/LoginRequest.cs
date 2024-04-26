@@ -1,4 +1,4 @@
-namespace MasterCRM.Application.Services.User.Requests;
+namespace MasterCRM.Application.Services.Auth.Requests;
 
 public record LoginRequest
 {

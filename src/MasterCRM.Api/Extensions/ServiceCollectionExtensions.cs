@@ -1,3 +1,4 @@
+using MasterCRM.Application.Services.Auth;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;
@@ -51,6 +52,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
     {
         services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IAuthService, AuthService>();
 
         return services;
     }

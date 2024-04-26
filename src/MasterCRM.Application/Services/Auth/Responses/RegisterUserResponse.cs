@@ -1,6 +1,6 @@
-namespace MasterCRM.Application.Services.User.Responses;
+namespace MasterCRM.Application.Services.Auth.Responses;
 
-public record LoginResponse
+public record RegisterUserResponse
 {
     public required string Id { get; init; }
     

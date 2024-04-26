@@ -7,7 +7,7 @@ namespace MasterCRM.Api.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("products/{productId}/{photos}")]
+[Route("products/{productId}/photos")]
 public class ProductPhotoController(IProductService productService) : ControllerBase
 {
     [HttpPost]

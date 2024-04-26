@@ -16,7 +16,6 @@ public class ProductController(IProductService productService) : ControllerBase
     /// Returns all products of the current authorized user
     /// </summary>
     [HttpGet]
-    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;

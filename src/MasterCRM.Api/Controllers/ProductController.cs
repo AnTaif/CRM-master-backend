@@ -12,6 +12,8 @@ namespace MasterCRM.Api.Controllers;
 [Route("products")]
 public class ProductController(IProductService productService) : ControllerBase
 {
+    private readonly string[] allowedExtensions = {".jpg", ".jpeg", ".png"};
+    
     /// <summary>
     /// Returns all products of the current authorized user
     /// </summary>
@@ -69,7 +71,12 @@ public class ProductController(IProductService productService) : ControllerBase
             var fileExtension = Path.GetExtension(formFile.FileName);
             var fileStream = formFile.OpenReadStream();
             return new UploadPhotoRequest(fileStream, fileExtension);
-        });
+        }).ToList();
+        
+        var usedAllowedExtensions = fileRequests.All(file => allowedExtensions.Contains(file.Extension));
+
+        if (!usedAllowedExtensions)
+            return BadRequest("Invalid file extension. Allowed extensions: .jpg, .jpeg, .png");
         
         var productDto = await productService.CreateAsync(userId, request, fileRequests);
 

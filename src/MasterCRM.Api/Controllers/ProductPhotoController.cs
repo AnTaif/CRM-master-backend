@@ -10,6 +10,8 @@ namespace MasterCRM.Api.Controllers;
 [Route("products/{productId}/photos")]
 public class ProductPhotoController(IProductService productService) : ControllerBase
 {
+    private readonly string[] allowedExtensions = {".jpg", ".jpeg", ".png"};
+    
     [HttpPost]
     public async Task<IActionResult> AddPhotosToProduct([FromRoute] Guid productId, IEnumerable<IFormFile> formFiles)
     {
@@ -26,9 +28,15 @@ public class ProductPhotoController(IProductService productService) : Controller
         var fileRequests = formFiles.Select(formFile =>
         {
             var fileExtension = Path.GetExtension(formFile.FileName);
+            
             var fileStream = formFile.OpenReadStream();
             return new UploadPhotoRequest(fileStream, fileExtension);
-        });
+        }).ToList();
+
+        var usedAllowedExtensions = fileRequests.All(file => allowedExtensions.Contains(file.Extension));
+
+        if (!usedAllowedExtensions)
+            return BadRequest("Invalid file extension. Allowed extensions: .jpg, .jpeg, .png");
         
         var productPhotoDtos = await productService.AddPhotosToProductAsync(productId, fileRequests);
 

@@ -20,7 +20,7 @@ public class ProductController(IProductService productService) : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         
-        var response = await productService.GetAllProductsAsync(userId);
+        var response = await productService.GetUserProductsAsync(userId);
 
         return Ok(response);
     }
@@ -30,25 +30,35 @@ public class ProductController(IProductService productService) : ControllerBase
     /// </summary>
     [HttpGet("user/{userId}")]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByUser(string userId)
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByUser([FromRoute] string userId)
     {
-        var response = await productService.GetAllProductsAsync(userId);
+        var response = await productService.GetUserProductsAsync(userId);
         
         return Ok(response);
     }
 
+    /// <summary>
+    /// Get product by id
+    /// </summary>
+    /// <returns>Product dto model</returns>
     [HttpGet("{id}")]
     [AllowAnonymous]
     public async Task<ActionResult<ProductDto>> Get([FromRoute] Guid id)
     {
-        var response = await productService.GetProductByIdAsync(id);
+        var productDto = await productService.GetProductByIdAsync(id);
 
-        if (response == null)
+        if (productDto == null)
             return NotFound();
 
-        return Ok(response);
+        return Ok(productDto);
     }
 
+    /// <summary>
+    /// Create a new product
+    /// </summary>
+    /// <param name="request">Create product request</param>
+    /// <param name="formFiles">Product photos</param>
+    /// <returns>Product dto model</returns>
     [HttpPost]
     public async Task<ActionResult<ProductDto>> Create([FromForm]CreateProductRequest request, IEnumerable<IFormFile> formFiles)
     {
@@ -61,13 +71,17 @@ public class ProductController(IProductService productService) : ControllerBase
             return new UploadPhotoRequest(fileStream, fileExtension);
         });
         
-        var response = await productService.CreateAsync(userId, request, fileRequests);
+        var productDto = await productService.CreateAsync(userId, request, fileRequests);
 
-        return Ok(response);
+        return Ok(productDto);
     }
 
+    /// <summary>
+    /// Change product by id
+    /// </summary>
+    /// <returns>Product dto model</returns>
     [HttpPut("{id}")]
-    public async Task<IActionResult> Change(Guid id, ChangeProductRequest request)
+    public async Task<ActionResult<ProductDto>> Change([FromRoute] Guid id, ChangeProductRequest request)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         
@@ -79,16 +93,19 @@ public class ProductController(IProductService productService) : ControllerBase
         if (userId != product.UserId)
             return Forbid();
 
-        var response = await productService.ChangeAsync(id, request);
+        var productDto = await productService.ChangeAsync(id, request);
 
-        if (response == null)
+        if (productDto == null)
             return BadRequest();
 
-        return Ok(response);
+        return Ok(productDto);
     }
 
+    /// <summary>
+    /// Delete product by id
+    /// </summary>
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         

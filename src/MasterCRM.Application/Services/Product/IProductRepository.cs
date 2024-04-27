@@ -1,11 +1,7 @@
-using MasterCRM.Domain.Entities;
-
 namespace MasterCRM.Application.Services.Product;
 
 public interface IProductRepository
 {
-    Task<IEnumerable<Domain.Entities.Product>> GetAllAsync();
-
     Task<IEnumerable<Domain.Entities.Product>> GetByUserIdAsync(string userId);
     
     Task<Domain.Entities.Product?> GetByIdAsync(Guid id);

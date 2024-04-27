@@ -11,7 +11,7 @@ namespace MasterCRM.Api.Controllers;
 public class ProductPhotoController(IProductService productService) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> AddPhotosToProduct(Guid productId, IEnumerable<IFormFile> formFiles)
+    public async Task<IActionResult> AddPhotosToProduct([FromRoute] Guid productId, IEnumerable<IFormFile> formFiles)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         
@@ -30,14 +30,16 @@ public class ProductPhotoController(IProductService productService) : Controller
             return new UploadPhotoRequest(fileStream, fileExtension);
         });
         
-        // Add photo to product
-        var response = await productService.AddPhotosToProductAsync(productId, fileRequests);
+        var productPhotoDtos = await productService.AddPhotosToProductAsync(productId, fileRequests);
 
-        return Ok(response);
+        if (productPhotoDtos == null)
+            return BadRequest();
+        
+        return Ok(productPhotoDtos);
     }
 
-    [HttpDelete("{photoId}")]
-    public async Task<IActionResult> DeletePhoto(Guid productId, Guid photoId)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletePhoto([FromRoute] Guid productId, [FromRoute] Guid id)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         
@@ -49,9 +51,9 @@ public class ProductPhotoController(IProductService productService) : Controller
         if (userId != product.UserId)
             return Forbid();
 
-        var response = await productService.TryDeletePhotoAsync(productId, photoId);
+        var success = await productService.TryDeletePhotoAsync(productId, id);
 
-        if (!response)
+        if (!success)
             return BadRequest();
 
         return Ok();

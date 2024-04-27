@@ -8,11 +8,11 @@ namespace MasterCRM.Application.Services.Product;
 
 public class ProductService(IProductRepository repository, IFileStorage fileStorage) : IProductService
 {
-    public async Task<IEnumerable<ProductDto>> GetAllProductsAsync(string userId)
+    public async Task<IEnumerable<ProductDto>> GetUserProductsAsync(string userId)
     {
         var products = await repository.GetByUserIdAsync(userId);
 
-        var response = products.Select(product => new ProductDto
+        var productDtos = products.Select(product => new ProductDto
         {
             Id = product.Id,
             UserId = product.MasterId,
@@ -23,7 +23,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
             Dimensions = product.Dimensions ?? "",
             Photos = product.Photos.Select(p => new ProductPhotoDto(p.Id, p.Url)).ToList()
         });
-        return response;
+        return productDtos;
     }
 
     public async Task<ProductDto?> GetProductByIdAsync(Guid productId)
@@ -33,7 +33,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         if (product == null)
             return null;
 
-        var response = new ProductDto
+        var productDto = new ProductDto
         {
             Id = product.Id,
             UserId = product.MasterId,
@@ -44,7 +44,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
             Dimensions = product.Dimensions ?? "",
             Photos = product.Photos.Select(p => new ProductPhotoDto(p.Id, p.Url)).ToList()
         };
-        return response;
+        return productDto;
     }
 
     public async Task<List<ProductPhotoDto>?> AddPhotosToProductAsync(Guid productId, IEnumerable<UploadPhotoRequest> request)
@@ -54,7 +54,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         if (product == null)
             return null;
 
-        var dtos = new List<ProductPhotoDto>();
+        var productPhotoDtos = new List<ProductPhotoDto>();
         foreach (var uploadRequest in request)
         {
             var fileId = Guid.NewGuid();
@@ -68,11 +68,11 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
                 Extension = uploadRequest.Extension
             };
             product.Photos.Add(photo);
-            dtos.Add(new ProductPhotoDto(fileId, url));
+            productPhotoDtos.Add(new ProductPhotoDto(fileId, url));
         }
 
         await repository.SaveChangesAsync();
-        return dtos;
+        return productPhotoDtos;
     }
 
     public async Task<ProductDto> CreateAsync(
@@ -108,7 +108,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         
         await repository.CreateAsync(newProduct);
 
-        var response = new ProductDto
+        var productDto = new ProductDto
         {
             Id = newProduct.Id,
             UserId = userId,
@@ -119,7 +119,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
             Dimensions = newProduct.Dimensions,
             Photos = newProduct.Photos.Select(p => new ProductPhotoDto(p.Id, p.Url)).ToList()
         };
-        return response;
+        return productDto;
     }
 
     public async Task<ProductDto?> ChangeAsync(
@@ -136,12 +136,11 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         if (request.Material != null)
             product.Material = Enum.Parse<Material>(request.Material);
         product.Dimensions = request.Dimensions ?? product.Dimensions;
-        //TODO: change image
 
         await repository.UpdateAsync(product);
         await repository.SaveChangesAsync();
 
-        var response = new ProductDto
+        var productDto = new ProductDto
         {
             Id = product.Id,
             UserId = product.MasterId,
@@ -153,7 +152,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
             Photos = product.Photos.Select(p => new ProductPhotoDto(p.Id, p.Url)).ToList()
         };
 
-        return response;
+        return productDto;
     }
 
     public async Task<bool> TryDeleteAsync(Guid productId)

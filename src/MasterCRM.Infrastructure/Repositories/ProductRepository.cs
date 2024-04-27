@@ -8,14 +8,11 @@ public class ProductRepository(CrmDbContext context) : IProductRepository
 {
     private DbSet<Product> dbSet => context.Products;
     
-    public async Task<IEnumerable<Product>> GetAllAsync() => 
-        await dbSet.Include(e => e.Photos).ToListAsync();
-    
     public async Task<IEnumerable<Product>> GetByUserIdAsync(string userId) => 
-        await dbSet.Include(e => e.Photos).Where(e => e.MasterId == userId).ToListAsync();
+        await dbSet.Include(p => p.Photos).Where(p => p.MasterId == userId).ToListAsync();
 
     public async Task<Product?> GetByIdAsync(Guid id) =>
-        await dbSet.Include(e => e.Photos).FirstOrDefaultAsync(e => e.Id == id);
+        await dbSet.Include(product => product.Photos).FirstOrDefaultAsync(e => e.Id == id);
 
     public async Task CreateAsync(Product entity)
     {

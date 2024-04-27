@@ -7,8 +7,19 @@ public class VkontakteService(string apiVersion, string serviceToken) : IVkontak
 {
     private const string vkApiMethodBase = "https://api.vk.com/method/"; 
     
-    public async Task<ExchangeTokenResponse?> ExchangeSilentTokenAsync(string silentToken, string uuid)
+    public async Task<ExchangeTokenResponse?> ExchangeSilentTokenAsync(string queryPayload)
     {
+        var payload = JsonNode.Parse(queryPayload);
+
+        if (payload == null)
+            throw new Exception();
+        
+        var silentToken = payload["token"]?.ToString();
+        var uuid = payload["uuid"]?.ToString();
+
+        if (silentToken == null || uuid == null)
+            throw new Exception();
+        
         using var client = new HttpClient();
 
         var queryParams = new[]

@@ -2,7 +2,7 @@ namespace MasterCRM.Domain.Interfaces;
 
 public interface IVkontakteService
 {
-    public Task<ExchangeTokenResponse?> ExchangeSilentTokenAsync(string silentToken, string uuid);
+    public Task<ExchangeTokenResponse?> ExchangeSilentTokenAsync(string queryPayload);
 
     public Task<VkProfileResponse?> GetProfileInfoAsync(string accessToken);
 }

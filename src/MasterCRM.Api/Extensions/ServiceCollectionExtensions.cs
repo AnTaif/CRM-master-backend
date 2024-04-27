@@ -1,4 +1,5 @@
 using MasterCRM.Application.Services.Auth;
+using MasterCRM.Application.Services.Auth.ExternalAuth;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;
@@ -53,6 +54,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IAuthService, AuthService>();
+        services.AddTransient<IVkAuthService, VkAuthService>();
 
         return services;
     }

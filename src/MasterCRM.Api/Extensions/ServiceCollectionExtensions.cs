@@ -1,8 +1,10 @@
-using MasterCRM.Application.Interfaces;
+using MasterCRM.Application.Services.Auth;
+using MasterCRM.Application.Services.Auth.ExternalAuth;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;
 using MasterCRM.Infrastructure;
+using MasterCRM.Infrastructure.ExternalServices;
 using MasterCRM.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +53,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
     {
         services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IAuthService, AuthService>();
+        services.AddTransient<IVkAuthService, VkAuthService>();
 
         return services;
     }
@@ -75,6 +79,12 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRepository<Client, Guid>, ClientRepository>();
         services.AddTransient<IRepository<Order, Guid>, OrderRepository>();
         services.AddTransient<IRepository<Product, Guid>, ProductRepository>();
+
+        var vkServiceToken = Environment.GetEnvironmentVariable("VK_SERVICE_TOKEN") ?? "";
+        var vkApiVersion = Environment.GetEnvironmentVariable("VK_API_VERSION") ?? "";
+        
+        services.AddTransient<IVkontakteService, VkontakteService>(_ => 
+            new VkontakteService(vkApiVersion, vkServiceToken));
 
         return services;
     }

@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using MasterCRM.Application.Interfaces;
+using MasterCRM.Application.Services.User;
 using MasterCRM.Application.Services.User.Requests;
 using MasterCRM.Application.Services.User.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -33,25 +33,25 @@ public class UserController(IUserService userService) : ControllerBase
         if (userId == null)
             return Forbid();
 
-        var successed = await userService.TryChangeInfoAsync(userId, request);
+        var success = await userService.TryChangeInfoAsync(userId, request);
 
-        if (!successed)
+        if (!success)
             return BadRequest();
 
         return NoContent();
     }
     
     [HttpPut("/password")]
-    public async Task<IActionResult> ChangeUserInfo(ChangePasswordRequest request)
+    public async Task<IActionResult> ChangeUserPassword(ChangePasswordRequest request)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         
         if (userId == null)
             return Forbid();
 
-        var successed = await userService.TryChangePasswordAsync(userId, request);
+        var success = await userService.TryChangePasswordAsync(userId, request);
 
-        if (!successed)
+        if (!success)
             return BadRequest();
 
         return NoContent();

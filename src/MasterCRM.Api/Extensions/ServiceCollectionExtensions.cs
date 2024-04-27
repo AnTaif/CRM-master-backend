@@ -1,5 +1,7 @@
 using MasterCRM.Application.Services.Auth;
 using MasterCRM.Application.Services.Auth.ExternalAuth;
+using MasterCRM.Application.Interfaces;
+using MasterCRM.Application.Services.Product;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;
@@ -55,12 +57,13 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IAuthService, AuthService>();
         services.AddTransient<IVkAuthService, VkAuthService>();
+        services.AddTransient<IProductService, ProductService>();
 
         return services;
     }
     
     public static IServiceCollection AddInfrastructureLayer(
-        this IServiceCollection services, ConfigurationManager configuration)
+        this IServiceCollection services, ConfigurationManager configuration, string uploadsPath)
     {
         // Changing database host depending on the running environment (Docker or Locally)
         var dbHost = Environment.GetEnvironmentVariable("DB_CONTAINER") ?? "localhost";
@@ -78,7 +81,11 @@ public static class ServiceCollectionExtensions
         
         services.AddTransient<IRepository<Client, Guid>, ClientRepository>();
         services.AddTransient<IRepository<Order, Guid>, OrderRepository>();
-        services.AddTransient<IRepository<Product, Guid>, ProductRepository>();
+        services.AddTransient<IProductRepository, ProductRepository>();
+        
+        // TODO: refactor hardcoded url
+        services.AddTransient<IFileStorage, RootFileStorage>(_ => 
+            new RootFileStorage(uploadsPath, "http://localhost:8080/uploads/"));
 
         var vkServiceToken = Environment.GetEnvironmentVariable("VK_SERVICE_TOKEN") ?? "";
         var vkApiVersion = Environment.GetEnvironmentVariable("VK_API_VERSION") ?? "";

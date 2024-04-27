@@ -1,5 +1,6 @@
 using DotNetEnv;
 using MasterCRM.Api.Extensions;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +16,8 @@ builder.Services.AddCustomCors(corsOrigins);
 
 builder.Services.AddCustomAuth();
 
-builder.Services.AddInfrastructureLayer(builder.Configuration);
+var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "Uploads");
+builder.Services.AddInfrastructureLayer(builder.Configuration, uploadsPath);
 builder.Services.AddApplicationLayer();
 
 var app = builder.Build();
@@ -31,6 +33,13 @@ app.UseCors("FrontendPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+Directory.CreateDirectory(uploadsPath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
 
 app.MapControllers();
 

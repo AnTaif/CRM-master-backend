@@ -5,22 +5,20 @@ namespace MasterCRM.Domain.Entities;
 
 public class Product : BaseEntity<Guid>
 {
-    public Guid MasterId { get; init; } 
+    public string MasterId { get; set; } = null!;
     //public virtual Master Master { get; init; } 
     
-    public string Name { get; init; }
+    public string Name { get; set; }
     
-    public string Description { get; init; }
+    public string Description { get; set; }
     
-    public string? Dimensions { get; init; }
+    public string? Dimensions { get; set; }
     
-    public Material Material { get; init; }
+    public Material Material { get; set; }
     
-    public double Price { get; init; }
+    public double Price { get; set; }
     
-    public int StockQuantity { get; init; }
-    
-    public DateTime CreationDate { get; init; }
-    
-    public string ImageSrc { get; init; }
+    public DateTime CreationDate { get; set; }
+
+    public virtual List<ProductPhoto> Photos { get; set; } = null!;
 }

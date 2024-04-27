@@ -3,6 +3,7 @@ using System;
 using MasterCRM.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MasterCRM.Infrastructure.Migrations
 {
     [DbContext(typeof(CrmDbContext))]
-    partial class CrmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240424194713_productMigration")]
+    partial class productMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -223,6 +226,10 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.Property<string>("Dimensions")
                         .HasColumnType("text");
 
+                    b.Property<string>("ImageSrc")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("MasterId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -240,29 +247,6 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("MasterCRM.Domain.Entities.ProductPhoto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Extension")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("ProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductPhoto");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -416,13 +400,6 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("MasterCRM.Domain.Entities.ProductPhoto", b =>
-                {
-                    b.HasOne("MasterCRM.Domain.Entities.Product", null)
-                        .WithMany("Photos")
-                        .HasForeignKey("ProductId");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -477,11 +454,6 @@ namespace MasterCRM.Infrastructure.Migrations
             modelBuilder.Entity("MasterCRM.Domain.Entities.Order", b =>
                 {
                     b.Navigation("OrderProducts");
-                });
-
-            modelBuilder.Entity("MasterCRM.Domain.Entities.Product", b =>
-                {
-                    b.Navigation("Photos");
                 });
 #pragma warning restore 612, 618
         }

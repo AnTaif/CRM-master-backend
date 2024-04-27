@@ -1,17 +1,18 @@
+using MasterCRM.Application.Services.Product;
 using MasterCRM.Domain.Entities;
-using MasterCRM.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Infrastructure.Repositories;
 
-public class ProductRepository(CrmDbContext context) : IRepository<Product, Guid>
+public class ProductRepository(CrmDbContext context) : IProductRepository
 {
     private DbSet<Product> dbSet => context.Products;
     
-    public async Task<IEnumerable<Product>> GetAllAsync() => await dbSet.ToListAsync();
+    public async Task<IEnumerable<Product>> GetByUserIdAsync(string userId) => 
+        await dbSet.Include(p => p.Photos).Where(p => p.MasterId == userId).ToListAsync();
 
     public async Task<Product?> GetByIdAsync(Guid id) =>
-        await dbSet.FirstOrDefaultAsync(e => e.Id == id);
+        await dbSet.Include(product => product.Photos).FirstOrDefaultAsync(e => e.Id == id);
 
     public async Task CreateAsync(Product entity)
     {

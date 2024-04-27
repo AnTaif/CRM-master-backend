@@ -6,10 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace MasterCRM.Application.Services.User;
 
-public class UserService(
-    UserManager<Master> userManager, 
-    SignInManager<Master> signInManager, 
-    IVkontakteService vkontakteService) : IUserService
+public class UserService(UserManager<Master> userManager) : IUserService
 {
     public async Task<GetUserInfoResponse?> GetInfoAsync(string id)
     {
@@ -25,7 +22,8 @@ public class UserService(
             Email = master.Email!,
             Phone = master.PhoneNumber ?? "",
             VkLink = master.VkLink,
-            TelegramLink = master.TelegramLink
+            TelegramLink = master.TelegramLink,
+            VkId = master.VkId.ToString()
         };
     }
     
@@ -36,7 +34,6 @@ public class UserService(
         if (user == null)
             return false;
         
-
         user.Email = request.Email ?? user.Email;
         user.PhoneNumber = request.Phone ?? user.PhoneNumber;
         
@@ -51,11 +48,6 @@ public class UserService(
 
         return result.Succeeded;
     }
-
-    // public Task<bool> TryChangeEmailAsync(Guid id, ChangeEmailRequest request)
-    // {
-    //     throw new NotImplementedException();
-    // }
 
     public async Task<bool> TryChangePasswordAsync(string id, ChangePasswordRequest request)
     {

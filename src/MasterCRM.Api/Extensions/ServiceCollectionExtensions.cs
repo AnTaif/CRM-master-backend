@@ -1,6 +1,5 @@
 using MasterCRM.Application.Services.Auth;
 using MasterCRM.Application.Services.Auth.ExternalAuth;
-using MasterCRM.Application.Interfaces;
 using MasterCRM.Application.Services.Product;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Domain.Entities;
@@ -15,6 +14,8 @@ namespace MasterCRM.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    private const string uploadsUrl = "http://localhost:8080/uploads/";
+
     public static IServiceCollection AddCustomAuth(this IServiceCollection services)
     {
         services.AddAuthentication().AddBearerToken();
@@ -63,29 +64,17 @@ public static class ServiceCollectionExtensions
     }
     
     public static IServiceCollection AddInfrastructureLayer(
-        this IServiceCollection services, ConfigurationManager configuration, string uploadsPath)
+        this IServiceCollection services, string uploadsPath)
     {
-        // Changing database host depending on the running environment (Docker or Locally)
-        var dbHost = Environment.GetEnvironmentVariable("DB_CONTAINER") ?? "localhost";
-        const int dbPort = 5432;
-        var dbName = Environment.GetEnvironmentVariable("DATABASE_NAME")!;
-        var dbUser = Environment.GetEnvironmentVariable("DATABASE_USER")!;
-        var dbPassword = Environment.GetEnvironmentVariable("DATABASE_PASSWORD")!;
-            
-        var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
-        
+        var connectionString = GetConnectionString();
         services.AddDbContext<CrmDbContext>(options =>
         {
             options.UseNpgsql(connectionString);
         });
         
-        services.AddTransient<IRepository<Client, Guid>, ClientRepository>();
-        services.AddTransient<IRepository<Order, Guid>, OrderRepository>();
         services.AddTransient<IProductRepository, ProductRepository>();
         
-        // TODO: refactor hardcoded url
-        services.AddTransient<IFileStorage, RootFileStorage>(_ => 
-            new RootFileStorage(uploadsPath, "http://localhost:8080/uploads/"));
+        services.AddTransient<IFileStorage, RootFileStorage>(_ => new RootFileStorage(uploadsPath, uploadsUrl));
 
         var vkServiceToken = Environment.GetEnvironmentVariable("VK_SERVICE_TOKEN") ?? "";
         var vkApiVersion = Environment.GetEnvironmentVariable("VK_API_VERSION") ?? "";
@@ -94,5 +83,23 @@ public static class ServiceCollectionExtensions
             new VkontakteService(vkApiVersion, vkServiceToken));
 
         return services;
+    }
+
+    /// <summary>
+    /// Get connection string for the database, host changes depending on the running environment (docker or locally)
+    /// </summary>
+    /// <returns>
+    /// Connection string in form of "Host={host};Port={port};Database={database};Username={user};Password={password}"
+    /// </returns>
+    private static string GetConnectionString()
+    {
+        // Changing database host depending on the running environment (Docker or Locally)
+        var dbHost = Environment.GetEnvironmentVariable("DB_CONTAINER") ?? "localhost";
+        const int dbPort = 5432;
+        var dbName = Environment.GetEnvironmentVariable("DATABASE_NAME")!;
+        var dbUser = Environment.GetEnvironmentVariable("DATABASE_USER")!;
+        var dbPassword = Environment.GetEnvironmentVariable("DATABASE_PASSWORD")!;
+            
+        return $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
     }
 }

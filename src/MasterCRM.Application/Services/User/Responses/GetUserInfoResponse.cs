@@ -13,4 +13,6 @@ public record GetUserInfoResponse
     public required string? VkLink { get; init; }
     
     public required string? TelegramLink { get; init; }
+    
+    public required string? VkId { get; init; }
 }

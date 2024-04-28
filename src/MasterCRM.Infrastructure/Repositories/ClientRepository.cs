@@ -1,35 +1,24 @@
+using MasterCRM.Application.Services.Clients;
 using MasterCRM.Domain.Entities;
-using MasterCRM.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Infrastructure.Repositories;
 
-public class ClientRepository(CrmDbContext context) : IRepository<Client, Guid>
+public class ClientRepository(CrmDbContext context) : IClientRepository
 {
     private DbSet<Client> dbSet => context.Clients;
     
-    public async Task<IEnumerable<Client>> GetAllAsync() => await dbSet.ToListAsync();
+    public async Task<IEnumerable<Client>> GetByMasterAsync(string masterId) => 
+        await dbSet.Where(client => client.MasterId == masterId).ToListAsync();
 
     public async Task<Client?> GetByIdAsync(Guid id) =>
-        await dbSet.FirstOrDefaultAsync(e => e.Id == id);
+        await dbSet.FirstOrDefaultAsync(client => client.Id == id);
 
-    public async Task CreateAsync(Client entity)
-    {
-        await dbSet.AddAsync(entity);
-        await SaveChangesAsync();
-    }
+    public async Task CreateAsync(Client client) => await dbSet.AddAsync(client);
 
-    public async Task DeleteAsync(Client entity)
-    {
-        dbSet.Remove(entity);
-        await SaveChangesAsync();
-    }
+    public void Delete(Client client) => dbSet.Remove(client);
 
-    public async Task UpdateAsync(Client entity)
-    {
-        dbSet.Update(entity);
-        await SaveChangesAsync();
-    }
+    public void Update(Client client) => dbSet.Update(client);
 
     public async Task SaveChangesAsync() => await context.SaveChangesAsync();
 }

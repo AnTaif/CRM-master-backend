@@ -8,11 +8,11 @@ public interface IClientRepository
     
     Task<Client?> GetByIdAsync(Guid id);
     
-    Task CreateAsync(Client entity);
+    Task CreateAsync(Client client);
     
-    Task DeleteAsync(Client entity);
+    void Delete(Client client);
     
-    Task UpdateAsync(Client entity);
+    void Update(Client client);
     
     Task SaveChangesAsync();
 }

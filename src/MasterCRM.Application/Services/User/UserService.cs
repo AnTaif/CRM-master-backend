@@ -33,13 +33,17 @@ public class UserService(UserManager<Master> userManager) : IUserService
 
         if (user == null)
             return false;
-        
-        user.Email = request.Email ?? user.Email;
+
+        if (request.Email != null)
+        {
+            await userManager.SetEmailAsync(user, request.Email);
+            await userManager.SetUserNameAsync(user, request.Email);
+        }
         user.PhoneNumber = request.Phone ?? user.PhoneNumber;
         
         var name = request.FullName?.Split();
-        user.FirstName = name?[0] ?? user.FirstName;
-        user.LastName = name?[1] ?? user.LastName;
+        user.LastName = name?[0] ?? user.LastName;
+        user.FirstName = name?[1] ?? user.FirstName;
         user.MiddleName = name?.Length > 2 ? name[2] : user.MiddleName;
         user.VkLink = request.VkLink ?? user.VkLink;
         user.TelegramLink = request.TelegramLink ?? user.TelegramLink;

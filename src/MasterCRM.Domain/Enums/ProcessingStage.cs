@@ -2,8 +2,9 @@ namespace MasterCRM.Domain.Enums;
 
 public enum ProcessingStage
 {
-    Registration = 0,
-    Specifying = 1,
-    InProgress = 2,
-    PaymentAndDelivery = 3,
+    Archived = 0,
+    Registration = 1,
+    Specifying = 2,
+    InProgress = 3,
+    PaymentAndDelivery = 4
 }

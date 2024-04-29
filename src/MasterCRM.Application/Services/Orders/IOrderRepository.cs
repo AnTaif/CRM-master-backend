@@ -8,13 +8,13 @@ public interface IOrderRepository
     
     public Task<IEnumerable<Order>> GetInactiveByMasterAsync(string masterId);
     
-    public Task<Order> GetByIdAsync(Guid id);
+    public Task<Order?> GetByIdAsync(Guid id);
     
     public Task CreateAsync(Order order);
     
-    public Task UpdateAsync(Order order);
+    public void Update(Order order);
     
-    public Task DeleteAsync(Order order);
+    public void Delete(Order order);
     
     public Task SaveChangesAsync();
 }

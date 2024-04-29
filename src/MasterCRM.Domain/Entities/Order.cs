@@ -5,22 +5,29 @@ namespace MasterCRM.Domain.Entities;
 
 public class Order : BaseEntity<Guid>
 {
-    public required Guid MasterId { get; init; }
-    //public virtual Master Master { get; init; }
+    public required Guid MasterId { get; set; }
     
-    public virtual List<OrderProduct> OrderProducts { get; init; } = null!;
+    public string Name { get; set; } = null!;
 
-    public required Guid CustomerId { get; init; }
-    
-    public required int TotalAmount { get; init; }
+    public required Guid ClientId { get; set; }
+    public virtual Client Client { get; set; } = null!;
 
-    public ProcessingStage ProcessingStage { get; init; } = ProcessingStage.Registration;
+    public string DeliveryAddress { get; set; } = null!;
+        
+    public Guid StageId { get; set; }
+    public virtual Stage Stage { get; set; } = null!;
     
-    public string DeliveryAddress { get; init; }
+    public required int TotalAmount { get; set; }
     
-    public string PostalCode { get; init; }
+    public string Comment { get; set; } = null!;
+
+    public DateTime CreatedAt { get; set; }
     
-    public string Requirements { get; init; }
+    public DateTime UpdatedAt { get; set; }
+
+    public bool IsActive { get; private set; } = true;
     
-    public DateTime CreatedAt { get; init; }
+    public virtual List<OrderProduct> OrderProducts { get; set; } = null!;
+    
+    public virtual List<OrderHistory> History { get; set; } = null!;
 }

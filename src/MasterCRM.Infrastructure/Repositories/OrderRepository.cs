@@ -1,35 +1,27 @@
+using MasterCRM.Application.Services.Orders;
 using MasterCRM.Domain.Entities;
-using MasterCRM.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Infrastructure.Repositories;
 
-public class OrderRepository(CrmDbContext context) : IRepository<Order, Guid>
+public class OrderRepository(CrmDbContext context) : IOrderRepository
 {
     private DbSet<Order> dbSet => context.Orders;
-    
-    public async Task<IEnumerable<Order>> GetAllAsync() => await dbSet.ToListAsync();
+
+    public async Task<IEnumerable<Order>> GetActiveByMasterAsync(string masterId) => 
+        await dbSet.Where(order => order.IsActive).ToListAsync();
+
+    public async Task<IEnumerable<Order>> GetInactiveByMasterAsync(string masterId) =>
+        await dbSet.Where(order => !order.IsActive).ToListAsync();
 
     public async Task<Order?> GetByIdAsync(Guid id) =>
         await dbSet.FirstOrDefaultAsync(e => e.Id == id);
 
-    public async Task CreateAsync(Order entity)
-    {
-        await dbSet.AddAsync(entity);
-        await SaveChangesAsync();
-    }
+    public async Task CreateAsync(Order order) => await dbSet.AddAsync(order);
 
-    public async Task DeleteAsync(Order entity)
-    {
-        dbSet.Remove(entity);
-        await SaveChangesAsync();
-    }
+    public void Delete(Order order) => dbSet.Remove(order);
 
-    public async Task UpdateAsync(Order entity)
-    {
-        dbSet.Update(entity);
-        await SaveChangesAsync();
-    }
+    public void Update(Order order) => dbSet.Update(order);
 
     public async Task SaveChangesAsync() => await context.SaveChangesAsync();
 }

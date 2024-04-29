@@ -10,7 +10,13 @@ public class OrderProduct : BaseEntity<Guid>
     public Guid OrderId { get; init; }
     public virtual Order Order { get; init; }
     
+    /// <summary>
+    /// Quantity of the product in the order
+    /// </summary>
     public int Quantity { get; init; }
     
+    /// <summary>
+    /// Price of one unit of the product
+    /// </summary>
     public double UnitPrice { get; init; }
 }

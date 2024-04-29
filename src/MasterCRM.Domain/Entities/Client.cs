@@ -4,16 +4,25 @@ namespace MasterCRM.Domain.Entities;
 
 public class Client : BaseEntity<Guid>
 {
-    public Guid MasterId { get; init; }
+    public string MasterId { get; init; } = null!;
     //public virtual Master Master { get; init; }
+
+    public string FirstName { get; set; } = null!;
+
+    public string LastName { get; set; } = null!;
     
-    public string FirstName { get; init; }
+    public string? MiddleName { get; set; }
+
+    public string Email { get; set; } = null!;
     
-    public string LastName { get; init; }
+    public string Phone { get; set; }
     
-    public string? MiddleName { get; init; }
+    public string GetFullName()
+    {
+        var fullName = $"{LastName} {FirstName}";
+        if (!string.IsNullOrEmpty(MiddleName))
+            fullName += $" {MiddleName}";
     
-    public string Email { get; init; }
-    
-    public string Phone { get; init; }
+        return fullName;
+    }
 }

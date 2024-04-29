@@ -1,6 +1,6 @@
-namespace MasterCRM.Application.Services.Order.Dto;
+namespace MasterCRM.Application.Services.Orders.Requests;
 
-public record CreateOrderProductDto
+public record OrderProductRequest
 {
     /// <summary>
     /// Product id

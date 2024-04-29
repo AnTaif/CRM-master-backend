@@ -1,6 +1,6 @@
-using MasterCRM.Application.Services.Order.Dto;
+using MasterCRM.Application.Services.Orders.Dto;
 
-namespace MasterCRM.Application.Services.Order.Responses;
+namespace MasterCRM.Application.Services.Orders.Responses;
 
 public record CreateOrderResponse
 {
@@ -12,9 +12,9 @@ public record CreateOrderResponse
     
     public required string Comment { get; init; }
     
-    public required GetOrderClientDto Client { get; init; }
+    public required OrderClientDto Client { get; init; }
     
-    public required IEnumerable<GetOrderProductDto> OrderProducts { get; init; }
+    public required IEnumerable<OrderProductDto> OrderProducts { get; init; }
     
     public required IEnumerable<OrderHistoryDto> History { get; init; }
 }

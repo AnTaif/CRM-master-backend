@@ -1,4 +1,4 @@
-namespace MasterCRM.Application.Services.Order.Dto;
+namespace MasterCRM.Application.Services.Orders.Dto;
 
 public record OrderHistoryDto
 {

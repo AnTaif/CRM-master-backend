@@ -8,7 +8,7 @@ public record GetClientResponse
     
     public required string Email { get; init; }
     
-    public required string? Phone { get; init; }
+    public required string Phone { get; init; }
     
     public required DateTime LastOrderDate { get; init; }
 

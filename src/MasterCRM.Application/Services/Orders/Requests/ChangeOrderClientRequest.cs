@@ -1,6 +1,6 @@
-namespace MasterCRM.Application.Services.Order.Dto;
+namespace MasterCRM.Application.Services.Orders.Requests;
 
-public record ChangeOrderClientDto
+public class ChangeOrderClientRequest
 {
     public required string? FullName { get; init; }
     
@@ -9,6 +9,4 @@ public record ChangeOrderClientDto
     public required string? Phone { get; init; }
     
     public required string? Address { get; init; }
-    
-    public required string? PostIndex { get; init; }
 }

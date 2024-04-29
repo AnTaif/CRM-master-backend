@@ -15,8 +15,8 @@ public class Client : BaseEntity<Guid>
 
     public string Email { get; set; } = null!;
     
-    public string Phone { get; set; }
-    
+    public string Phone { get; set; } = null!;
+
     public string GetFullName()
     {
         var fullName = $"{LastName} {FirstName}";

@@ -1,6 +1,6 @@
-namespace MasterCRM.Application.Services.Order.Dto;
+namespace MasterCRM.Application.Services.Orders.Dto;
 
-public record GetOrderProductDto
+public record OrderProductDto
 {
     /// <summary>
     /// Product id

@@ -5,7 +5,7 @@ namespace MasterCRM.Application.Services.Auth;
 
 public interface IAuthService
 {
-    public Task<SignInResult> RegisterAsync(RegisterUserRequest request);
+    public Task<IdentityResult> RegisterAsync(RegisterUserRequest request);
     
     public Task<SignInResult> LoginAsync(LoginRequest request);
     

@@ -7,7 +7,7 @@ public interface IUserService
 {
     public Task<GetUserInfoResponse?> GetInfoAsync(string id);
 
-    public Task<bool> TryChangeInfoAsync(string id, ChangeUserInfoRequest request);
+    public Task<GetUserInfoResponse?> ChangeInfoAsync(string id, ChangeUserInfoRequest request);
     
     public Task<bool> TryChangePasswordAsync(string id, ChangePasswordRequest request);
 }

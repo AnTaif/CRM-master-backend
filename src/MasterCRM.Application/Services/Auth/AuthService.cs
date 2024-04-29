@@ -7,7 +7,7 @@ namespace MasterCRM.Application.Services.Auth;
 public class AuthService(UserManager<Master> userManager, 
     SignInManager<Master> signInManager) : IAuthService
 {
-    public async Task<SignInResult> RegisterAsync(RegisterUserRequest request)
+    public async Task<IdentityResult> RegisterAsync(RegisterUserRequest request)
     {
         var name = request.FullName.Split();
         var master = new Master
@@ -28,13 +28,16 @@ public class AuthService(UserManager<Master> userManager,
         if (!result.Succeeded)
             throw new Exception("User already exists");
         
-        var loginResult = await signInManager.PasswordSignInAsync(
+        var signInResult = await signInManager.PasswordSignInAsync(
             request.Email, 
             request.Password, 
             true, 
             true);
 
-        return loginResult;
+        if (!signInResult.Succeeded)
+            throw new Exception("Failed to sign in after registration");
+
+        return result;
     }
     
     public async Task<SignInResult> LoginAsync(LoginRequest request)

@@ -33,12 +33,12 @@ public class UserController(IUserService userService) : ControllerBase
         if (userId == null)
             return Forbid();
 
-        var success = await userService.TryChangeInfoAsync(userId, request);
+        var userInfoResponse = await userService.ChangeInfoAsync(userId, request);
 
-        if (!success)
+        if (userInfoResponse == null)
             return BadRequest();
 
-        return NoContent();
+        return Ok(userInfoResponse);
     }
     
     [HttpPut("/password")]

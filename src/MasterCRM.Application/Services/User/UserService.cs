@@ -19,38 +19,51 @@ public class UserService(UserManager<Master> userManager) : IUserService
         {
             Id = master.Id,
             FullName = master.GetFullName(),
-            Email = master.Email!,
+            Email = master.Email ?? "",
             Phone = master.PhoneNumber ?? "",
             VkLink = master.VkLink,
             TelegramLink = master.TelegramLink,
-            VkId = master.VkId.ToString()
+            VkId = master.VkId?.ToString()
         };
     }
-    
-    public async Task<bool> TryChangeInfoAsync(string id, ChangeUserInfoRequest request)
+
+    public async Task<GetUserInfoResponse?> ChangeInfoAsync(string id, ChangeUserInfoRequest request)
     {
         var user = await userManager.FindByIdAsync(id);
 
         if (user == null)
-            return false;
+            return null;
 
         if (request.Email != null)
         {
             await userManager.SetEmailAsync(user, request.Email);
             await userManager.SetUserNameAsync(user, request.Email);
         }
+
         user.PhoneNumber = request.Phone ?? user.PhoneNumber;
-        
+
         var name = request.FullName?.Split();
         user.LastName = name?[0] ?? user.LastName;
         user.FirstName = name?[1] ?? user.FirstName;
         user.MiddleName = name?.Length > 2 ? name[2] : user.MiddleName;
         user.VkLink = request.VkLink ?? user.VkLink;
         user.TelegramLink = request.TelegramLink ?? user.TelegramLink;
-        
+
         var result = await userManager.UpdateAsync(user);
 
-        return result.Succeeded;
+        if (!result.Succeeded)
+            throw new Exception("Failed to update user info.");
+
+        return new GetUserInfoResponse
+        {
+            Id = user.Id,
+            FullName = user.GetFullName(),
+            Email = user.Email ?? "",
+            Phone = user.PhoneNumber ?? "",
+            VkLink = user.VkLink,
+            TelegramLink = user.TelegramLink,
+            VkId = user.VkId?.ToString()
+        };
     }
 
     public async Task<bool> TryChangePasswordAsync(string id, ChangePasswordRequest request)

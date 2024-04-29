@@ -26,7 +26,7 @@ public class AuthController(IAuthService authService, IVkAuthService vkAuthServi
         if (!result.Succeeded)
             return BadRequest();
 
-        return NoContent();
+        return CreatedAtAction(nameof(Register), result);
     }
     
     /// <summary>

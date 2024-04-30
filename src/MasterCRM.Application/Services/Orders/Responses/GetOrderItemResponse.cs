@@ -2,7 +2,10 @@ using MasterCRM.Application.Services.Orders.Dto;
 
 namespace MasterCRM.Application.Services.Orders.Responses;
 
-public record GetOrderResponse
+/// <summary>
+/// Represents a response for list of orders.
+/// </summary>
+public class GetOrderItemResponse
 {
     public required Guid Id { get; init; }
     
@@ -17,6 +20,4 @@ public record GetOrderResponse
     public required string Address { get; init; }
     
     public required OrderClientDto Client { get; init; }
-    
-    public required IEnumerable<OrderProductDto> Products { get; init; }
 }

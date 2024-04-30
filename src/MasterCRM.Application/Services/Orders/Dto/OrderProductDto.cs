@@ -20,5 +20,5 @@ public record OrderProductDto
     /// <summary>
     /// Product image source link
     /// </summary>
-    public required string ImageSrc { get; init; } 
+    public required string Photo { get; init; } 
 }

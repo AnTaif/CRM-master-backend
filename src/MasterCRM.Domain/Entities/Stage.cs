@@ -8,5 +8,14 @@ public class Stage : BaseEntity<Guid>
 
     public required string Name { get; init; }
 
-    public bool IsSystemStage { get; init; } = false;
+    public StageType StageType { get; init; }
+    
+    public int Order { get; init; }
+}
+
+public enum StageType
+{
+    Default = 0,
+    Start = 1,
+    End = 2
 }

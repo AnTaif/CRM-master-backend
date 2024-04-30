@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using MasterCRM.Application.Services.Orders;
 using MasterCRM.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -8,14 +9,18 @@ public class OrderRepository(CrmDbContext context) : IOrderRepository
 {
     private DbSet<Order> dbSet => context.Orders;
 
-    public async Task<IEnumerable<Order>> GetActiveByMasterAsync(string masterId) => 
-        await dbSet.Where(order => order.IsActive).ToListAsync();
-
-    public async Task<IEnumerable<Order>> GetInactiveByMasterAsync(string masterId) =>
-        await dbSet.Where(order => !order.IsActive).ToListAsync();
+    public async Task<IEnumerable<Order>> GetByPredicateAsync(Expression<Func<Order, bool>> predicate) => 
+        await dbSet
+            .Include(order => order.Stage)
+            .Where(predicate)
+            .ToListAsync();
 
     public async Task<Order?> GetByIdAsync(Guid id) =>
-        await dbSet.FirstOrDefaultAsync(e => e.Id == id);
+        await dbSet
+            .Include(order => order.Stage)
+            .Include(order => order.Client)
+            .Include(order => order.OrderProducts)
+            .FirstOrDefaultAsync(e => e.Id == id);
 
     public async Task CreateAsync(Order order) => await dbSet.AddAsync(order);
 

@@ -1,6 +1,8 @@
 using MasterCRM.Application.Services.Auth;
 using MasterCRM.Application.Services.Auth.ExternalAuth;
 using MasterCRM.Application.Services.Clients;
+using MasterCRM.Application.Services.Orders;
+using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Application.Services.Product;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Domain.Entities;
@@ -61,6 +63,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IVkAuthService, VkAuthService>();
         services.AddTransient<IProductService, ProductService>();
         services.AddTransient<IClientService, ClientService>();
+        services.AddTransient<IOrderService, OrderService>();
 
         return services;
     }
@@ -76,6 +79,8 @@ public static class ServiceCollectionExtensions
         
         services.AddTransient<IProductRepository, ProductRepository>();
         services.AddTransient<IClientRepository, ClientRepository>();
+        services.AddTransient<IOrderRepository, OrderRepository>();
+        services.AddTransient<IStageRepository, StageRepository>();
         
         services.AddTransient<IFileStorage, RootFileStorage>(_ => new RootFileStorage(uploadsPath, uploadsUrl));
 

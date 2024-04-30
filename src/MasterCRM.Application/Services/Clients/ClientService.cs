@@ -1,5 +1,6 @@
 using MasterCRM.Application.Services.Clients.Requests;
 using MasterCRM.Application.Services.Clients.Responses;
+using MasterCRM.Domain.Entities;
 
 namespace MasterCRM.Application.Services.Clients;
 

@@ -12,7 +12,9 @@ public record CreateOrderRequest
     
     public required string Comment { get; init; }
     
+    public required string Address { get; init; }
+    
     public required OrderClientDto Client { get; init; }
     
-    public required IEnumerable<OrderProductRequest> OrderProducts { get; init; }
+    public required IEnumerable<OrderProductRequest> Products { get; init; }
 }

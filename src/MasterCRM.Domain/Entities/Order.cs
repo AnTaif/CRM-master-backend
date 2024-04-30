@@ -5,19 +5,19 @@ namespace MasterCRM.Domain.Entities;
 
 public class Order : BaseEntity<Guid>
 {
-    public required Guid MasterId { get; set; }
+    public required string MasterId { get; set; }
     
     public string Name { get; set; } = null!;
 
     public required Guid ClientId { get; set; }
     public virtual Client Client { get; set; } = null!;
 
-    public string DeliveryAddress { get; set; } = null!;
+    public string Address { get; set; } = null!;
         
     public Guid StageId { get; set; }
     public virtual Stage Stage { get; set; } = null!;
     
-    public required int TotalAmount { get; set; }
+    public required double TotalAmount { get; set; }
     
     public string Comment { get; set; } = null!;
 

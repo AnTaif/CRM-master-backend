@@ -2,8 +2,6 @@ namespace MasterCRM.Application.Services.Orders.Dto;
 
 public record OrderHistoryDto
 {
-    public required Guid Id { get; init; }
-    
     public required string Change { get; init; }
     
     public required string Type { get; init; }

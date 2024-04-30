@@ -7,9 +7,6 @@ public class OrderProduct : BaseEntity<Guid>
     public Guid ProductId { get; init; }
     public virtual Product Product { get; init; }
     
-    public Guid OrderId { get; init; }
-    public virtual Order Order { get; init; }
-    
     /// <summary>
     /// Quantity of the product in the order
     /// </summary>

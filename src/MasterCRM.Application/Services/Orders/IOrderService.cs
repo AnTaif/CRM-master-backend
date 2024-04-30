@@ -5,15 +5,15 @@ namespace MasterCRM.Application.Services.Orders;
 
 public interface IOrderService
 {
-    public Task<IEnumerable<GetOrderResponse>> GetActiveOrdersAsync();
+    public Task<IEnumerable<GetOrderItemResponse>> GetActiveByMasterAsync(string masterId);
     
-    public Task<IEnumerable<GetOrderResponse>> GetInactiveOrdersAsync();
+    public Task<IEnumerable<GetOrderItemResponse>> GetInactiveByMasterAsync(string masterId);
 
-    public Task<GetOrderResponse> GetOrderByIdAsync(Guid orderId);
+    public Task<GetOrderResponse?> GetOrderByIdAsync(Guid orderId);
     
-    public Task<CreateOrderResponse> CreateOrderAsync(CreateOrderRequest request);
+    public Task<GetOrderResponse> CreateOrderAsync(string masterId, CreateOrderRequest request);
     
-    public Task<GetOrderResponse> ChangeOrderAsync(ChangeOrderRequest request);
+    public Task<GetOrderResponse> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request);
     
     public Task<bool> TryDeleteOrderAsync(Guid orderId);
 }

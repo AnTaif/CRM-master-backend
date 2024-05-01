@@ -15,34 +15,12 @@ public class OrderService(
     IStageRepository stageRepository,
     IProductRepository productRepository) : IOrderService
 {
-    public async Task<IEnumerable<GetOrderItemResponse>> GetActiveByMasterAsync(string masterId)
+    public async Task<IEnumerable<GetOrderItemResponse>> GetWithStageByMasterAsync(string masterId, Guid stageId)
     {
         var activeOrders = await orderRepository.GetByPredicateAsync(order =>
-            order.MasterId == masterId && order.IsActive);
+            order.MasterId == masterId && order.IsActive && order.Stage.Id == stageId);
         
         return activeOrders.Select(order => new GetOrderItemResponse
-        {
-            Id = order.Id,
-            Name = order.Name,
-            Stage = order.Stage.Name,
-            TotalAmount = order.TotalAmount,
-            Comment = order.Comment,
-            Address = order.Address,
-            Client = new OrderClientDto
-            {
-                FullName = order.Client.GetFullName(),
-                Email = order.Client.Email,
-                Phone = order.Client.Phone,
-            }
-        });
-    }
-
-    public async Task<IEnumerable<GetOrderItemResponse>> GetInactiveByMasterAsync(string masterId)
-    {
-        var inactiveOrders = await orderRepository.GetByPredicateAsync(order =>
-            order.MasterId == masterId && !order.IsActive);
-        
-        return inactiveOrders.Select(order => new GetOrderItemResponse
         {
             Id = order.Id,
             Name = order.Name,
@@ -168,12 +146,12 @@ public class OrderService(
         };
     }
 
-    public async Task<GetOrderResponse> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request)
+    public async Task<GetOrderResponse?> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request)
     {
         var order = await orderRepository.GetByIdAsync(orderId);
-        
+
         if (order is null)
-            throw new Exception("Order not found");
+            return null;
         
         if (order.MasterId != masterId)
             throw new Exception("Current user is not the owner of the order");

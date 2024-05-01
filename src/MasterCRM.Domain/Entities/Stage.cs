@@ -9,8 +9,6 @@ public class Stage : BaseEntity<Guid>
     public required string Name { get; init; }
 
     public StageType StageType { get; init; }
-    
-    public int Order { get; init; }
 }
 
 public enum StageType

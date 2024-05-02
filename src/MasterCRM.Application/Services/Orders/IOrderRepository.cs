@@ -5,7 +5,7 @@ namespace MasterCRM.Application.Services.Orders;
 
 public interface IOrderRepository
 {
-    public Task<IEnumerable<Order>> GetByPredicateAsync(Expression<Func<Order, bool>> predicate);
+    public Task<IEnumerable<Order>> GetAllByPredicateAsync(Expression<Func<Order, bool>> predicate);
     
     public Task<Order?> GetByIdAsync(Guid id);
     

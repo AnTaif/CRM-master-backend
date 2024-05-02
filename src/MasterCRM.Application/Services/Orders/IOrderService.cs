@@ -6,7 +6,7 @@ namespace MasterCRM.Application.Services.Orders;
 
 public interface IOrderService
 {
-    public Task<IEnumerable<GetOrderItemResponse>> GetWithStageByMasterAsync(string masterId, Guid stageId);
+    public Task<IEnumerable<GetOrderItemResponse>> GetWithStageByMasterAsync(string masterId, int orderTab);
 
     public Task<GetOrderResponse?> GetOrderByIdAsync(Guid orderId);
     

@@ -20,15 +20,15 @@ public class StageController(IStageService stageService) : ControllerBase
         return Ok(stages);
     }
 
-    [HttpPost("reorder")]
-    public async Task<ActionResult<IEnumerable<StageDto>>> ReorderStages(IEnumerable<Guid> ids)
-    {
-        var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
-        var stages = await stageService.ReorderItemsAsync(masterId, ids);
-        
-        return Ok(stages);
-    }
+    // [HttpPost("reorder")]
+    // public async Task<ActionResult<IEnumerable<StageDto>>> ReorderStages(IEnumerable<Guid> ids)
+    // {
+    //     var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+    //
+    //     var stages = await stageService.ReorderItemsAsync(masterId, ids);
+    //     
+    //     return Ok(stages);
+    // }
 
     [HttpPut("{id}")]
     public async Task<ActionResult<StageDto>> Update([FromRoute] Guid id, UpdateStageRequest request)
@@ -42,6 +42,17 @@ public class StageController(IStageService stageService) : ControllerBase
             return NotFound();
 
         return Ok(stage);
+    }
+
+    [HttpPut]
+    public async Task<ActionResult<IEnumerable<StageDto>>> UpdateRange(IEnumerable<UpdateStageItemRequest> requests)
+    {
+        var stageDtos = await stageService.UpdateRangeAsync(requests);
+
+        if (stageDtos == null)
+            return NotFound();
+
+        return Ok(stageDtos);
     }
 
     [HttpDelete("{id}")]

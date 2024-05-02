@@ -15,10 +15,10 @@ public class OrderService(
     IStageRepository stageRepository,
     IProductRepository productRepository) : IOrderService
 {
-    public async Task<IEnumerable<GetOrderItemResponse>> GetWithStageByMasterAsync(string masterId, Guid stageId)
+    public async Task<IEnumerable<GetOrderItemResponse>> GetWithStageByMasterAsync(string masterId, int orderTab)
     {
-        var activeOrders = await orderRepository.GetByPredicateAsync(order =>
-            order.MasterId == masterId && order.IsActive && order.Stage.Id == stageId);
+        var activeOrders = await orderRepository.GetAllByPredicateAsync(order =>
+            order.MasterId == masterId && order.IsActive && order.Stage.Order == orderTab);
         
         return activeOrders.Select(order => new GetOrderItemResponse
         {
@@ -265,7 +265,7 @@ public class OrderService(
 
         orderRepository.Delete(order);
 
-        var clientOrders = await orderRepository.GetByPredicateAsync(o => o.ClientId == clientId);
+        var clientOrders = await orderRepository.GetAllByPredicateAsync(o => o.ClientId == clientId);
 
         if (!clientOrders.Any())
         {
@@ -283,9 +283,9 @@ public class OrderService(
         var name = new StringBuilder();
 
         name.Append(splitFullname[0]);
-        name.Append(' ' + splitFullname[1][0] + '.');
+        name.Append($" {splitFullname[1][0]}.");
         if (splitFullname.Length > 2)
-            name.Append(' ' + splitFullname[2][0] + '.');
+            name.Append($"{splitFullname[2][0]}.");
         return name.ToString();
     }
 }

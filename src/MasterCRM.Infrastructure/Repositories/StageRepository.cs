@@ -23,5 +23,7 @@ public class StageRepository(CrmDbContext context) : IStageRepository
 
     public void Delete(Stage stage) => dbSet.Remove(stage);
 
+    public async Task AddRangeAsync(IEnumerable<Stage> stages) => await dbSet.AddRangeAsync(stages);
+
     public async Task SaveChangesAsync() => await context.SaveChangesAsync();
 }

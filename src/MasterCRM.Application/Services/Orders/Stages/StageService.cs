@@ -49,6 +49,28 @@ public class StageService(IStageRepository stageRepository) : IStageService
         return new StageDto(stage.Id, stage.Name, stage.Order, stage.IsSystem);
     }
 
+    public async Task<List<StageDto>?> UpdateRangeAsync(IEnumerable<UpdateStageItemRequest> requests)
+    {
+        var stages = new List<Stage>();
+        
+        foreach (var request in requests)
+        {
+            var stage = await stageRepository.GetByIdAsync(request.Id);
+
+            if (stage == null)
+                return null;
+
+            stage.Name = request.Name ?? stage.Name;
+            stage.Order = request.Order ?? stage.Order;
+            
+            stageRepository.Update(stage);
+            stages.Add(stage);
+        }
+        await stageRepository.SaveChangesAsync();
+
+        return stages.Select(stage => new StageDto(stage.Id, stage.Name, stage.Order, stage.IsSystem)).ToList();
+    }
+
     public async Task<bool> TryDeleteAsync(Guid id)
     {
         var stage = await stageRepository.GetByIdAsync(id);

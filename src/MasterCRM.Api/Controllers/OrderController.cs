@@ -13,14 +13,14 @@ namespace MasterCRM.Api.Controllers;
 public class OrderController(IOrderService orderService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetOrderItemResponse>>> GetWithStageByMaster([FromQuery] Guid stageId)
+    public async Task<ActionResult<IEnumerable<GetOrderItemResponse>>> GetWithStageByMaster([FromQuery] int tab)
     {
         var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         
-        return Ok(await orderService.GetWithStageByMasterAsync(masterId, stageId));
+        return Ok(await orderService.GetWithStageByMasterAsync(masterId, tab));
     }
     
-    [HttpGet("id")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<GetOrderResponse>> GetOrderById([FromRoute] Guid id)
     {
         var order = await orderService.GetOrderByIdAsync(id);

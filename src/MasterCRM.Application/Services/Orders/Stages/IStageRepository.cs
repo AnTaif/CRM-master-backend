@@ -16,6 +16,8 @@ public interface IStageRepository
     public void UpdateRange(IEnumerable<Stage> stages);
 
     public void Delete(Stage stage);
+    
+    public Task AddRangeAsync(IEnumerable<Stage> stages);
 
     public Task SaveChangesAsync();
 }

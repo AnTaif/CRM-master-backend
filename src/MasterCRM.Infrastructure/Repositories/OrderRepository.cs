@@ -9,9 +9,10 @@ public class OrderRepository(CrmDbContext context) : IOrderRepository
 {
     private DbSet<Order> dbSet => context.Orders;
 
-    public async Task<IEnumerable<Order>> GetByPredicateAsync(Expression<Func<Order, bool>> predicate) => 
+    public async Task<IEnumerable<Order>> GetAllByPredicateAsync(Expression<Func<Order, bool>> predicate) => 
         await dbSet
             .Include(order => order.Stage)
+            .Include(order => order.Client)
             .Where(predicate)
             .ToListAsync();
 
@@ -20,6 +21,8 @@ public class OrderRepository(CrmDbContext context) : IOrderRepository
             .Include(order => order.Stage)
             .Include(order => order.Client)
             .Include(order => order.OrderProducts)
+            .ThenInclude(orderProduct => orderProduct.Product)
+            .ThenInclude(product => product.Photos)
             .FirstOrDefaultAsync(e => e.Id == id);
 
     public async Task CreateAsync(Order order) => await dbSet.AddAsync(order);

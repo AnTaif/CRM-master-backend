@@ -1,17 +1,20 @@
 using MasterCRM.Application.Services.Auth.Requests;
+using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace MasterCRM.Application.Services.Auth;
 
 public class AuthService(UserManager<Master> userManager, 
-    SignInManager<Master> signInManager) : IAuthService
+    SignInManager<Master> signInManager,
+    IStageRepository stageRepository) : IAuthService
 {
     public async Task<IdentityResult> RegisterAsync(RegisterUserRequest request)
     {
         var name = request.FullName.Split();
         var master = new Master
         {
+            Id = Guid.NewGuid().ToString(),
             UserName = request.Email,
             Email = request.Email,
             PhoneNumber = request.Phone,
@@ -27,6 +30,45 @@ public class AuthService(UserManager<Master> userManager,
         
         if (!result.Succeeded)
             throw new Exception("User already exists");
+
+        var preCreatedStages = new List<Stage>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = master.Id,
+                Name = "Новый заказ",
+                StageType = StageType.Start,
+                Order = 0
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = master.Id,
+                Name = "В работе",
+                StageType = StageType.Default,
+                Order = 1
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = master.Id,
+                Name = "Доставка",
+                StageType = StageType.Default,
+                Order = 2
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = master.Id,
+                Name = "Архив",
+                StageType = StageType.End,
+                Order = 3
+            },
+        };
+
+        await stageRepository.AddRangeAsync(preCreatedStages);
+        await stageRepository.SaveChangesAsync();
         
         var signInResult = await signInManager.PasswordSignInAsync(
             request.Email, 

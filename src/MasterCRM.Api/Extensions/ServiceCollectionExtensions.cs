@@ -64,6 +64,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IProductService, ProductService>();
         services.AddTransient<IClientService, ClientService>();
         services.AddTransient<IOrderService, OrderService>();
+        services.AddTransient<IStageService, StageService>();
 
         return services;
     }

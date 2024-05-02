@@ -10,4 +10,12 @@ public interface IStageRepository
     public Task<Stage?> GetByIdAsync(Guid id);
     
     public Task<IEnumerable<Stage>> GetAllByPredicateAsync(Expression<Func<Stage, bool>> predicate);
+    
+    public void Update(Stage stage);
+    
+    public void UpdateRange(IEnumerable<Stage> stages);
+
+    public void Delete(Stage stage);
+
+    public Task SaveChangesAsync();
 }

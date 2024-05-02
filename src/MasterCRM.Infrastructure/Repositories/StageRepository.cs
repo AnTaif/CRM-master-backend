@@ -16,4 +16,12 @@ public class StageRepository(CrmDbContext context) : IStageRepository
     
     public async Task<IEnumerable<Stage>> GetAllByPredicateAsync(Expression<Func<Stage, bool>> predicate) => 
         await dbSet.Where(predicate).ToListAsync();
+
+    public void Update(Stage stage) => dbSet.Update(stage);
+    
+    public void UpdateRange(IEnumerable<Stage> stages) => dbSet.UpdateRange(stages);
+
+    public void Delete(Stage stage) => dbSet.Remove(stage);
+
+    public async Task SaveChangesAsync() => await context.SaveChangesAsync();
 }

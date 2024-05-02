@@ -13,7 +13,10 @@ public class StageRepository(CrmDbContext context) : IStageRepository
         await dbSet.FirstAsync(stage => stage.MasterId == masterId && stage.StageType == StageType.Start);
     
     public async Task<Stage?> GetByIdAsync(Guid id) => await dbSet.FindAsync(id);
-    
+
+    public async Task<Stage?> GetWithTabByMaster(string masterId, short stageTab) =>
+        await dbSet.FirstOrDefaultAsync(stage => stage.Order == stageTab);
+
     public async Task<IEnumerable<Stage>> GetAllByPredicateAsync(Expression<Func<Stage, bool>> predicate) => 
         await dbSet.Where(predicate).ToListAsync();
 

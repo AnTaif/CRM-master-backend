@@ -8,6 +8,8 @@ public interface IStageRepository
     public Task<Stage> GetStartByMasterAsync(string masterId);
 
     public Task<Stage?> GetByIdAsync(Guid id);
+
+    public Task<Stage?> GetWithTabByMaster(string masterId, short stageTab); 
     
     public Task<IEnumerable<Stage>> GetAllByPredicateAsync(Expression<Func<Stage, bool>> predicate);
     

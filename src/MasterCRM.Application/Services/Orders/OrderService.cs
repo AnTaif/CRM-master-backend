@@ -15,7 +15,7 @@ public class OrderService(
     IStageRepository stageRepository,
     IProductRepository productRepository) : IOrderService
 {
-    public async Task<IEnumerable<GetOrderItemResponse>> GetWithStageByMasterAsync(string masterId, int orderTab)
+    public async Task<IEnumerable<GetOrderItemResponse>> GetWithStageByMasterAsync(string masterId, short orderTab)
     {
         var activeOrders = await orderRepository.GetAllByPredicateAsync(order =>
             order.MasterId == masterId && order.IsActive && order.Stage.Order == orderTab);
@@ -160,9 +160,9 @@ public class OrderService(
         order.Comment = request.Comment ?? order.Comment;
         order.Address = request.Address ?? order.Address;
 
-        if (request.StageId != null)
+        if (request.StageTab != null)
         {
-            var stage = await stageRepository.GetByIdAsync(request.StageId.Value);
+            var stage = await stageRepository.GetWithTabByMaster(masterId, (short)request.StageTab);
             
             if (stage == null)
                 throw new Exception("Stage not found");

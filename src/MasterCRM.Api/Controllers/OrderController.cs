@@ -13,7 +13,7 @@ namespace MasterCRM.Api.Controllers;
 public class OrderController(IOrderService orderService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetOrderItemResponse>>> GetWithStageByMaster([FromQuery] int tab)
+    public async Task<ActionResult<IEnumerable<GetOrderItemResponse>>> GetWithStageByMaster([FromQuery] short tab)
     {
         var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         

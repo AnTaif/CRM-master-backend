@@ -2,7 +2,7 @@ namespace MasterCRM.Application.Services.Orders.Requests;
 
 public record ChangeOrderRequest
 {
-    public required Guid? StageId { get; init; }
+    public required short? StageTab { get; init; }
     
     public required double? TotalAmount { get; init; }
     

@@ -15,6 +15,6 @@ public interface IStageService
 
 public record StageDto(Guid Id, string Name, short Order, bool IsSystem);
 
-public record UpdateStageRequest(string? Name, short Order);
+public record UpdateStageRequest(string? Name);
 
 public record UpdateStageItemRequest(Guid Id, string? Name,short? Order);

@@ -1,4 +1,6 @@
+using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Domain.Entities;
+using MasterCRM.Domain.Entities.Orders;
 using MasterCRM.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +10,8 @@ namespace MasterCRM.Application.Services.Auth.ExternalAuth;
 public class VkAuthService(
     UserManager<Master> userManager, 
     SignInManager<Master> signInManager, 
-    IVkontakteService vkontakteService) : IVkAuthService
+    IVkontakteService vkontakteService,
+    IStageRepository stageRepository) : IVkAuthService
 {
     /// <summary>
     /// Checks silent token and login if user with vkId was found in database,
@@ -50,6 +53,8 @@ public class VkAuthService(
             var newUserResult = await userManager.CreateAsync(newUser);
             if (!newUserResult.Succeeded)
                 throw new Exception("User creation failed");
+
+            await AddDefaultStagesAsync(newUser.Id);
             
             await signInManager.SignInAsync(newUser, true);
     
@@ -84,5 +89,47 @@ public class VkAuthService(
         await userManager.UpdateAsync(user);
 
         return vkId.ToString();
+    }
+    
+    private async Task AddDefaultStagesAsync(string masterId)
+    {
+        var defaultStages = new List<Stage>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = masterId,
+                Name = "Новый заказ",
+                StageType = StageType.Start,
+                Order = 0
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = masterId,
+                Name = "В работе",
+                StageType = StageType.Default,
+                Order = 1
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = masterId,
+                Name = "Доставка",
+                StageType = StageType.Default,
+                Order = 2
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = masterId,
+                Name = "Архив",
+                StageType = StageType.End,
+                Order = 3
+            },
+        };
+
+        await stageRepository.AddRangeAsync(defaultStages);
+        await stageRepository.SaveChangesAsync();
     }
 }

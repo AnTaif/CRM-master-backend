@@ -12,70 +12,17 @@ public class AuthService(UserManager<Master> userManager,
 {
     public async Task<IdentityResult> RegisterAsync(RegisterUserRequest request)
     {
-        var name = request.FullName.Split();
-        var master = new Master
-        {
-            Id = Guid.NewGuid().ToString(),
-            UserName = request.Email,
-            Email = request.Email,
-            PhoneNumber = request.Phone,
-            LastName = name[0],
-            FirstName = name[1],
-            MiddleName = name.Length > 2 ? name[2] : null,
-            VkLink = request.VkLink,
-            TelegramLink = request.TelegramLink,
-            WebsiteId = Guid.NewGuid()
-        };
+        var master = new Master(request.FullName, request.Email, request.Phone, request.VkLink, request.TelegramLink);
 
         var result = await userManager.CreateAsync(master, request.Password);
         
         if (!result.Succeeded)
             throw new Exception("User already exists");
 
-        var preCreatedStages = new List<Stage>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                MasterId = master.Id,
-                Name = "Новый заказ",
-                StageType = StageType.Start,
-                Order = 0
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                MasterId = master.Id,
-                Name = "В работе",
-                StageType = StageType.Default,
-                Order = 1
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                MasterId = master.Id,
-                Name = "Доставка",
-                StageType = StageType.Default,
-                Order = 2
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                MasterId = master.Id,
-                Name = "Архив",
-                StageType = StageType.End,
-                Order = 3
-            },
-        };
-
-        await stageRepository.AddRangeAsync(preCreatedStages);
-        await stageRepository.SaveChangesAsync();
+        await AddDefaultStagesAsync(master.Id);
         
         var signInResult = await signInManager.PasswordSignInAsync(
-            request.Email, 
-            request.Password, 
-            true, 
-            true);
+            request.Email, request.Password, true, true);
 
         if (!signInResult.Succeeded)
             throw new Exception("Failed to sign in after registration");
@@ -95,4 +42,46 @@ public class AuthService(UserManager<Master> userManager,
     }
     
     public async Task LogoutAsync() => await signInManager.SignOutAsync();
+    
+    private async Task AddDefaultStagesAsync(string masterId)
+    {
+        var defaultStages = new List<Stage>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = masterId,
+                Name = "Новый заказ",
+                StageType = StageType.Start,
+                Order = 0
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = masterId,
+                Name = "В работе",
+                StageType = StageType.Default,
+                Order = 1
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = masterId,
+                Name = "Доставка",
+                StageType = StageType.Default,
+                Order = 2
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                MasterId = masterId,
+                Name = "Архив",
+                StageType = StageType.End,
+                Order = 3
+            },
+        };
+
+        await stageRepository.AddRangeAsync(defaultStages);
+        await stageRepository.SaveChangesAsync();
+    }
 }

@@ -29,6 +29,23 @@ public class Master : IdentityUser
     
     public int? VkId { get; set; }
 
+    public Master()
+    {
+        Id = Guid.NewGuid().ToString();
+    }
+
+    public Master(string fullname, string email, string phone, string? vkLink, string? telegramLink)
+    {
+        Id = Guid.NewGuid().ToString();
+        UserName = email;
+        Email = email;
+        PhoneNumber = phone;
+        SetFullName(fullname);
+        VkLink = vkLink;
+        TelegramLink = telegramLink;
+        WebsiteId = Guid.NewGuid();
+    }
+
     public void Update(string? fullname, string? phone, string? vkLink, string? telegramLink)
     {
         if (fullname != null)

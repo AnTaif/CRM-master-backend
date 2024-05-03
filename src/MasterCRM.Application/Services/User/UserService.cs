@@ -1,5 +1,4 @@
 using MasterCRM.Application.Services.User.Requests;
-using MasterCRM.Application.Services.User.Responses;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -8,26 +7,26 @@ namespace MasterCRM.Application.Services.User;
 
 public class UserService(UserManager<Master> userManager) : IUserService
 {
-    public async Task<GetUserInfoResponse?> GetInfoAsync(string id)
+    public async Task<UserDto?> GetInfoAsync(string id)
     {
-        var master = await userManager.FindByIdAsync(id);
+        var user = await userManager.FindByIdAsync(id);
 
-        if (master == null)
+        if (user == null)
             return null;
 
-        return new GetUserInfoResponse
+        return new UserDto
         {
-            Id = master.Id,
-            FullName = master.GetFullName(),
-            Email = master.Email ?? "",
-            Phone = master.PhoneNumber ?? "",
-            VkLink = master.VkLink,
-            TelegramLink = master.TelegramLink,
-            VkId = master.VkId?.ToString()
+            Id = user.Id,
+            FullName = user.GetFullName(),
+            Email = user.Email ?? "",
+            Phone = user.PhoneNumber ?? "",
+            VkLink = user.VkLink,
+            TelegramLink = user.TelegramLink,
+            VkId = user.VkId?.ToString()
         };
     }
 
-    public async Task<GetUserInfoResponse?> ChangeInfoAsync(string id, ChangeUserInfoRequest request)
+    public async Task<UserDto?> ChangeInfoAsync(string id, ChangeUserInfoRequest request)
     {
         var user = await userManager.FindByIdAsync(id);
 
@@ -54,7 +53,7 @@ public class UserService(UserManager<Master> userManager) : IUserService
         if (!result.Succeeded)
             throw new Exception("Failed to update user info.");
 
-        return new GetUserInfoResponse
+        return new UserDto
         {
             Id = user.Id,
             FullName = user.GetFullName(),

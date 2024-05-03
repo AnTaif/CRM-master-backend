@@ -1,4 +1,6 @@
 using MasterCRM.Domain.Entities;
+using MasterCRM.Domain.Entities.Orders;
+using MasterCRM.Domain.Entities.Products;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,5 +23,10 @@ public class CrmDbContext : IdentityDbContext<Master>
     public CrmDbContext(DbContextOptions<CrmDbContext> options) : base(options)
     {
         Database.EnsureCreated();
+    }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
     }
 }

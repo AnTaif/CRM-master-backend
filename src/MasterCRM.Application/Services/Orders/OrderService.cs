@@ -5,8 +5,9 @@ using MasterCRM.Application.Services.Orders.History;
 using MasterCRM.Application.Services.Orders.Requests;
 using MasterCRM.Application.Services.Orders.Responses;
 using MasterCRM.Application.Services.Orders.Stages;
-using MasterCRM.Application.Services.Product;
+using MasterCRM.Application.Services.Products;
 using MasterCRM.Domain.Entities;
+using MasterCRM.Domain.Entities.Orders;
 
 namespace MasterCRM.Application.Services.Orders;
 
@@ -39,7 +40,7 @@ public class OrderService(
         });
     }
 
-    public async Task<GetOrderResponse?> GetOrderByIdAsync(Guid orderId)
+    public async Task<OrderDto?> GetOrderByIdAsync(Guid orderId)
     {
         var order = await orderRepository.GetByIdAsync(orderId);
         
@@ -48,7 +49,7 @@ public class OrderService(
             return null;
         }
         
-        return new GetOrderResponse
+        return new OrderDto
         {
             Id = order.Id,
             Name = order.Name,
@@ -72,7 +73,7 @@ public class OrderService(
         };
     }
 
-    public async Task<GetOrderResponse> CreateOrderAsync(string masterId, CreateOrderRequest request)
+    public async Task<OrderDto> CreateOrderAsync(string masterId, CreateOrderRequest request)
     {
         var client = await clientRepository.GetByEmailAsync(request.Client.Email);
         
@@ -135,7 +136,7 @@ public class OrderService(
         
         await orderRepository.SaveChangesAsync();
 
-        return new GetOrderResponse
+        return new OrderDto
         {
             Id = newOrder.Id,
             Name = newOrder.Name,
@@ -159,7 +160,7 @@ public class OrderService(
         };
     }
 
-    public async Task<GetOrderResponse?> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request)
+    public async Task<OrderDto?> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request)
     {
         var order = await orderRepository.GetByIdAsync(orderId);
 
@@ -287,7 +288,7 @@ public class OrderService(
         
         await orderRepository.SaveChangesAsync();
         
-        return new GetOrderResponse
+        return new OrderDto
         {
             Id = order.Id,
             Name = order.Name,

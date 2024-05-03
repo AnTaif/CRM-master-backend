@@ -4,13 +4,6 @@ namespace MasterCRM.Infrastructure;
 
 public class RootFileStorage(string rootPath, string uploadUrlBase) : IFileStorage
 {
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="stream"></param>
-    /// <param name="fileName"></param>
-    /// <returns>Url to the uploaded file</returns>
     public async Task<string> UploadAsync(Stream stream, string fileName)
     {
         var filePath = Path.Combine(rootPath, fileName);

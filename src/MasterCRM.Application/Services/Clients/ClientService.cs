@@ -1,19 +1,18 @@
 using MasterCRM.Application.Services.Clients.Requests;
-using MasterCRM.Application.Services.Clients.Responses;
 using MasterCRM.Domain.Entities;
 
 namespace MasterCRM.Application.Services.Clients;
 
 public class ClientService(IClientRepository clientRepository) : IClientService
 {
-    public async Task<IEnumerable<GetClientResponse>> GetByMasterAsync(string masterId)
+    public async Task<IEnumerable<ClientDto>> GetByMasterAsync(string masterId)
     {
         var clients = await clientRepository.GetByMasterAsync(masterId);
         
         //TODO: Implement getting last order date
         //var lastOrderDate = await orderRepository.GetLastOrderDateAsync(masterId);
         
-        return clients.Select(client => new GetClientResponse
+        return clients.Select(client => new ClientDto
         {
             Id = client.Id,
             FullName = client.GetFullName(),
@@ -23,14 +22,14 @@ public class ClientService(IClientRepository clientRepository) : IClientService
         });
     }
 
-    public async Task<GetClientResponse?> GetByIdAsync(Guid id)
+    public async Task<ClientDto?> GetByIdAsync(Guid id)
     {
         var client = await clientRepository.GetByIdAsync(id);
         
         if (client == null)
             return null;
 
-        return new GetClientResponse
+        return new ClientDto
         {
             Id = client.Id,
             FullName = client.GetFullName(),

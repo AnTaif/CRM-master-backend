@@ -1,5 +1,5 @@
-using MasterCRM.Application.Services.Product;
-using MasterCRM.Domain.Entities;
+using MasterCRM.Application.Services.Products;
+using MasterCRM.Domain.Entities.Products;
 using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Infrastructure.Repositories;

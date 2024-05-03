@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Domain.Entities;
+using MasterCRM.Domain.Entities.Orders;
 using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Infrastructure.Repositories;

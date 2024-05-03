@@ -1,3 +1,4 @@
+using MasterCRM.Application.Services.Orders.Dto;
 using MasterCRM.Application.Services.Orders.Requests;
 using MasterCRM.Application.Services.Orders.Responses;
 using MasterCRM.Domain.Entities;
@@ -8,11 +9,11 @@ public interface IOrderService
 {
     public Task<IEnumerable<GetOrderItemResponse>> GetWithStageByMasterAsync(string masterId, short orderTab);
 
-    public Task<GetOrderResponse?> GetOrderByIdAsync(Guid orderId);
+    public Task<OrderDto?> GetOrderByIdAsync(Guid orderId);
     
-    public Task<GetOrderResponse> CreateOrderAsync(string masterId, CreateOrderRequest request);
+    public Task<OrderDto> CreateOrderAsync(string masterId, CreateOrderRequest request);
     
-    public Task<GetOrderResponse?> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request);
+    public Task<OrderDto?> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request);
     
     public Task<bool> TryDeleteOrderAsync(Guid orderId);
 }

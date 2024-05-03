@@ -1,10 +1,10 @@
-using MasterCRM.Application.Services.Auth;
+using MasterCRM.Application.Services.Auth.DefaultAuth;
 using MasterCRM.Application.Services.Auth.ExternalAuth;
 using MasterCRM.Application.Services.Clients;
 using MasterCRM.Application.Services.Orders;
 using MasterCRM.Application.Services.Orders.History;
 using MasterCRM.Application.Services.Orders.Stages;
-using MasterCRM.Application.Services.Product;
+using MasterCRM.Application.Services.Products;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;

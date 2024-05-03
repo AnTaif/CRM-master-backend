@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using MasterCRM.Application.Services.Clients;
 using MasterCRM.Application.Services.Clients.Requests;
-using MasterCRM.Application.Services.Clients.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +12,7 @@ namespace MasterCRM.Api.Controllers;
 public class ClientsController(IClientService clientService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<GetClientResponse>> GetByCurrentUser()
+    public async Task<ActionResult<ClientDto>> GetByCurrentUser()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         

@@ -5,6 +5,7 @@ namespace MasterCRM.Application.Services.Orders.Requests;
 public record CreateOrderRequest
 {
     //public required string Name { get; init; }
+    public short? StageTab { get; init; } 
     
     public required double TotalAmount { get; init; }
     

@@ -1,10 +1,10 @@
 namespace MasterCRM.Application.Services.Orders.Requests;
 
-public class ChangeOrderClientRequest
+public record ChangeOrderClientRequest
 {
-    public required string? FullName { get; init; }
+    public string? FullName { get; init; }
     
-    public required string? Email { get; init; }
+    public string? Email { get; init; }
     
-    public required string? Phone { get; init; }
+    public string? Phone { get; init; }
 }

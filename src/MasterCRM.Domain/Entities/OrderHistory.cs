@@ -4,11 +4,11 @@ namespace MasterCRM.Domain.Entities;
 
 public class OrderHistory : BaseEntity<Guid>
 {
-    public string Change { get; init; }
+    public Guid OrderId { get; init; }
     
-    public string Type { get; init; }
+    public string Change { get; init; } = null!;
     
-    public string Stage { get; init; }
+    public string Type { get; init; } = null!;
     
     public DateTime Date { get; init; }
 }

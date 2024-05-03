@@ -1,6 +1,7 @@
 using System.Text;
 using MasterCRM.Application.Services.Clients;
 using MasterCRM.Application.Services.Orders.Dto;
+using MasterCRM.Application.Services.Orders.History;
 using MasterCRM.Application.Services.Orders.Requests;
 using MasterCRM.Application.Services.Orders.Responses;
 using MasterCRM.Application.Services.Orders.Stages;
@@ -13,7 +14,8 @@ public class OrderService(
     IOrderRepository orderRepository, 
     IClientRepository clientRepository,
     IStageRepository stageRepository,
-    IProductRepository productRepository) : IOrderService
+    IProductRepository productRepository,
+    IOrderHistoryRepository historyRepository) : IOrderService
 {
     public async Task<IEnumerable<GetOrderItemResponse>> GetWithStageByMasterAsync(string masterId, short orderTab)
     {
@@ -120,6 +122,17 @@ public class OrderService(
         };
         
         await orderRepository.CreateAsync(newOrder);
+
+        var historyItem = new OrderHistory
+        {
+            Id = Guid.NewGuid(),
+            OrderId = newOrder.Id,
+            Change = $"Заказ {newOrder.Name}",
+            Type = "Создана сделка",
+            Date = newOrder.CreatedAt
+        };
+        await historyRepository.CreateAsync(historyItem);
+        
         await orderRepository.SaveChangesAsync();
 
         return new GetOrderResponse
@@ -160,6 +173,19 @@ public class OrderService(
         order.Comment = request.Comment ?? order.Comment;
         order.Address = request.Address ?? order.Address;
 
+        if (request.TotalAmount != null || request.Comment != null || request.Address != null)
+        {
+            var updateOrderHistory = new OrderHistory
+            {
+                Id = Guid.NewGuid(),
+                OrderId = order.Id,
+                Change = $"{request.TotalAmount} {request.Comment ?? ""} {request.Address ?? ""}",
+                Type = "Данные заказа изменены",
+                Date = DateTime.UtcNow
+            };
+            await historyRepository.CreateAsync(updateOrderHistory);   
+        }
+
         if (request.StageTab != null)
         {
             var stage = await stageRepository.GetWithTabByMaster(masterId, (short)request.StageTab);
@@ -169,6 +195,16 @@ public class OrderService(
             
             if (stage.MasterId != masterId)
                 throw new Exception("Current user is not the owner of the stage");
+
+            var updateStageHistory = new OrderHistory
+            {
+                Id = Guid.NewGuid(),
+                OrderId = order.Id,
+                Change = $"{order.Stage.Name} -> {stage.Name}",
+                Type = "Этап изменен",
+                Date = DateTime.UtcNow
+            };
+            await historyRepository.CreateAsync(updateStageHistory);
             
             order.StageId = stage.Id;
         }
@@ -202,6 +238,16 @@ public class OrderService(
                 client.Phone = request.Client.Phone ?? order.Client.Phone;
                 order.ClientId = client.Id;
             }
+            
+            var updateClientHistory = new OrderHistory
+            {
+                Id = Guid.NewGuid(),
+                OrderId = order.Id,
+                Change = $"{request.Client.FullName ?? ""} {request.Client.Email ?? ""} {request.Client.Phone ?? ""}",
+                Type = "Данные клиента изменены",
+                Date = DateTime.UtcNow
+            };
+            await historyRepository.CreateAsync(updateClientHistory);
         }
         
         if (request.Products != null)
@@ -225,9 +271,20 @@ public class OrderService(
             
             order.OrderProducts.Clear();
             order.OrderProducts.AddRange(products);
+            
+            var updateOrderProductsHistory = new OrderHistory
+            {
+                Id = Guid.NewGuid(),
+                OrderId = order.Id,
+                Change = $"{products.Count} позиций на {products.Sum(product => product.Quantity * product.UnitPrice)} \u20bd",
+                Type = "Товары заказа изменены",
+                Date = DateTime.UtcNow
+            };
+            await historyRepository.CreateAsync(updateOrderProductsHistory);
         }
         
         orderRepository.Update(order);
+        
         await orderRepository.SaveChangesAsync();
         
         return new GetOrderResponse

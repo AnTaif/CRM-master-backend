@@ -12,6 +12,8 @@ public class CrmDbContext : IdentityDbContext<Master>
 
     public DbSet<Order> Orders { get; set; } = null!;
 
+    public DbSet<OrderHistory> OrderHistories { get; set; } = null!;
+
     public DbSet<Client> Clients { get; set; } = null!;
     
     public DbSet<Stage> Stages { get; set; } = null!;

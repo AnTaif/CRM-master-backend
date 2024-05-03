@@ -19,7 +19,7 @@ public class StageRepository(CrmDbContext context) : IStageRepository
         await dbSet.FirstOrDefaultAsync(stage => stage.Order == stageTab);
 
     public async Task<IEnumerable<Stage>> GetAllByPredicateAsync(Expression<Func<Stage, bool>> predicate) => 
-        await dbSet.Where(predicate).ToListAsync();
+        await dbSet.Where(predicate).OrderBy(stage => stage.Order).ToListAsync();
 
     public void Update(Stage stage) => dbSet.Update(stage);
     

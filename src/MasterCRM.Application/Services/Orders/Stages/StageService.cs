@@ -49,25 +49,43 @@ public class StageService(IStageRepository stageRepository) : IStageService
         return new StageDto(stage.Id, stage.Name, stage.Order, stage.IsSystem);
     }
 
-    public async Task<List<StageDto>?> UpdateRangeAsync(IEnumerable<UpdateStageItemRequest> requests)
+    public async Task<List<StageDto>?> UpdateRangeAsync(UpdateRangeRequest request)
     {
         var stages = new List<Stage>();
-        
-        foreach (var request in requests)
+
+        var updateRequests = request.UpdateStages;
+        if (updateRequests != null)
         {
-            var stage = await stageRepository.GetByIdAsync(request.Id);
+            foreach (var updateRequest in updateRequests)
+            {
+                var stage = await stageRepository.GetByIdAsync(updateRequest.Id);
 
-            if (stage == null)
-                return null;
+                if (stage == null)
+                    return null;
 
-            stage.Name = request.Name ?? stage.Name;
-            stage.Order = request.Order ?? stage.Order;
-            
-            stageRepository.Update(stage);
-            stages.Add(stage);
+                stage.Name = updateRequest.Name ?? stage.Name;
+                stage.Order = updateRequest.Order ?? stage.Order;
+                
+                stageRepository.Update(stage);
+                stages.Add(stage);
+            }
         }
-        await stageRepository.SaveChangesAsync();
+        
+        var deletedStages = request.DeleteStages;
+        if (deletedStages != null)
+        {
+            foreach (var deletedStageId in deletedStages)
+            {
+                var deletedStage = await stageRepository.GetByIdAsync(deletedStageId);
 
+                if (deletedStage == null)
+                    throw new Exception($"Stage with this id: \"{deletedStageId}\" not found");
+                
+                stageRepository.Delete(deletedStage);
+            }
+        }
+        
+        await stageRepository.SaveChangesAsync();
         return stages.Select(stage => new StageDto(stage.Id, stage.Name, stage.Order, stage.IsSystem)).ToList();
     }
 

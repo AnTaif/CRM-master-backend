@@ -45,9 +45,9 @@ public class StageController(IStageService stageService) : ControllerBase
     }
 
     [HttpPut]
-    public async Task<ActionResult<IEnumerable<StageDto>>> UpdateRange(IEnumerable<UpdateStageItemRequest> requests)
+    public async Task<ActionResult<IEnumerable<StageDto>>> UpdateRange(UpdateRangeRequest request)
     {
-        var stageDtos = await stageService.UpdateRangeAsync(requests);
+        var stageDtos = await stageService.UpdateRangeAsync(request);
 
         if (stageDtos == null)
             return NotFound();

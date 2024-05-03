@@ -8,7 +8,7 @@ public interface IStageService
 
     public Task<StageDto?> UpdateAsync(Guid id, UpdateStageRequest request);
 
-    public Task<List<StageDto>?> UpdateRangeAsync(IEnumerable<UpdateStageItemRequest> requests);
+    public Task<List<StageDto>?> UpdateRangeAsync(UpdateRangeRequest request);
         
     public Task<bool> TryDeleteAsync(Guid id);
 }
@@ -17,4 +17,7 @@ public record StageDto(Guid Id, string Name, short Order, bool IsSystem);
 
 public record UpdateStageRequest(string? Name);
 
-public record UpdateStageItemRequest(Guid Id, string? Name,short? Order);
+public record UpdateRangeRequest(IEnumerable<UpdateStageItemRequest>? UpdateStages,
+    IEnumerable<Guid>? DeleteStages);
+
+public record UpdateStageItemRequest(Guid Id, string? Name, short? Order);

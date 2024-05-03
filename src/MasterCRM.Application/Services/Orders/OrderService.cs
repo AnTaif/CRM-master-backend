@@ -85,7 +85,11 @@ public class OrderService(
             clientId = newClient.Id;
         }
         else
+        {
+            client.LastOrderDate = DateTime.UtcNow;
+            clientRepository.Update(client);
             clientId = client.Id;
+        }
 
         var startStage = await stageRepository.GetStartByMasterAsync(masterId);
 

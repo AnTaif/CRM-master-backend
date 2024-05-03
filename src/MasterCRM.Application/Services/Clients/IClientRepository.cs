@@ -4,7 +4,7 @@ namespace MasterCRM.Application.Services.Clients;
 
 public interface IClientRepository
 {
-    Task<IEnumerable<Client?>> GetByMasterAsync(string masterId);
+    Task<IEnumerable<Client>> GetByMasterAsync(string masterId);
     
     Task<Client?> GetByEmailAsync(string email);
     

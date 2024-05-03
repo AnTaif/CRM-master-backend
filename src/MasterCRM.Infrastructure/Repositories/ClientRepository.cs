@@ -6,9 +6,9 @@ namespace MasterCRM.Infrastructure.Repositories;
 
 public class ClientRepository(CrmDbContext context) : IClientRepository
 {
-    private DbSet<Client?> dbSet => context.Clients;
+    private DbSet<Client> dbSet => context.Clients;
     
-    public async Task<IEnumerable<Client?>> GetByMasterAsync(string masterId) => 
+    public async Task<IEnumerable<Client>> GetByMasterAsync(string masterId) => 
         await dbSet.Where(client => client.MasterId == masterId).ToListAsync();
 
     public async Task<Client?> GetByEmailAsync(string email) =>

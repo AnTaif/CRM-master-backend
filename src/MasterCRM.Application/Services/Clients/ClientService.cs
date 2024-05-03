@@ -9,16 +9,13 @@ public class ClientService(IClientRepository clientRepository) : IClientService
     {
         var clients = await clientRepository.GetByMasterAsync(masterId);
         
-        //TODO: Implement getting last order date
-        //var lastOrderDate = await orderRepository.GetLastOrderDateAsync(masterId);
-        
         return clients.Select(client => new ClientDto
         {
             Id = client.Id,
             FullName = client.GetFullName(),
             Email = client.Email,
             Phone = client.Phone,
-            LastOrderDate = DateTime.UtcNow //TODO: change to lastOrderDate
+            LastOrderDate = client.LastOrderDate
         });
     }
 
@@ -35,7 +32,7 @@ public class ClientService(IClientRepository clientRepository) : IClientService
             FullName = client.GetFullName(),
             Email = client.Email,
             Phone = client.Phone,
-            LastOrderDate = DateTime.UtcNow //TODO: change to lastOrderDate
+            LastOrderDate = client.LastOrderDate
         };
     }
 

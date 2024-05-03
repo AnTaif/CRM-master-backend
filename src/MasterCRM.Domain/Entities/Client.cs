@@ -16,6 +16,8 @@ public class Client : BaseEntity<Guid>
     public string Email { get; set; } = null!;
     
     public string Phone { get; set; } = null!;
+    
+    public DateTime LastOrderDate { get; set; }
 
     public Client()
     {
@@ -29,6 +31,7 @@ public class Client : BaseEntity<Guid>
         ParseFullName(fullname);
         Email = email;
         Phone = phone;
+        LastOrderDate = DateTime.UtcNow;
     }
 
     public string GetFullName()

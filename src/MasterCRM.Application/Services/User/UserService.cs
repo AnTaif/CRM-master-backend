@@ -1,6 +1,6 @@
+using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.User.Requests;
 using MasterCRM.Domain.Entities;
-using MasterCRM.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 namespace MasterCRM.Application.Services.User;
@@ -11,19 +11,7 @@ public class UserService(UserManager<Master> userManager) : IUserService
     {
         var user = await userManager.FindByIdAsync(id);
 
-        if (user == null)
-            return null;
-
-        return new UserDto
-        {
-            Id = user.Id,
-            FullName = user.GetFullName(),
-            Email = user.Email ?? "",
-            Phone = user.PhoneNumber ?? "",
-            VkLink = user.VkLink,
-            TelegramLink = user.TelegramLink,
-            VkId = user.VkId?.ToString()
-        };
+        return user?.ToDto();
     }
 
     public async Task<UserDto?> ChangeInfoAsync(string id, ChangeUserInfoRequest request)
@@ -38,31 +26,15 @@ public class UserService(UserManager<Master> userManager) : IUserService
             await userManager.SetEmailAsync(user, request.Email);
             await userManager.SetUserNameAsync(user, request.Email);
         }
-
-        user.PhoneNumber = request.Phone ?? user.PhoneNumber;
-
-        var name = request.FullName?.Split();
-        user.LastName = name?[0] ?? user.LastName;
-        user.FirstName = name?[1] ?? user.FirstName;
-        user.MiddleName = name?.Length > 2 ? name[2] : user.MiddleName;
-        user.VkLink = request.VkLink ?? user.VkLink;
-        user.TelegramLink = request.TelegramLink ?? user.TelegramLink;
+        
+        user.Update(request.FullName, request.Phone, request.VkLink, request.TelegramLink);
 
         var result = await userManager.UpdateAsync(user);
 
         if (!result.Succeeded)
             throw new Exception("Failed to update user info.");
 
-        return new UserDto
-        {
-            Id = user.Id,
-            FullName = user.GetFullName(),
-            Email = user.Email ?? "",
-            Phone = user.PhoneNumber ?? "",
-            VkLink = user.VkLink,
-            TelegramLink = user.TelegramLink,
-            VkId = user.VkId?.ToString()
-        };
+        return user.ToDto();
     }
 
     public async Task<bool> TryChangePasswordAsync(string id, ChangePasswordRequest request)

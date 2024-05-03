@@ -1,6 +1,6 @@
 using MasterCRM.Domain.Common;
 
-namespace MasterCRM.Domain.Entities;
+namespace MasterCRM.Domain.Entities.Orders;
 
 public class OrderHistory : BaseEntity<Guid>
 {

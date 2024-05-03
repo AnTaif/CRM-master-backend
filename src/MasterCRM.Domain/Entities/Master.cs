@@ -29,6 +29,27 @@ public class Master : IdentityUser
     
     public int? VkId { get; set; }
 
+    public void Update(string? fullname, string? phone, string? vkLink, string? telegramLink)
+    {
+        if (fullname != null)
+            SetFullName(fullname);
+        if (phone != null)
+            PhoneNumber = phone;
+        if (vkLink != null)
+            VkLink = vkLink;
+        if (telegramLink != null)
+            TelegramLink = telegramLink;
+    }
+    
+    public void SetFullName(string fullname)
+    {
+        var names = fullname.Split();
+        
+        LastName = names[0];
+        FirstName = names[1];
+        MiddleName = names.Length > 2 ? names[2] : null;
+    }
+
     public string GetFullName()
     {
         var fullName = $"{LastName} {FirstName}";

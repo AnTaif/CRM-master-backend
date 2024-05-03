@@ -28,10 +28,20 @@ public class Client : BaseEntity<Guid>
     {
         Id = Guid.NewGuid();
         MasterId = masterId;
-        ParseFullName(fullname);
+        SetFullName(fullname);
         Email = email;
         Phone = phone;
         LastOrderDate = DateTime.UtcNow;
+    }
+
+    public void Update(string? fullName, string? email, string? phone)
+    {
+        if (fullName != null)
+            SetFullName(fullName);
+        if (email != null)
+            Email = email;
+        if (phone != null)
+            Phone = phone;
     }
 
     public string GetFullName()
@@ -43,14 +53,12 @@ public class Client : BaseEntity<Guid>
         return fullName;
     }
 
-    public void ParseFullName(string fullname)
+    public void SetFullName(string fullname)
     {
         var names = fullname.Split();
         
         LastName = names[0];
         FirstName = names[1];
-        
-        if (names.Length > 2)
-            MiddleName = names[2];
+        MiddleName = names.Length > 2 ? names[2] : null;
     }
 }

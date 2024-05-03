@@ -17,11 +17,11 @@ public class ClientRepository(CrmDbContext context) : IClientRepository
     public async Task<Client?> GetByIdAsync(Guid id) =>
         await dbSet.FirstOrDefaultAsync(client => client.Id == id);
 
-    public async Task CreateAsync(Client? client) => await dbSet.AddAsync(client);
+    public async Task CreateAsync(Client client) => await dbSet.AddAsync(client);
 
-    public void Delete(Client? client) => dbSet.Remove(client);
+    public void Delete(Client client) => dbSet.Remove(client);
 
-    public void Update(Client? client) => dbSet.Update(client);
+    public void Update(Client client) => dbSet.Update(client);
 
     public async Task SaveChangesAsync() => await context.SaveChangesAsync();
 }

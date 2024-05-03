@@ -1,4 +1,5 @@
 using System.Text;
+using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.Clients;
 using MasterCRM.Application.Services.Orders.Dto;
 using MasterCRM.Application.Services.Orders.History;
@@ -23,54 +24,14 @@ public class OrderService(
         var activeOrders = await orderRepository.GetAllByPredicateAsync(order =>
             order.MasterId == masterId && order.IsActive && order.Stage.Order == orderTab);
         
-        return activeOrders.Select(order => new GetOrderItemResponse
-        {
-            Id = order.Id,
-            Name = order.Name,
-            Stage = order.Stage.Name,
-            TotalAmount = order.TotalAmount,
-            Comment = order.Comment,
-            Address = order.Address,
-            Client = new OrderClientDto
-            {
-                FullName = order.Client.GetFullName(),
-                Email = order.Client.Email,
-                Phone = order.Client.Phone,
-            }
-        });
+        return activeOrders.Select(order => order.ToItemResponse());
     }
 
     public async Task<OrderDto?> GetOrderByIdAsync(Guid orderId)
     {
         var order = await orderRepository.GetByIdAsync(orderId);
         
-        if (order is null)
-        {
-            return null;
-        }
-        
-        return new OrderDto
-        {
-            Id = order.Id,
-            Name = order.Name,
-            Stage = order.Stage.Name,
-            TotalAmount = order.TotalAmount,
-            Comment = order.Comment,
-            Address = order.Address,
-            Client = new OrderClientDto
-            {
-                FullName = order.Client.GetFullName(),
-                Email = order.Client.Email,
-                Phone = order.Client.Phone,
-            },
-            Products = order.OrderProducts.Select(product => new OrderProductDto
-            {
-                ProductId = product.Product.Id,
-                Name = product.Product.Name,
-                Quantity = product.Quantity,
-                Photo = product.Product.Photos.First().Url
-            })
-        };
+        return order?.ToDto();
     }
 
     public async Task<OrderDto> CreateOrderAsync(string masterId, CreateOrderRequest request)
@@ -122,8 +83,7 @@ public class OrderService(
             Comment = request.Comment,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            OrderProducts = products,
-            History = new List<OrderHistory>() // TODO: add new history item
+            OrderProducts = products
         };
         
         await orderRepository.CreateAsync(newOrder);
@@ -140,28 +100,7 @@ public class OrderService(
         
         await orderRepository.SaveChangesAsync();
 
-        return new OrderDto
-        {
-            Id = newOrder.Id,
-            Name = newOrder.Name,
-            Stage = startStage.Name,
-            TotalAmount = newOrder.TotalAmount,
-            Comment = newOrder.Comment,
-            Client = new OrderClientDto
-            {
-                FullName = newOrder.Client.GetFullName(),
-                Email = newOrder.Client.Email,
-                Phone = newOrder.Client.Phone,
-            },
-            Address = newOrder.Address,
-            Products = newOrder.OrderProducts.Select(product => new OrderProductDto
-            {
-                ProductId = product.Product.Id,
-                Name = product.Product.Name,
-                Quantity = product.Quantity,
-                Photo = product.Product.Photos.First().Url
-            })
-        };
+        return newOrder.ToDto();
     }
 
     public async Task<OrderDto?> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request)
@@ -174,10 +113,8 @@ public class OrderService(
         if (order.MasterId != masterId)
             throw new Exception("Current user is not the owner of the order");
 
-        order.TotalAmount = request.TotalAmount ?? order.TotalAmount;
-        order.Comment = request.Comment ?? order.Comment;
-        order.Address = request.Address ?? order.Address;
-
+        order.Update(request.TotalAmount, request.Comment, request.Address);
+        
         if (request.TotalAmount != null || request.Comment != null || request.Address != null)
         {
             var updateOrderHistory = new OrderHistory
@@ -226,8 +163,7 @@ public class OrderService(
             if (client == null)
             {
                 // Create new client
-                var newClient = new Client(
-                    masterId, 
+                var newClient = new Client(masterId, 
                     request.Client.FullName ?? order.Client.GetFullName(), 
                     request.Client.Email!, 
                     request.Client.Phone ?? order.Client.Phone);
@@ -237,10 +173,7 @@ public class OrderService(
             }
             else
             {
-                if (request.Client.FullName != null)
-                    client.ParseFullName(request.Client.FullName);
-
-                client.Phone = request.Client.Phone ?? order.Client.Phone;
+                client.Update(request.Client.FullName, null, request.Client.Phone);
                 order.ClientId = client.Id;
             }
             
@@ -291,29 +224,8 @@ public class OrderService(
         orderRepository.Update(order);
         
         await orderRepository.SaveChangesAsync();
-        
-        return new OrderDto
-        {
-            Id = order.Id,
-            Name = order.Name,
-            Stage = order.Stage.Name,
-            TotalAmount = order.TotalAmount,
-            Comment = order.Comment,
-            Address = order.Address,
-            Client = new OrderClientDto
-            {
-                FullName = order.Client.GetFullName(),
-                Email = order.Client.Email,
-                Phone = order.Client.Phone,
-            },
-            Products = order.OrderProducts.Select(product => new OrderProductDto
-            {
-                ProductId = product.Product.Id,
-                Name = product.Product.Name,
-                Quantity = product.Quantity,
-                Photo = product.Product.Photos.First().Url
-            })
-        };
+
+        return order.ToDto();
     }
 
     public async Task<bool> TryDeleteOrderAsync(Guid orderId)
@@ -332,7 +244,7 @@ public class OrderService(
         if (!clientOrders.Any())
         {
             var client = await clientRepository.GetByIdAsync(clientId);
-            clientRepository.Delete(client);
+            clientRepository.Delete(client!);
         }
 
         await orderRepository.SaveChangesAsync();
@@ -342,7 +254,7 @@ public class OrderService(
     private string GetOrderName(string fullname)
     {
         var splitFullname = fullname.Split();
-        var name = new StringBuilder();
+        var name = new StringBuilder("Заказ ");
 
         name.Append(splitFullname[0]);
         name.Append($" {splitFullname[1][0]}.");

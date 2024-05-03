@@ -1,4 +1,4 @@
-using MasterCRM.Domain.Entities;
+using MasterCRM.Application.MapExtensions;
 using MasterCRM.Domain.Entities.Orders;
 
 namespace MasterCRM.Application.Services.Orders.Stages;
@@ -8,31 +8,8 @@ public class StageService(IStageRepository stageRepository) : IStageService
     public async Task<List<StageDto>> GetByMasterAsync(string masterId)
     {
         var stages = await stageRepository.GetAllByPredicateAsync(stage => stage.MasterId == masterId);
-        var stagesList = stages.ToList();
-        
-        stagesList.Sort((stage1, stage2) => stage1.Order.CompareTo(stage2.Order));
 
-        return stagesList.Select(stage => new StageDto(stage.Id, stage.Name, stage.Order, stage.IsSystem)).ToList();
-    }
-
-    public async Task<List<StageDto>> ReorderItemsAsync(string masterId, IEnumerable<Guid> ids)
-    {
-        var stages = await stageRepository.GetAllByPredicateAsync(stage => stage.MasterId == masterId);
-        var stagesList = stages.ToList();
-
-        var idsList = ids.ToList();
-        for (var i = 0; i < idsList.Count; i++)
-        {
-            var id = idsList[i];
-            var stage = stagesList.First(stage => stage.Id == id);
-
-            stage.Order = (short)i;
-        }
-        
-        stageRepository.UpdateRange(stagesList);
-        await stageRepository.SaveChangesAsync();
-        
-        return stagesList.Select(stage => new StageDto(stage.Id, stage.Name, stage.Order, stage.IsSystem)).ToList();
+        return stages.Select(stage => stage.ToDto()).ToList();
     }
 
     public async Task<StageDto?> UpdateAsync(Guid id, UpdateStageRequest request)
@@ -42,12 +19,10 @@ public class StageService(IStageRepository stageRepository) : IStageService
         if (stage == null)
             return null;
 
-        stage.Name = request.Name ?? stage.Name;
-        
-        stageRepository.Update(stage);
+        stage.Update(request.Name, request.Order);
         await stageRepository.SaveChangesAsync();
 
-        return new StageDto(stage.Id, stage.Name, stage.Order, stage.IsSystem);
+        return stage.ToDto();
     }
 
     public async Task<List<StageDto>?> UpdateRangeAsync(UpdateRangeRequest request)
@@ -64,10 +39,7 @@ public class StageService(IStageRepository stageRepository) : IStageService
                 if (stage == null)
                     return null;
 
-                stage.Name = updateRequest.Name ?? stage.Name;
-                stage.Order = updateRequest.Order ?? stage.Order;
-                
-                stageRepository.Update(stage);
+                stage.Update(updateRequest.Name, updateRequest.Order);
                 stages.Add(stage);
             }
         }
@@ -87,7 +59,7 @@ public class StageService(IStageRepository stageRepository) : IStageService
         }
         
         await stageRepository.SaveChangesAsync();
-        return stages.Select(stage => new StageDto(stage.Id, stage.Name, stage.Order, stage.IsSystem)).ToList();
+        return stages.Select(stage => stage.ToDto()).ToList();
     }
 
     public async Task<bool> TryDeleteAsync(Guid id)

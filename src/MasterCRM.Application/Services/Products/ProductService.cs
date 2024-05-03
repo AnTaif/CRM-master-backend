@@ -1,3 +1,4 @@
+using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.Products.Dto;
 using MasterCRM.Application.Services.Products.Requests;
 using MasterCRM.Domain.Entities.Products;
@@ -12,39 +13,14 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
     {
         var products = await repository.GetByUserIdAsync(userId);
 
-        var productDtos = products.Select(product => new ProductDto
-        {
-            Id = product.Id,
-            UserId = product.MasterId,
-            Name = product.Name,
-            Description = product.Description,
-            Price = product.Price,
-            Material = product.Material.ToString(),
-            Dimensions = product.Dimensions ?? "",
-            Photos = product.Photos.Select(p => new ProductPhotoDto(p.Id, p.Url)).ToList()
-        });
-        return productDtos;
+        return products.Select(product => product.ToDto());
     }
 
     public async Task<ProductDto?> GetProductByIdAsync(Guid productId)
     {
         var product = await repository.GetByIdAsync(productId);
 
-        if (product == null)
-            return null;
-
-        var productDto = new ProductDto
-        {
-            Id = product.Id,
-            UserId = product.MasterId,
-            Name = product.Name,
-            Description = product.Description,
-            Price = product.Price,
-            Material = product.Material.ToString(),
-            Dimensions = product.Dimensions ?? "",
-            Photos = product.Photos.Select(p => new ProductPhotoDto(p.Id, p.Url)).ToList()
-        };
-        return productDto;
+        return product?.ToDto();
     }
 
     public async Task<List<ProductPhotoDto>?> AddPhotosToProductAsync(Guid productId, IEnumerable<UploadPhotoRequest> request)
@@ -78,18 +54,8 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
     public async Task<ProductDto> CreateAsync(
         string userId, CreateProductRequest request, IEnumerable<UploadPhotoRequest> photoRequests)
     {
-        var newProduct = new Product
-        {
-            Id = Guid.NewGuid(),
-            MasterId = userId,
-            Name = request.Name,
-            Description = request.Description,
-            Dimensions = request.Dimensions,
-            Material = Enum.Parse<Material>(request.Material),
-            Price = request.Price,
-            CreationDate = DateTime.UtcNow,
-            Photos = new List<ProductPhoto>(),
-        };
+        var newProduct = new Product(userId, request.Name, request.Description, request.Dimensions, 
+            Enum.Parse<Material>(request.Material), request.Price);
         
         foreach (var uploadRequest in photoRequests)
         {
@@ -108,18 +74,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         
         await repository.CreateAsync(newProduct);
 
-        var productDto = new ProductDto
-        {
-            Id = newProduct.Id,
-            UserId = userId,
-            Name = newProduct.Name,
-            Description = newProduct.Description,
-            Price = newProduct.Price,
-            Material = newProduct.Material.ToString(),
-            Dimensions = newProduct.Dimensions,
-            Photos = newProduct.Photos.Select(p => new ProductPhotoDto(p.Id, p.Url)).ToList()
-        };
-        return productDto;
+        return newProduct.ToDto();
     }
 
     public async Task<ProductDto?> ChangeAsync(
@@ -130,29 +85,10 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         if (product == null)
             return null;
 
-        product.Name = request.Name ?? product.Name;
-        product.Description = request.Description ?? product.Description;
-        product.Price = request.Price ?? product.Price;
-        if (request.Material != null)
-            product.Material = Enum.Parse<Material>(request.Material);
-        product.Dimensions = request.Dimensions ?? product.Dimensions;
-
-        await repository.UpdateAsync(product);
+        product.Update(request.Name, request.Description, request.Price, request.Material, request.Dimensions);
         await repository.SaveChangesAsync();
 
-        var productDto = new ProductDto
-        {
-            Id = product.Id,
-            UserId = product.MasterId,
-            Name = product.Name,
-            Description = product.Description,
-            Price = product.Price,
-            Material = product.Material.ToString(),
-            Dimensions = product.Dimensions ?? "",
-            Photos = product.Photos.Select(p => new ProductPhotoDto(p.Id, p.Url)).ToList()
-        };
-
-        return productDto;
+        return product.ToDto();
     }
 
     public async Task<bool> TryDeleteAsync(Guid productId)
@@ -187,5 +123,3 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         return fileStorage.TryDelete(photo.Url);
     }
 }
-
-public record UploadPhotoRequest(Stream PhotoStream, string Extension);

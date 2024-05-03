@@ -13,6 +13,14 @@ public class Stage : BaseEntity<Guid>
     public short Order { get; set; }
 
     public bool IsSystem => StageType != StageType.Default;
+
+    public void Update(string? name, short? order)
+    {
+        if (name != null)
+            Name = name;
+        if (order != null)
+            Order = (short)order;
+    }
 }
 
 public enum StageType

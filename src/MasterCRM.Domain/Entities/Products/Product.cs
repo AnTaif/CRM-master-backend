@@ -20,5 +20,31 @@ public class Product : BaseEntity<Guid>
     
     public DateTime CreationDate { get; set; }
 
-    public virtual List<ProductPhoto> Photos { get; set; } = null!;
+    public virtual List<ProductPhoto> Photos { get; set; } = new();
+
+    public Product(string masterId, string name, string description, string dimensions, Material material, double price)
+    {
+        Id = Guid.NewGuid();
+        MasterId = masterId;
+        Name = name;
+        Description = description;
+        Dimensions = dimensions;
+        Material = material;
+        Price = price;
+        CreationDate = DateTime.UtcNow;
+    }
+
+    public void Update(string? name, string? description, double? price, string? materialStr, string? dimensions)
+    {
+        if (name != null)
+            Name = name;
+        if (description != null)
+            Description = description;
+        if (price != null)
+            Price = (double)price;
+        if (materialStr != null)
+            Material = Enum.Parse<Material>(materialStr);
+        if (dimensions != null)
+            Dimensions = dimensions;
+    }
 }

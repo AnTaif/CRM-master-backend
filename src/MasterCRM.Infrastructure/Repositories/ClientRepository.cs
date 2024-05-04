@@ -15,7 +15,10 @@ public class ClientRepository(CrmDbContext context) : IClientRepository
         await dbSet.Include(client => client.Orders).FirstOrDefaultAsync(client => client.Email == email);
 
     public async Task<Client?> GetByIdAsync(Guid id) =>
-        await dbSet.Include(client => client.Orders).FirstOrDefaultAsync(client => client.Id == id);
+        await dbSet
+            .Include(client => client.Orders)
+            .ThenInclude(order => order.Stage)
+            .FirstOrDefaultAsync(client => client.Id == id);
 
     public async Task CreateAsync(Client client) => await dbSet.AddAsync(client);
 

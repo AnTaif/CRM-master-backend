@@ -1,8 +1,6 @@
-using MasterCRM.Application.Services.Orders.Responses;
-
 namespace MasterCRM.Application.Services.Clients;
 
-public record ClientDto
+public record ClientItemResponse
 {
     public required Guid Id { get; init; }
     
@@ -13,6 +11,4 @@ public record ClientDto
     public required string Phone { get; init; }
     
     public required DateTime LastOrderDate { get; init; }
-
-    public required IEnumerable<GetOrderItemResponse> Orders { get; init; }
 }

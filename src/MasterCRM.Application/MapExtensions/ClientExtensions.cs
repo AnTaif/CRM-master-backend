@@ -13,6 +13,19 @@ public static class ClientExtensions
             FullName = client.GetFullName(),
             Email = client.Email,
             Phone = client.Phone,
+            LastOrderDate = client.GetLastOrderDate(),
+            Orders = client.Orders.Select(order => order.ToItemResponse())
+        };
+    }
+
+    public static ClientItemResponse ToItemResponse(this Client client)
+    {
+        return new ClientItemResponse
+        {
+            Id = client.Id,
+            FullName = client.GetFullName(),
+            Email = client.Email,
+            Phone = client.Phone,
             LastOrderDate = client.GetLastOrderDate()
         };
     }

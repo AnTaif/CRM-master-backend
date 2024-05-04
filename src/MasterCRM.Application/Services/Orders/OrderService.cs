@@ -19,20 +19,22 @@ public class OrderService(
     IProductRepository productRepository,
     IOrderHistoryRepository historyRepository) : IOrderService
 {
-    public async Task<IEnumerable<GetOrderItemResponse>> GetAllByMasterAsync(string masterId)
+    public async Task<GetOrdersResponse> GetAllByMasterAsync(string masterId)
     {
         var orders = await orderRepository.GetAllByPredicateAsync(order =>
             order.MasterId == masterId);
 
-        return orders.Select(order => order.ToItemResponse());
+        var ordersArray = orders.ToArray();
+        return new GetOrdersResponse(ordersArray.Length, ordersArray.Select(order => order.ToItemResponse()));
     }
     
-    public async Task<IEnumerable<GetOrderItemResponse>> GetWithStageByMasterAsync(string masterId, short orderTab)
+    public async Task<GetOrdersResponse> GetWithStageByMasterAsync(string masterId, short orderTab)
     {
         var activeOrders = await orderRepository.GetAllByPredicateAsync(order =>
             order.MasterId == masterId && order.Stage.Order == orderTab);
-        
-        return activeOrders.Select(order => order.ToItemResponse());
+
+        var orders = activeOrders.ToArray();
+        return new GetOrdersResponse(orders.Length, orders.Select(order => order.ToItemResponse()));
     }
 
     public async Task<OrderDto?> GetOrderByIdAsync(Guid orderId)

@@ -22,7 +22,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
     // }
     
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetOrderItemResponse>>> GetWithStageByMaster([FromQuery] short? tab)
+    public async Task<ActionResult<GetOrdersResponse>> GetWithStageByMaster([FromQuery] short? tab)
     {
         var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 

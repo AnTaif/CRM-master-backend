@@ -13,12 +13,23 @@ namespace MasterCRM.Api.Controllers.Orders;
 [Route("orders")]
 public class OrderController(IOrderService orderService) : ControllerBase
 {
+    // [HttpGet]
+    // public async Task<ActionResult<IEnumerable<GetOrderItemResponse>>> GetAllByMaster()
+    // {
+    //     var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+    //     
+    //     return Ok(await orderService.GetAllByMasterAsync(masterId));
+    // }
+    
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetOrderItemResponse>>> GetWithStageByMaster([FromQuery] short tab)
+    public async Task<ActionResult<IEnumerable<GetOrderItemResponse>>> GetWithStageByMaster([FromQuery] short? tab)
     {
         var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        if (tab == null)
+            return Ok(await orderService.GetAllByMasterAsync(masterId));
         
-        return Ok(await orderService.GetWithStageByMasterAsync(masterId, tab));
+        return Ok(await orderService.GetWithStageByMasterAsync(masterId, (short)tab));
     }
     
     [HttpGet("{id}")]
@@ -32,7 +43,6 @@ public class OrderController(IOrderService orderService) : ControllerBase
         return Ok(order);
     }
     
-    //TODO: create order for specific stage
     [HttpPost]
     public async Task<ActionResult<Guid>> CreateOrder(CreateOrderRequest request)
     {

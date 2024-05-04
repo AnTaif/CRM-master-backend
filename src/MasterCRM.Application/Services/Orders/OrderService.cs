@@ -19,10 +19,18 @@ public class OrderService(
     IProductRepository productRepository,
     IOrderHistoryRepository historyRepository) : IOrderService
 {
+    public async Task<IEnumerable<GetOrderItemResponse>> GetAllByMasterAsync(string masterId)
+    {
+        var orders = await orderRepository.GetAllByPredicateAsync(order =>
+            order.MasterId == masterId);
+
+        return orders.Select(order => order.ToItemResponse());
+    }
+    
     public async Task<IEnumerable<GetOrderItemResponse>> GetWithStageByMasterAsync(string masterId, short orderTab)
     {
         var activeOrders = await orderRepository.GetAllByPredicateAsync(order =>
-            order.MasterId == masterId && order.IsActive && order.Stage.Order == orderTab);
+            order.MasterId == masterId && order.Stage.Order == orderTab);
         
         return activeOrders.Select(order => order.ToItemResponse());
     }
@@ -36,7 +44,10 @@ public class OrderService(
 
     public async Task<OrderDto> CreateOrderAsync(string masterId, CreateOrderRequest request)
     {
-        var startStage = await stageRepository.GetStartByMasterAsync(masterId);
+        var stage = await stageRepository.GetWithTabByMaster(masterId, request.StageTab);
+
+        if (stage == null)
+            throw new Exception($"Stage with tab \"{request.StageTab}\" not found");
 
         var products = new List<OrderProduct>();
 
@@ -61,7 +72,7 @@ public class OrderService(
             MasterId = masterId,
             Name = GetOrderName(request.Client.FullName),
             Address = request.Address,
-            StageId = startStage.Id,
+            StageId = stage.Id,
             TotalAmount = request.TotalAmount,
             Comment = request.Comment,
             CreatedAt = DateTime.UtcNow,

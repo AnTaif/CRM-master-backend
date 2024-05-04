@@ -20,6 +20,8 @@ public class CrmDbContext : IdentityDbContext<Master>
     
     public DbSet<Stage> Stages { get; set; } = null!;
 
+    public DbSet<OrderProduct> OrderProducts { get; set; } = null!;
+
     public CrmDbContext(DbContextOptions<CrmDbContext> options) : base(options)
     {
         Database.EnsureCreated();

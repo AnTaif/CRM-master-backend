@@ -2,6 +2,8 @@ namespace MasterCRM.Application.Services.Orders.Dto;
 
 public record OrderProductDto
 {
+    public Guid Id { get; init; }
+    
     /// <summary>
     /// Product id
     /// </summary>

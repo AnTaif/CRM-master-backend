@@ -43,6 +43,7 @@ public static class OrderProductExtensions
     {
         return new OrderProductDto
         {
+            Id = orderProduct.Id,
             ProductId = orderProduct.Product.Id,
             Name = orderProduct.Product.Name,
             Quantity = orderProduct.Quantity,

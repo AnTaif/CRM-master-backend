@@ -11,4 +11,17 @@ public class OrderHistory : BaseEntity<Guid>
     public string Type { get; init; } = null!;
     
     public DateTime Date { get; init; }
+
+    public OrderHistory()
+    {
+    }
+    
+    public OrderHistory(Guid orderId, string change, string type)
+    {
+        Id = Guid.NewGuid();
+        OrderId = orderId;
+        Change = change;
+        Type = type;
+        Date = DateTime.UtcNow;
+    }
 }

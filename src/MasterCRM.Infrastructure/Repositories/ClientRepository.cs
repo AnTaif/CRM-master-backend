@@ -9,13 +9,13 @@ public class ClientRepository(CrmDbContext context) : IClientRepository
     private DbSet<Client> dbSet => context.Clients;
     
     public async Task<IEnumerable<Client>> GetByMasterAsync(string masterId) => 
-        await dbSet.Where(client => client.MasterId == masterId).ToListAsync();
+        await dbSet.Include(client => client.Orders).Where(client => client.MasterId == masterId).ToListAsync();
 
     public async Task<Client?> GetByEmailAsync(string email) =>
-        await dbSet.FirstOrDefaultAsync(client => client.Email == email);
+        await dbSet.Include(client => client.Orders).FirstOrDefaultAsync(client => client.Email == email);
 
     public async Task<Client?> GetByIdAsync(Guid id) =>
-        await dbSet.FirstOrDefaultAsync(client => client.Id == id);
+        await dbSet.Include(client => client.Orders).FirstOrDefaultAsync(client => client.Id == id);
 
     public async Task CreateAsync(Client client) => await dbSet.AddAsync(client);
 

@@ -36,22 +36,6 @@ public class OrderService(
 
     public async Task<OrderDto> CreateOrderAsync(string masterId, CreateOrderRequest request)
     {
-        var client = await clientRepository.GetByEmailAsync(request.Client.Email);
-        
-        Guid clientId;
-        if (client == null)
-        {
-            var newClient = new Client(masterId, request.Client.FullName, request.Client.Email, request.Client.Phone);
-            await clientRepository.CreateAsync(newClient);
-            clientId = newClient.Id;
-        }
-        else
-        {
-            client.LastOrderDate = DateTime.UtcNow;
-            clientRepository.Update(client);
-            clientId = client.Id;
-        }
-
         var startStage = await stageRepository.GetStartByMasterAsync(masterId);
 
         var products = new List<OrderProduct>();
@@ -76,7 +60,6 @@ public class OrderService(
             Id = Guid.NewGuid(),
             MasterId = masterId,
             Name = GetOrderName(request.Client.FullName),
-            ClientId = clientId,
             Address = request.Address,
             StageId = startStage.Id,
             TotalAmount = request.TotalAmount,
@@ -87,6 +70,8 @@ public class OrderService(
         };
         
         await orderRepository.CreateAsync(newOrder);
+        
+        await CreateOrUpdateClientAsync(newOrder, request.Client.FullName, request.Client.Email, request.Client.Phone);
 
         var historyItem = new OrderHistory
         {
@@ -154,34 +139,14 @@ public class OrderService(
         // Update client or create new one
         if (request.Client != null)
         {
-            Client? client;
-            if (request.Client.Email == null)
-                client = order.Client;
-            else 
-                client = await clientRepository.GetByEmailAsync(request.Client.Email);
-
-            if (client == null)
-            {
-                // Create new client
-                var newClient = new Client(masterId, 
-                    request.Client.FullName ?? order.Client.GetFullName(), 
-                    request.Client.Email!, 
-                    request.Client.Phone ?? order.Client.Phone);
-                
-                await clientRepository.CreateAsync(newClient);
-                order.ClientId = newClient.Id;
-            }
-            else
-            {
-                client.Update(request.Client.FullName, null, request.Client.Phone);
-                order.ClientId = client.Id;
-            }
+            var clientRequest = request.Client;
+            await CreateOrUpdateClientAsync(order, clientRequest.FullName, clientRequest.Email, clientRequest.Phone);
             
             var updateClientHistory = new OrderHistory
             {
                 Id = Guid.NewGuid(),
                 OrderId = order.Id,
-                Change = $"{request.Client.FullName ?? ""} {request.Client.Email ?? ""} {request.Client.Phone ?? ""}",
+                Change = $"{clientRequest.FullName ?? ""} {clientRequest.Email ?? ""} {clientRequest.Phone ?? ""}",
                 Type = "Данные клиента изменены",
                 Date = DateTime.UtcNow
             };
@@ -249,6 +214,29 @@ public class OrderService(
 
         await orderRepository.SaveChangesAsync();
         return true;
+    }
+
+    private async Task CreateOrUpdateClientAsync(Order order, string? fullnameRequest, string? emailRequest, string? phoneRequest)
+    {
+        var masterId = order.MasterId;
+        var fullname = fullnameRequest ?? order.Client.GetFullName();
+        var email = emailRequest ?? order.Client.Email;
+        var phone = phoneRequest ?? order.Client.Phone;
+        
+        var client = await clientRepository.GetByEmailAsync(email);
+
+        if (client == null)
+        {
+            // Client not found - create new one
+            var newClient = new Client(masterId, fullname, email, phone, order.CreatedAt);
+            await clientRepository.CreateAsync(newClient);
+            order.ClientId = newClient.Id;
+        }
+        else
+        {
+            client.Update(fullname, null, phone);
+            order.ClientId = client.Id;
+        }
     }
     
     private string GetOrderName(string fullname)

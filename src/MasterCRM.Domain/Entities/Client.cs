@@ -1,4 +1,5 @@
 using MasterCRM.Domain.Common;
+using MasterCRM.Domain.Entities.Orders;
 
 namespace MasterCRM.Domain.Entities;
 
@@ -17,7 +18,9 @@ public class Client : BaseEntity<Guid>
     
     public string Phone { get; set; } = null!;
     
-    public DateTime LastOrderDate { get; set; }
+    public virtual List<Order> Orders { get; set; }
+    
+    public DateTime GetLastOrderDate() => Orders.Max(order => order.CreatedAt);
 
     public Client()
     {
@@ -31,7 +34,15 @@ public class Client : BaseEntity<Guid>
         SetFullName(fullname);
         Email = email;
         Phone = phone;
-        LastOrderDate = DateTime.UtcNow;
+    }
+    
+    public Client(string masterId, string fullname, string email, string phone, DateTime orderDate)
+    {
+        Id = Guid.NewGuid();
+        MasterId = masterId;
+        SetFullName(fullname);
+        Email = email;
+        Phone = phone;
     }
 
     public void Update(string? fullName, string? email, string? phone)

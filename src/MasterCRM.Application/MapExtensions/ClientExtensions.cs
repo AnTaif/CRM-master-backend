@@ -13,7 +13,7 @@ public static class ClientExtensions
             FullName = client.GetFullName(),
             Email = client.Email,
             Phone = client.Phone,
-            LastOrderDate = client.LastOrderDate
+            LastOrderDate = client.GetLastOrderDate()
         };
     }
 }

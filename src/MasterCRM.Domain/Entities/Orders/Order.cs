@@ -9,7 +9,7 @@ public class Order : BaseEntity<Guid>
     
     public string Name { get; set; } = null!;
 
-    public required Guid ClientId { get; set; }
+    public Guid ClientId { get; set; }
     public virtual Client Client { get; set; } = null!;
 
     public string Address { get; set; } = null!;
@@ -17,7 +17,7 @@ public class Order : BaseEntity<Guid>
     public Guid StageId { get; set; }
     public virtual Stage Stage { get; set; } = null!;
     
-    public required double TotalAmount { get; set; }
+    public double TotalAmount { get; set; }
     
     public string Comment { get; set; } = null!;
 

@@ -23,34 +23,6 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         return product?.ToDto();
     }
 
-    public async Task<List<ProductPhotoDto>?> AddPhotosToProductAsync(Guid productId, IEnumerable<UploadPhotoRequest> request)
-    {
-        var product = await repository.GetByIdAsync(productId);
-
-        if (product == null)
-            return null;
-
-        var productPhotoDtos = new List<ProductPhotoDto>();
-        foreach (var uploadRequest in request)
-        {
-            var fileId = Guid.NewGuid();
-            var fileName = fileId + uploadRequest.Extension;
-            var url = await fileStorage.UploadAsync(uploadRequest.PhotoStream, fileName);
-
-            var photo = new ProductPhoto
-            {
-                Id = fileId,
-                Url = url,
-                Extension = uploadRequest.Extension
-            };
-            product.Photos.Add(photo);
-            productPhotoDtos.Add(new ProductPhotoDto(fileId, url));
-        }
-
-        await repository.SaveChangesAsync();
-        return productPhotoDtos;
-    }
-
     public async Task<ProductDto> CreateAsync(
         string userId, CreateProductRequest request, IEnumerable<UploadPhotoRequest> photoRequests)
     {
@@ -66,6 +38,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
             var photo = new ProductPhoto
             {
                 Id = fileId,
+                Order = (short)newProduct.Photos.Count,
                 Url = url,
                 Extension = uploadRequest.Extension
             };
@@ -107,19 +80,5 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
             fileStorage.TryDelete(url);
 
         return true;
-    }
-
-    public async Task<bool> TryDeletePhotoAsync(Guid productId, Guid photoId)
-    {
-        var product = await repository.GetByIdAsync(productId);
-
-        var photo = product?.Photos.FirstOrDefault(photo => photo.Id == photoId);
-        
-        if (photo == null)
-            return false;
-
-        product!.Photos.Remove(photo);
-        await repository.SaveChangesAsync();
-        return fileStorage.TryDelete(photo.Url);
     }
 }

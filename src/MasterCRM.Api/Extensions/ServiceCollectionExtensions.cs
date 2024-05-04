@@ -6,6 +6,7 @@ using MasterCRM.Application.Services.Orders.History;
 using MasterCRM.Application.Services.Orders.Products;
 using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Application.Services.Products;
+using MasterCRM.Application.Services.Products.Photos;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;
@@ -64,6 +65,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IAuthService, AuthService>();
         services.AddTransient<IVkAuthService, VkAuthService>();
         services.AddTransient<IProductService, ProductService>();
+        services.AddTransient<IProductPhotoService, ProductPhotoService>();
         services.AddTransient<IClientService, ClientService>();
         services.AddTransient<IOrderService, OrderService>();
         services.AddTransient<IStageService, StageService>();
@@ -83,6 +85,7 @@ public static class ServiceCollectionExtensions
         });
         
         services.AddTransient<IProductRepository, ProductRepository>();
+        services.AddTransient<IProductPhotoRepository, ProductPhotoRepository>();
         services.AddTransient<IClientRepository, ClientRepository>();
         services.AddTransient<IOrderRepository, OrderRepository>();
         services.AddTransient<IStageRepository, StageRepository>();

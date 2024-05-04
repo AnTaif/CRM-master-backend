@@ -12,6 +12,8 @@ public class CrmDbContext : IdentityDbContext<Master>
     
     public DbSet<Product> Products { get; set; } = null!;
 
+    public DbSet<ProductPhoto> ProductPhotos { get; set; } = null!;
+
     public DbSet<Order> Orders { get; set; } = null!;
 
     public DbSet<OrderHistory> OrderHistories { get; set; } = null!;

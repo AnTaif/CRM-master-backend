@@ -14,6 +14,7 @@ public class ProductController(IProductService productService) : ControllerBase
 {
     private readonly string[] allowedExtensions = {".jpg", ".jpeg", ".png"};
     
+    //TODO: add isVisible parameter
     /// <summary>
     /// Returns all products of the current authorized user
     /// </summary>

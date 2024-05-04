@@ -7,6 +7,6 @@ public static class ProductPhotoExtensions
 {
     public static ProductPhotoDto ToDto(this ProductPhoto productPhoto)
     {
-        return new ProductPhotoDto(productPhoto.Id, productPhoto.Url);
+        return new ProductPhotoDto(productPhoto.Id, productPhoto.Url, productPhoto.Order);
     }
 }

@@ -16,7 +16,7 @@ public static class ProductExtensions
             Price = product.Price,
             Material = product.Material.ToString(),
             Dimensions = product.Dimensions ?? "",
-            Photos = product.Photos.Select(productPhoto => productPhoto.ToDto()).ToList()
+            Photos = product.Photos.OrderBy(photo => photo.Order).Select(productPhoto => productPhoto.ToDto()).ToList()
         };
     }
 }

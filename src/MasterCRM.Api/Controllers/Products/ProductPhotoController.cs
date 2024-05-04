@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using MasterCRM.Application.Services.Products;
+using MasterCRM.Application.Services.Products.Dto;
+using MasterCRM.Application.Services.Products.Photos;
 using MasterCRM.Application.Services.Products.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,22 +11,15 @@ namespace MasterCRM.Api.Controllers.Products;
 [ApiController]
 [Authorize]
 [Route("products/{productId}/photos")]
-public class ProductPhotoController(IProductService productService) : ControllerBase
+public class ProductPhotoController(IProductPhotoService productPhotoService) : ControllerBase
 {
     private readonly string[] allowedExtensions = {".jpg", ".jpeg", ".png"};
     
     [HttpPost]
     public async Task<IActionResult> AddPhotosToProduct([FromRoute] Guid productId, IEnumerable<IFormFile> formFiles)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        
-        var product = await productService.GetProductByIdAsync(productId);
-
-        if (product == null)
-            return NotFound();
-
-        if (userId != product.UserId)
-            return Forbid();
+        //TODO: protect services by another users
+        //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var fileRequests = formFiles.Select(formFile =>
         {
@@ -39,28 +34,30 @@ public class ProductPhotoController(IProductService productService) : Controller
         if (!usedAllowedExtensions)
             return BadRequest("Invalid file extension. Allowed extensions: .jpg, .jpeg, .png");
         
-        var productPhotoDtos = await productService.AddPhotosToProductAsync(productId, fileRequests);
+        var productPhotoDtos = await productPhotoService.AddPhotosToProductAsync(productId, fileRequests);
 
         if (productPhotoDtos == null)
             return BadRequest();
         
-        return Ok(productPhotoDtos);
+        return CreatedAtAction(nameof(AddPhotosToProduct), productPhotoDtos);
+    }
+
+    [HttpPut]
+    public async Task<ActionResult<IEnumerable<ProductPhotoDto>>> Update([FromRoute] Guid productId, IEnumerable<UpdateProductPhotosRequest> requests)
+    {
+        //TODO: добавить обновление фотографии?
+        var dtos = await productPhotoService.UpdateRangeAsync(productId, requests);
+
+        return Ok(dtos);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePhoto([FromRoute] Guid productId, [FromRoute] Guid id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        
-        var product = await productService.GetProductByIdAsync(productId);
+        //TODO: protect services by another users
+        //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        if (product == null)
-            return NotFound();
-
-        if (userId != product.UserId)
-            return Forbid();
-
-        var success = await productService.TryDeletePhotoAsync(productId, id);
+        var success = await productPhotoService.TryDeletePhotoAsync(productId, id);
 
         if (!success)
             return BadRequest();

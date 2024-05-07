@@ -15,6 +15,7 @@ using MasterCRM.Infrastructure.ExternalServices;
 using MasterCRM.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using IEmailSender = MasterCRM.Domain.Interfaces.IEmailSender;
 
 namespace MasterCRM.Api.Extensions;
 
@@ -76,7 +77,7 @@ public static class ServiceCollectionExtensions
     }
     
     public static IServiceCollection AddInfrastructureLayer(
-        this IServiceCollection services, string uploadsPath)
+        this IServiceCollection services, ConfigurationManager configuration, string uploadsPath)
     {
         var connectionString = GetConnectionString();
         services.AddDbContext<CrmDbContext>(options =>
@@ -99,6 +100,14 @@ public static class ServiceCollectionExtensions
         
         services.AddTransient<IVkontakteService, VkontakteService>(_ => 
             new VkontakteService(vkApiVersion, vkServiceToken));
+
+        var smtpSettings = configuration.GetSection("SmtpSettings").Get<SmtpSettings>() ??
+                           new SmtpSettings("smtp.ethereal.email", 587);
+        var smtpUser = Environment.GetEnvironmentVariable("SMTP_USER") ?? "";
+        var smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD") ?? "";
+        var smtpSenderEmail = Environment.GetEnvironmentVariable("SMTP_EMAIL") ?? "";
+        services.AddTransient<IEmailSender, EmailSender>(_ => 
+            new EmailSender(smtpSettings, smtpUser, smtpPassword, smtpSenderEmail));
 
         return services;
     }

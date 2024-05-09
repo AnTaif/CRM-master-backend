@@ -3,6 +3,7 @@ using MasterCRM.Application.Services.Orders;
 using MasterCRM.Application.Services.Orders.Dto;
 using MasterCRM.Application.Services.Orders.Requests;
 using MasterCRM.Application.Services.Orders.Responses;
+using MasterCRM.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,12 +36,21 @@ public class OrderController(IOrderService orderService) : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<OrderDto>> GetOrderById([FromRoute] Guid id)
     {
-        var order = await orderService.GetOrderByIdAsync(id);
-        
-        if (order is null)
-            return NotFound();
-        
-        return Ok(order);
+        try
+        {
+            var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            
+            var order = await orderService.GetOrderByIdAsync(masterId, id);
+            
+            if (order is null)
+                return NotFound();
+            
+            return Ok(order);
+        }
+        catch (ForbidException)
+        {
+            return Forbid();
+        }
     }
     
     [HttpPost]
@@ -56,24 +66,44 @@ public class OrderController(IOrderService orderService) : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<OrderDto>> UpdateOrder([FromRoute] Guid id, ChangeOrderRequest request)
     {
-        var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        try
+        {
+            var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        var response = await orderService.ChangeOrderAsync(masterId, id, request);
+            var response = await orderService.ChangeOrderAsync(masterId, id, request);
 
-        if (response == null)
-            return NotFound();
+            if (response == null)
+                return NotFound("Order not found");
 
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (ForbidException)
+        {
+            return Forbid();
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteOrder([FromRoute] Guid id)
     {
-        var result = await orderService.TryDeleteOrderAsync(id);
-        
-        if (!result)
-            return NotFound();
-        
-        return NoContent();
+        try
+        {
+            var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            
+            var result = await orderService.TryDeleteOrderAsync(masterId, id);
+            
+            if (!result)
+                return NotFound();
+            
+            return NoContent();
+        }
+        catch (ForbidException)
+        {
+            return Forbid();
+        }
     }
 }

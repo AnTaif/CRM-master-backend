@@ -12,7 +12,7 @@ public interface IProductService
     public Task<ProductDto> CreateAsync(
         string userId, CreateProductRequest request, IEnumerable<UploadPhotoRequest> photoRequests);
 
-    public Task<ProductDto?> ChangeAsync(Guid productId, ChangeProductRequest request);
+    public Task<ProductDto?> ChangeAsync(string masterId, Guid productId, ChangeProductRequest request);
 
     public Task<bool> TryDeleteAsync(Guid productId);
 }

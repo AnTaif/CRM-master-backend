@@ -1,6 +1,7 @@
 using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;
+using MasterCRM.Domain.Exceptions;
 using MasterCRM.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -67,6 +68,11 @@ public class VkAuthService(
 
     public async Task<string> LinkAsync(string userId, string queryPayload)
     {
+        var user = await userManager.FindByIdAsync(userId);
+        
+        if (user == null)
+            throw new NotFoundException("User not found");
+        
         var exchangeTokenResponse = await vkontakteService.ExchangeSilentTokenAsync(queryPayload);
 
         if (exchangeTokenResponse == null)
@@ -74,15 +80,10 @@ public class VkAuthService(
         
         var vkId = exchangeTokenResponse.UserId;
 
-        var isVkIdAlreadyUsed = await userManager.Users.AnyAsync(user => user.VkId == vkId);
+        var isVkIdAlreadyUsed = await userManager.Users.AnyAsync(master => master.VkId == vkId);
 
         if (isVkIdAlreadyUsed)
             throw new Exception("VK ID is already used by another user");
-        
-        var user = await userManager.FindByIdAsync(userId);
-        
-        if (user == null)
-            throw new Exception("User not found");
         
         user.VkId = vkId;
         

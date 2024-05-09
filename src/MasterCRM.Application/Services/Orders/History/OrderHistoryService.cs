@@ -1,14 +1,23 @@
 using MasterCRM.Domain.Entities.Orders;
+using MasterCRM.Domain.Exceptions;
 
 namespace MasterCRM.Application.Services.Orders.History;
 
-public class OrderHistoryService(IOrderHistoryRepository historyRepository) : IOrderHistoryService
+public class OrderHistoryService(IOrderHistoryRepository historyRepository, IOrderRepository orderRepository) : IOrderHistoryService
 {
-    public async Task<IEnumerable<OrderHistoryDto>> GetOrderHistoryAsync(Guid orderId)
+    public async Task<IEnumerable<OrderHistoryDto>?> GetOrderHistoryAsync(string masterId, Guid orderId)
     {
+        var order = await orderRepository.GetByIdAsync(orderId);
+
+        if (order == null)
+            return null;
+
+        if (order.MasterId != masterId)
+            throw new ForbidException("Current user is not the owner of the order");
+        
         var history = await historyRepository
             .GetAllByPredicateAsync(historyItem => historyItem.OrderId == orderId);
-
+        
         var historyList = history.ToList();
         return historyList.Select(orderHistory =>
             new OrderHistoryDto(orderHistory.Change, orderHistory.Type, orderHistory.Date));

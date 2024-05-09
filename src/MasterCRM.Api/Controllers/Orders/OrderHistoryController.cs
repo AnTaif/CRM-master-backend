@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using MasterCRM.Application.Services.Orders.History;
+using MasterCRM.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +14,17 @@ public class OrderHistoryController(IOrderHistoryService historyService) : Contr
     [HttpGet]
     public async Task<IActionResult> GetByOrder([FromRoute] Guid orderId)
     {
-        var history = await historyService.GetOrderHistoryAsync(orderId);
+        try
+        {
+            var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            
+            var history = await historyService.GetOrderHistoryAsync(masterId, orderId);
 
-        return Ok(history);
+            return Ok(history);
+        }
+        catch (ForbidException)
+        {
+            return Forbid();
+        }
     }
 }

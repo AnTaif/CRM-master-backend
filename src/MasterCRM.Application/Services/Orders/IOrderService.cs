@@ -11,11 +11,11 @@ public interface IOrderService
     
     public Task<GetOrdersResponse> GetWithStageByMasterAsync(string masterId, short orderTab);
 
-    public Task<OrderDto?> GetOrderByIdAsync(Guid orderId);
+    public Task<OrderDto?> GetOrderByIdAsync(string masterid, Guid orderId);
     
     public Task<OrderDto> CreateOrderAsync(string masterId, CreateOrderRequest request);
     
     public Task<OrderDto?> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request);
     
-    public Task<bool> TryDeleteOrderAsync(Guid orderId);
+    public Task<bool> TryDeleteOrderAsync(string masterid, Guid orderId);
 }

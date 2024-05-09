@@ -9,6 +9,7 @@ using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Application.Services.Products;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;
+using MasterCRM.Domain.Exceptions;
 
 namespace MasterCRM.Application.Services.Orders;
 
@@ -37,11 +38,17 @@ public class OrderService(
         return new GetOrdersResponse(orders.Length, orders.Select(order => order.ToItemResponse()));
     }
 
-    public async Task<OrderDto?> GetOrderByIdAsync(Guid orderId)
+    public async Task<OrderDto?> GetOrderByIdAsync(string masterid, Guid orderId)
     {
         var order = await orderRepository.GetByIdAsync(orderId);
+
+        if (order == null)
+            return null;
         
-        return order?.ToDto();
+        if (order.MasterId != masterid)
+            throw new ForbidException("Current user is not the owner of the order");
+        
+        return order.ToDto();
     }
 
     public async Task<OrderDto> CreateOrderAsync(string masterId, CreateOrderRequest request)
@@ -49,7 +56,7 @@ public class OrderService(
         var stage = await stageRepository.GetWithTabByMaster(masterId, request.StageTab);
 
         if (stage == null)
-            throw new Exception($"Stage with tab \"{request.StageTab}\" not found");
+            throw new NotFoundException($"Stage with tab \"{request.StageTab}\" not found");
 
         var products = new List<OrderProduct>();
 
@@ -58,7 +65,7 @@ public class OrderService(
             var product = await productRepository.GetByIdAsync(productRequest.ProductId);
             
             if (product == null)
-                throw new Exception("Product not found");
+                throw new NotFoundException("Product not found");
 
             products.Add(new OrderProduct
             {
@@ -101,7 +108,7 @@ public class OrderService(
             return null;
         
         if (order.MasterId != masterId)
-            throw new Exception("Current user is not the owner of the order");
+            throw new ForbidException("Current user is not the owner of the order");
 
         order.Update(request.TotalAmount, request.Comment, request.Address);
         
@@ -116,10 +123,7 @@ public class OrderService(
             var stage = await stageRepository.GetWithTabByMaster(masterId, (short)request.StageTab);
             
             if (stage == null)
-                throw new Exception("Stage not found");
-            
-            if (stage.MasterId != masterId)
-                throw new Exception("Current user is not the owner of the stage");
+                throw new NotFoundException("Stage not found");
             
             await historyService.AddStageChangedHistoryAsync(
                 order.Id, order.Stage, stage, DateTime.UtcNow);
@@ -146,7 +150,7 @@ public class OrderService(
                 var product = await productRepository.GetByIdAsync(productRequest.ProductId);
             
                 if (product == null)
-                    throw new Exception("Product not found");
+                    throw new NotFoundException("Product not found");
 
                 products.Add(new OrderProduct
                 {
@@ -169,12 +173,15 @@ public class OrderService(
         return order.ToDto();
     }
 
-    public async Task<bool> TryDeleteOrderAsync(Guid orderId)
+    public async Task<bool> TryDeleteOrderAsync(string masterid, Guid orderId)
     {
         var order = await orderRepository.GetByIdAsync(orderId);
 
         if (order == null)
             return false;
+
+        if (order.MasterId != masterid)
+            throw new ForbidException("Current user is not the owner of the order");
 
         var clientId = order.ClientId;
 

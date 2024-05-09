@@ -2,6 +2,7 @@ using System.Security.Claims;
 using MasterCRM.Application.Services.Products;
 using MasterCRM.Application.Services.Products.Dto;
 using MasterCRM.Application.Services.Products.Requests;
+using MasterCRM.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -91,22 +92,21 @@ public class ProductController(IProductService productService) : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<ProductDto>> Change([FromRoute] Guid id, ChangeProductRequest request)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        
-        var product = await productService.GetProductByIdAsync(id);
+        try
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        if (product == null)
-            return NotFound();
+            var productDto = await productService.ChangeAsync(userId, id, request);
 
-        if (userId != product.UserId)
+            if (productDto == null)
+                return NotFound();
+
+            return Ok(productDto);
+        }
+        catch (ForbidException)
+        {
             return Forbid();
-
-        var productDto = await productService.ChangeAsync(id, request);
-
-        if (productDto == null)
-            return BadRequest();
-
-        return Ok(productDto);
+        }
     }
 
     /// <summary>

@@ -4,7 +4,7 @@ namespace MasterCRM.Application.Services.Orders.History;
 
 public interface IOrderHistoryService
 {
-    public Task<IEnumerable<OrderHistoryDto>> GetOrderHistoryAsync(Guid orderId);
+    public Task<IEnumerable<OrderHistoryDto>?> GetOrderHistoryAsync(string masterId, Guid orderId);
 
     public Task AddNewOrderHistoryAsync(Guid orderId, string orderName, DateTime date);
 

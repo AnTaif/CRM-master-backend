@@ -3,6 +3,7 @@ using MasterCRM.Application.Services.Products.Dto;
 using MasterCRM.Application.Services.Products.Requests;
 using MasterCRM.Domain.Entities.Products;
 using MasterCRM.Domain.Enums;
+using MasterCRM.Domain.Exceptions;
 using MasterCRM.Domain.Interfaces;
 
 namespace MasterCRM.Application.Services.Products;
@@ -50,13 +51,15 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         return newProduct.ToDto();
     }
 
-    public async Task<ProductDto?> ChangeAsync(
-        Guid productId, ChangeProductRequest request)
+    public async Task<ProductDto?> ChangeAsync(string userId, Guid productId, ChangeProductRequest request)
     {
         var product = await repository.GetByIdAsync(productId);
-
+        
         if (product == null)
             return null;
+
+        if (userId != product.MasterId)
+            throw new ForbidException("Current user is not the owner of the product");
 
         product.Update(request.Name, request.Description, request.Price, request.Material, request.Dimensions);
         await repository.SaveChangesAsync();

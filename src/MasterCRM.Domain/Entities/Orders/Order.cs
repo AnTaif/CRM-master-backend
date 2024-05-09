@@ -7,6 +7,7 @@ public class Order : BaseEntity<Guid>
 {
     public required string MasterId { get; set; }
     
+    //TODO: fix name changing when client changed
     public string Name { get; set; } = null!;
 
     public Guid ClientId { get; set; }

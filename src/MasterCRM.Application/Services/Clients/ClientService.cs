@@ -18,7 +18,7 @@ public class ClientService(IClientRepository clientRepository) : IClientService
         
         return client?.ToDto();
     }
-
+    
     public async Task<bool> TryChangeAsync(Guid id, ChangeClientRequest request)
     {
         var client = await clientRepository.GetByIdAsync(id);
@@ -26,6 +26,7 @@ public class ClientService(IClientRepository clientRepository) : IClientService
         if (client == null)
             return false;
         
+        //TODO: add history to client's orders
         client.Update(request.FullName, request.Email, request.Phone);
         
         await clientRepository.SaveChangesAsync();

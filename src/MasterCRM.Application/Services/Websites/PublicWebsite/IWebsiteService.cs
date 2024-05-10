@@ -10,13 +10,13 @@ public interface IWebsiteService
     /// <returns></returns>
     public Task GetWebsite(Guid websiteId, string? masterId);
     
-    public Task<CreateWebsiteResponse> CreateAsync(string masterId, string name);
+    public Task<WebsiteItemResponse?> CreateAsync(string masterId, string title);
     
-    public Task SelectTemplateAsync(Guid websiteId, int templateId);
+    public Task<WebsiteItemResponse?> SelectTemplateAsync(string masterId, Guid websiteId, int templateId);
 
-    public Task ChangeWebsiteInfo(string masterId, Guid websiteId, ChangeWebsiteInfoRequest request);
+    public Task<WebsiteItemResponse?> ChangeWebsiteInfoAsync(string masterId, Guid websiteId, ChangeWebsiteInfoRequest request);
 }
 
-public record CreateWebsiteResponse(Guid Id, string Title);
+public record WebsiteItemResponse(Guid Id, string Title, int? TemplateId);
 
-public record ChangeWebsiteInfoRequest(string Title);
+public record ChangeWebsiteInfoRequest(string? Title);

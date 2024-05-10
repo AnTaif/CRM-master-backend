@@ -5,29 +5,23 @@ namespace MasterCRM.Domain.Entities.Websites;
 
 public class Website : BaseEntity<Guid>
 {
-    public required string Title { get; init; }
+    public required string Title { get; set; }
     
     public required string OwnerId { get; init; }
     
     [ForeignKey("OwnerId")]
     public virtual Master Master { get; init; } = null!;
+    
+    public int? TemplateId { get; set; }
 
-    public List<Style> GlobalStyles { get; init; } = null!;
+    public List<Style> GlobalStyles { get; set; } = null!;
 
-    public List<ConstructorBlock> Components { get; init; } = null!;
+    public List<ConstructorBlock> Components { get; set; } = null!;
     
     // TODO: order/product sections
-    // public ConstructorBlock OrderSection { get; init; }
+    // public ConstructorBlock OrderSection { get; set; }
     //
-    // public ConstructorBlock ProductCard { get; init; }
-
-    public Website() { }
-
-    public Website(string title, string ownerId)
-    {
-        Title = title;
-        OwnerId = ownerId;
-    }
+    // public ConstructorBlock ProductCard { get; set; }
 
     // TODO: when updating blocks, this string must be changed
     public string GetWebsite() => "website is not ready";

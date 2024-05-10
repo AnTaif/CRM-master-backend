@@ -20,6 +20,8 @@ public class Order : BaseEntity<Guid>
     
     public double TotalAmount { get; set; }
     
+    public bool IsCalculationAutomated { get; set; }
+    
     public string Comment { get; set; } = null!;
 
     public DateTime CreatedAt { get; set; }

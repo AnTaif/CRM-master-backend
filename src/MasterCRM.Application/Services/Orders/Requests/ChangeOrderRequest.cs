@@ -6,6 +6,8 @@ public record ChangeOrderRequest
     
     public required double? TotalAmount { get; init; }
     
+    public required bool? IsCalculationAutomated { get; init; }
+    
     public required string? Comment { get; init; }
     
     public required string? Address { get; init; }

@@ -15,6 +15,7 @@ public static class OrderExtensions
             Name = order.Name,
             Stage = order.Stage.Name,
             TotalAmount = order.TotalAmount,
+            IsCalculationAutomated = order.IsCalculationAutomated,
             Comment = order.Comment,
             Address = order.Address,
             Client = order.Client.ToOrderDto(),

@@ -83,6 +83,7 @@ public class OrderService(
             Address = request.Address,
             StageId = stage.Id,
             TotalAmount = request.TotalAmount,
+            IsCalculationAutomated = request.IsCalculationAutomated,
             Comment = request.Comment,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,

@@ -10,9 +10,6 @@ public class Master : IdentityUser
 
     public string? MiddleName { get;  set; }
     
-    public Guid WebsiteId { get; init; }
-    //public virtual Website { get; init; }
-    
     // public string Email { get; init; }
     //
     // public string PasswordHash { get; init; }
@@ -43,7 +40,6 @@ public class Master : IdentityUser
         SetFullName(fullname);
         VkLink = vkLink;
         TelegramLink = telegramLink;
-        WebsiteId = Guid.NewGuid();
     }
 
     public void Update(string? fullname, string? phone, string? vkLink, string? telegramLink)

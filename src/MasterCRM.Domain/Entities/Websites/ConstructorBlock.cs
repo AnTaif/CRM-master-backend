@@ -4,7 +4,13 @@ namespace MasterCRM.Domain.Entities.Websites;
 
 public class ConstructorBlock : BaseEntity<Guid>
 {
+    public new Guid Id { get; init; } = Guid.NewGuid();
+    
     public short Order { get; init; }
+    
+    public int? TemplateId { get; init; }
+    
+    public Guid? WebsiteId { get; init; }
     
     //public string Styles { get; init; }
 }

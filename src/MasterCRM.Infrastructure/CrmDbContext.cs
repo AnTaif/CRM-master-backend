@@ -44,6 +44,141 @@ public class CrmDbContext : IdentityDbContext<Master>
             .HasValue<CatalogBlock>("Catalog")
             .HasValue<FooterBlock>("Footer");
         
+        modelBuilder.Entity<Template>()
+            .HasData(
+                new Template
+                {
+                    Id = 1,
+                    Title = "Первый шаблон"
+                },
+                new Template
+                {
+                    Id = 2,
+                    Title = "Второй шаблон"
+                });
+
+        modelBuilder.Entity<Style>()
+            .HasData(
+                new Style
+                {
+                    TemplateId = 1,
+                    Element = "body",
+                    Properties = new Dictionary<string, string>
+                    {
+                        {"background-color", "#100001"},
+                        {"color", "#000011"}
+                    } 
+                },
+                new Style
+                {
+                    TemplateId = 1,
+                    Element = "h1",
+                    Properties = new Dictionary<string, string>
+                    {
+                        {"color", "#001100"}
+                    } 
+                },
+                new Style
+                {
+                    TemplateId = 2,
+                    Element = "body",
+                    Properties = new Dictionary<string, string>
+                    {
+                        {"background-color", "#000001"},
+                        {"color", "#110011"}
+                    } 
+                },
+                new Style
+                {
+                    TemplateId = 2,
+                    Element = "h1",
+                    Properties = new Dictionary<string, string>
+                    {
+                        {"color", "#110000"}
+                    } 
+                });
+
+        modelBuilder.Entity<HeaderBlock>()
+            .HasData(
+                new HeaderBlock
+                {
+                    TemplateId = 1,
+                    Order = 0,
+                    Type = 0
+                },
+                new HeaderBlock
+                {
+                    TemplateId = 2,
+                    Order = 0,
+                    Type = 0
+                });
+
+        modelBuilder.Entity<TextBlock>()
+            .HasData(
+                new TextBlock
+                {
+                    TemplateId = 1,
+                    Order = 1,
+                    Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl. Fusce a lacus ullamcorper, ultrices neque eu, cursus risus. Cras nisl purus, dignissim in efficitur quis, aliquam id odio. Suspendisse eu risus accumsan, iaculis augue id, porta elit. Fusce faucibus, erat vitae faucibus sagittis, dui dolor tincidunt urna, ut vulputate leo lorem ac eros. Aenean fermentum posuere mattis. Suspendisse scelerisque felis diam, sed ultrices ante luctus sed. Fusce posuere nunc a felis eleifend, et sollicitudin mi eleifend."
+                },
+                new TextBlock
+                {
+                    TemplateId = 2,
+                    Order = 1,
+                    Text =
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl. Fusce a lacus ullamcorper, ultrices neque eu, cursus risus. Cras nisl purus, dignissim in efficitur quis, aliquam id odio. Suspendisse eu risus accumsan, iaculis augue id, porta elit. Fusce faucibus, erat vitae faucibus sagittis, dui dolor tincidunt urna, ut vulputate leo lorem ac eros. Aenean fermentum posuere mattis. Suspendisse scelerisque felis diam, sed ultrices ante luctus sed. Fusce posuere nunc a felis eleifend, et sollicitudin mi eleifend."
+                });
+        
+        modelBuilder.Entity<H1Block>()
+            .HasData(
+                new H1Block
+                {
+                    TemplateId = 1,
+                    Order = 2,
+                    H1Text = "H1 text",
+                    PText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl. Fusce a lacus ullamcorper, ultrices neque eu, cursus risus. Cras nisl purus, dignissim in efficitur quis, aliquam id odio. Suspendisse eu risus accumsan, iaculis augue id, porta elit. Fusce faucibus, erat vitae faucibus sagittis, dui dolor tincidunt urna, ut vulputate leo lorem ac eros. Aenean fermentum posuere mattis. Suspendisse scelerisque felis diam, sed ultrices ante luctus sed. Fusce posuere nunc a felis eleifend, et sollicitudin mi eleifend.",
+                    ImageUrl = "" //TODO: add image url
+                },
+                new H1Block
+                {
+                    TemplateId = 2,
+                    Order = 2,
+                    H1Text = "H1 text",
+                    PText =
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl. Fusce a lacus ullamcorper, ultrices neque eu, cursus risus. Cras nisl purus, dignissim in efficitur quis, aliquam id odio. Suspendisse eu risus accumsan, iaculis augue id, porta elit. Fusce faucibus, erat vitae faucibus sagittis, dui dolor tincidunt urna, ut vulputate leo lorem ac eros. Aenean fermentum posuere mattis. Suspendisse scelerisque felis diam, sed ultrices ante luctus sed. Fusce posuere nunc a felis eleifend, et sollicitudin mi eleifend.",
+                    ImageUrl = "" //TODO: add image url
+                });
+        
+        modelBuilder.Entity<CatalogBlock>()
+            .HasData(
+                new CatalogBlock
+                {
+                    TemplateId = 1,
+                    Order = 3,
+                    Type = 0
+                },
+                new CatalogBlock
+                {
+                    TemplateId = 2,
+                    Order = 3,
+                    Type = 0
+                });
+        
+        modelBuilder.Entity<FooterBlock>()
+            .HasData(
+                new FooterBlock
+                {
+                    TemplateId = 1,
+                    Order = 4,
+                    Type = 0
+                },
+                new FooterBlock
+                {
+                    TemplateId = 2,
+                    Order = 4,
+                    Type = 0
+                });
+        
         base.OnModelCreating(modelBuilder);
     }
 }

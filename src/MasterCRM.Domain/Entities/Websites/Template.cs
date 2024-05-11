@@ -6,9 +6,9 @@ public class Template : BaseEntity<int>
 {
     public string Title { get; init; }
     
-    public List<Style> GlobalStyles { get; init; }
+    public virtual List<Style> GlobalStyles { get; init; }
     
-    public List<ConstructorBlock> Components { get; init; }
+    public virtual List<ConstructorBlock> Components { get; init; }
     
     // TODO: order/product sections
     // public ConstructorBlock OrderSection { get; init; }

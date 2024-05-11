@@ -1,11 +1,16 @@
 using MasterCRM.Application.Services.Websites.Templates;
 using MasterCRM.Domain.Entities.Websites;
 using MasterCRM.Domain.Exceptions;
+using MasterCRM.Domain.Interfaces;
 
 namespace MasterCRM.Application.Services.Websites.PublicWebsite;
 
-public class WebsiteService(IWebsiteRepository websiteRepository, ITemplateRepository templateRepository) 
-    : IWebsiteService
+public class WebsiteService(
+        IWebsiteRepository websiteRepository, 
+        ITemplateRepository templateRepository, 
+        IFileStorage fileStorage,
+        IConstructorBlockRepository constructorBlockRepository,
+        IStyleRepository styleRepository) : IWebsiteService
 {
     public Task GetWebsite(Guid websiteId, string? masterId)
     {
@@ -46,11 +51,78 @@ public class WebsiteService(IWebsiteRepository websiteRepository, ITemplateRepos
             throw new NotFoundException("Template not found");
         
         website.TemplateId = template.Id;
-        //TODO(!!!): copy elements (+ change ids for different db entries)
-        website.Components = template.Components;
-        website.GlobalStyles = template.GlobalStyles;
         
-        websiteRepository.Update(website);
+        var websiteGlobalStyles = new List<Style>();
+        foreach (var style in template.GlobalStyles)
+        {
+            websiteGlobalStyles.Add(new Style
+            {
+                Element = style.Element,
+                Properties = new Dictionary<string, string>(style.Properties),
+                TemplateId = null,
+                WebsiteId = website.Id
+            });
+        }
+        
+        await styleRepository.AddRangeAsync(websiteGlobalStyles);
+        
+        var websiteComponents = new List<ConstructorBlock>();
+        foreach (var component in template.Components)
+        {
+            switch (component)
+            {
+                case HeaderBlock headerBlock:
+                    websiteComponents.Add(new HeaderBlock
+                    {
+                        Order = headerBlock.Order,
+                        TemplateId = null,
+                        WebsiteId = website.Id,
+                        Type = headerBlock.Type
+                    });
+                    break;
+                case H1Block h1Block:
+                    websiteComponents.Add(new H1Block
+                    {
+                        Order = h1Block.Order,
+                        TemplateId = null,
+                        WebsiteId = website.Id,
+                        H1Text = h1Block.H1Text,
+                        PText = h1Block.PText,
+                        ImageUrl = fileStorage.CopyToPublic(h1Block.ImageUrl)
+                    });
+                    break;
+                case TextBlock textBlock:
+                    websiteComponents.Add(new TextBlock
+                    {
+                        Order = textBlock.Order,
+                        TemplateId = null,
+                        WebsiteId = website.Id,
+                        Text = textBlock.Text
+                    });
+                    break;
+                case CatalogBlock catalogBlock:
+                    websiteComponents.Add(new CatalogBlock
+                    {
+                        Order = catalogBlock.Order,
+                        TemplateId = null,
+                        WebsiteId = website.Id,
+                        Type = catalogBlock.Type
+                    });
+                    break;
+                case FooterBlock footerBlock:
+                    websiteComponents.Add(new FooterBlock
+                    {
+                        Order = footerBlock.Order,
+                        TemplateId = null,
+                        WebsiteId = website.Id,
+                        Type = footerBlock.Type
+                    });
+                    break;
+            }
+        }
+        
+        await constructorBlockRepository.AddRangeAsync(websiteComponents);
+
         await websiteRepository.SaveChangesAsync();
 
         return new WebsiteItemResponse(website.Id, website.Title, website.TemplateId);

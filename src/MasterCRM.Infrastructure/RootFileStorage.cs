@@ -16,9 +16,23 @@ public class RootFileStorage(string rootPath, string uploadUrlBase) : IFileStora
         return uploadUrlBase + fileName;
     }
 
+    public string CopyToPublic(string templateUrl)
+    {
+        var filePath = Path.Combine(templatesUploadPath, Path.GetFileName(templateUrl));
+        
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException("Source file not found.", filePath);
+
+        var destFileName = Guid.NewGuid() + Path.GetExtension(filePath);
+        var destFilePath = Path.Combine(publicUploadPath, destFileName);
+        
+        File.Copy(filePath, destFilePath);
+        return uploadUrlBase + destFileName;
+    }
+
     public bool TryDelete(string url)
     {
-        var filePath = Path.Combine(rootPath, Path.GetFileName(url));
+        var filePath = Path.Combine(publicUploadPath, Path.GetFileName(url));
 
         if (!File.Exists(filePath))
             return false;

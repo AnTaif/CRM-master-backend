@@ -8,13 +8,13 @@ public class Style : BaseEntity<Guid>
     /// Html element to which style properties should be applied
     /// </summary>
     /// <example>body, h1, p, button</example>
-    public required string Element { get; init; }
+    public string Element { get; init; } = null!;
 
     /// <summary>
     /// Css style properties
     /// </summary>
     /// <example>{ "color": "#8A2BE2"}, {"background-color": "#FFE4E1"}</example>
-    public required Dictionary<string, string> Properties { get; set; }
+    public Dictionary<string, string> Properties { get; set; } = null!;
 
     public int? TemplateId { get; init; }
     

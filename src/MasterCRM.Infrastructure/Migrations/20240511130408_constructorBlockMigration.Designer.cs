@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using MasterCRM.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MasterCRM.Infrastructure.Migrations
 {
     [DbContext(typeof(CrmDbContext))]
-    partial class CrmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240511130408_constructorBlockMigration")]
+    partial class constructorBlockMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -393,33 +396,33 @@ namespace MasterCRM.Infrastructure.Migrations
 
                     b.HasIndex("WebsiteId");
 
-                    b.ToTable("Styles");
+                    b.ToTable("Style");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("3288a688-b44f-4cbf-a003-be5b102a79f8"),
+                            Id = new Guid("7096720c-28f0-419b-98b2-6a5a371169f4"),
                             Element = "body",
                             Properties = new Dictionary<string, string> { ["background-color"] = "#100001", ["color"] = "#000011" },
                             TemplateId = 1
                         },
                         new
                         {
-                            Id = new Guid("8eab627e-4eec-41d8-a95c-dd0de04467f3"),
+                            Id = new Guid("73a9bf8e-c87c-43c1-b642-8ca79d9569dd"),
                             Element = "h1",
                             Properties = new Dictionary<string, string> { ["color"] = "#001100" },
                             TemplateId = 1
                         },
                         new
                         {
-                            Id = new Guid("909a4afc-8e79-4712-a60e-abcd5854b4f9"),
+                            Id = new Guid("60fb00ee-b14f-467a-b249-19db2b29fec3"),
                             Element = "body",
                             Properties = new Dictionary<string, string> { ["background-color"] = "#000001", ["color"] = "#110011" },
                             TemplateId = 2
                         },
                         new
                         {
-                            Id = new Guid("3fd7692e-90ed-453f-9e48-66731b7b3902"),
+                            Id = new Guid("b651e563-aefd-411a-8fbd-c8e45188390f"),
                             Element = "h1",
                             Properties = new Dictionary<string, string> { ["color"] = "#110000" },
                             TemplateId = 2
@@ -623,14 +626,14 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a852e545-3e00-4abe-abd7-6daecd872504"),
+                            Id = new Guid("d58a0b9d-adb9-464f-a01c-8ce86ae4f1c2"),
                             Order = (short)3,
                             TemplateId = 1,
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("1dcdcee7-01bc-4ebf-8019-b012bab9e5ba"),
+                            Id = new Guid("941161ef-7fb5-4243-a831-7d4bd3cb4613"),
                             Order = (short)3,
                             TemplateId = 2,
                             Type = 0
@@ -655,14 +658,14 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("bf2c5576-087c-447e-8ab1-75177dd3f66e"),
+                            Id = new Guid("e8623584-9927-452b-866a-3b38256c8d49"),
                             Order = (short)4,
                             TemplateId = 1,
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("61bb87f5-3eac-42bc-9d93-b03c172149cd"),
+                            Id = new Guid("3f48c097-da54-48a2-a89f-d7baeaa2d089"),
                             Order = (short)4,
                             TemplateId = 2,
                             Type = 0
@@ -689,7 +692,7 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("8e98c811-3a57-4363-8d03-37e747907490"),
+                            Id = new Guid("ac76c5e4-ddd9-460b-8103-fe066aa45576"),
                             Order = (short)1,
                             TemplateId = 1,
                             H1Text = "H1 text",
@@ -698,7 +701,7 @@ namespace MasterCRM.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("d554759a-a7bd-40b8-9ae9-7117a6763fcf"),
+                            Id = new Guid("bd151027-4699-4ed0-9100-b77c47668ab3"),
                             Order = (short)1,
                             TemplateId = 2,
                             H1Text = "H1 text",
@@ -725,14 +728,14 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d9d04eeb-791d-4c47-929b-6300b8633435"),
+                            Id = new Guid("6c55e6a5-54f5-494c-aea1-4fe1cfda128f"),
                             Order = (short)0,
                             TemplateId = 1,
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("9b0acd79-a221-4c68-a9de-733b14a464fd"),
+                            Id = new Guid("09bfddc2-b801-41c7-b9e8-77998467dbfb"),
                             Order = (short)0,
                             TemplateId = 2,
                             Type = 0
@@ -752,14 +755,14 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("54f100fb-0801-4c38-b7a3-17ca79363564"),
+                            Id = new Guid("829b768c-fc50-4b12-984a-7519821c0092"),
                             Order = (short)2,
                             TemplateId = 1,
                             Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl. Fusce a lacus ullamcorper, ultrices neque eu, cursus risus. Cras nisl purus, dignissim in efficitur quis, aliquam id odio. Suspendisse eu risus accumsan, iaculis augue id, porta elit. Fusce faucibus, erat vitae faucibus sagittis, dui dolor tincidunt urna, ut vulputate leo lorem ac eros. Aenean fermentum posuere mattis. Suspendisse scelerisque felis diam, sed ultrices ante luctus sed. Fusce posuere nunc a felis eleifend, et sollicitudin mi eleifend."
                         },
                         new
                         {
-                            Id = new Guid("2818bf0f-d9ee-43a0-9b51-b981a700c83b"),
+                            Id = new Guid("471ca963-a2af-42c1-af19-994759e5e3b0"),
                             Order = (short)2,
                             TemplateId = 2,
                             Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl. Fusce a lacus ullamcorper, ultrices neque eu, cursus risus. Cras nisl purus, dignissim in efficitur quis, aliquam id odio. Suspendisse eu risus accumsan, iaculis augue id, porta elit. Fusce faucibus, erat vitae faucibus sagittis, dui dolor tincidunt urna, ut vulputate leo lorem ac eros. Aenean fermentum posuere mattis. Suspendisse scelerisque felis diam, sed ultrices ante luctus sed. Fusce posuere nunc a felis eleifend, et sollicitudin mi eleifend."

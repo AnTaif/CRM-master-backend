@@ -29,6 +29,10 @@ public class CrmDbContext : IdentityDbContext<Master>
     
     public DbSet<Template> Templates { get; set; } = null!;
 
+    public DbSet<ConstructorBlock> ConstructorBlocks { get; set; } = null!;
+
+    public DbSet<Style> Styles { get; set; } = null!;
+
     public CrmDbContext(DbContextOptions<CrmDbContext> options) : base(options)
     {
         Database.EnsureCreated();

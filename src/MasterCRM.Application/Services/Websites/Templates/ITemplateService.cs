@@ -1,6 +1,6 @@
 using MasterCRM.Domain.Entities.Websites;
 
-namespace MasterCRM.Application.Services.Websites.Constructor.Templates;
+namespace MasterCRM.Application.Services.Websites.Templates;
 
 public interface ITemplateService
 {

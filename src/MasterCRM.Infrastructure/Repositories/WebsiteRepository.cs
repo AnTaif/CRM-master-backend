@@ -11,7 +11,11 @@ public class WebsiteRepository(CrmDbContext context) : IWebsiteRepository
     public async Task<bool> IsMasterHaveWebsite(string masterId) => 
         await dbSet.AnyAsync(website => website.OwnerId == masterId);
 
-    public async Task<Website?> GetByIdAsync(Guid id) => await dbSet.FirstOrDefaultAsync(website => website.Id == id);
+    public async Task<Website?> GetByIdAsync(Guid id) => 
+        await dbSet
+            .Include(website => website.GlobalStyles)
+            .Include(website => website.Components)
+            .FirstOrDefaultAsync(website => website.Id == id);
     
     public async Task CreateAsync(Website website) => await dbSet.AddAsync(website);
 

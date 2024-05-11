@@ -34,11 +34,18 @@ app.UseCors("FrontendPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
-Directory.CreateDirectory(uploadsPath);
+Directory.CreateDirectory(Path.Combine(uploadsPath, "Public"));
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(uploadsPath),
+    FileProvider = new PhysicalFileProvider(Path.Combine(uploadsPath, "Public")),
     RequestPath = "/uploads"
+});
+
+Directory.CreateDirectory(Path.Combine(uploadsPath, "Templates"));
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(uploadsPath, "Templates")),
+    RequestPath = "/uploads/templates"
 });
 
 app.MapControllers();

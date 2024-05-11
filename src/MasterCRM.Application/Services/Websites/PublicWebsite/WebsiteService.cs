@@ -57,7 +57,7 @@ public class WebsiteService(
         {
             websiteGlobalStyles.Add(new Style
             {
-                Element = style.Element,
+                Selector = style.Selector,
                 Properties = new Dictionary<string, string>(style.Properties),
                 TemplateId = null,
                 WebsiteId = website.Id

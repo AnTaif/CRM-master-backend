@@ -5,10 +5,10 @@ namespace MasterCRM.Domain.Entities.Websites;
 public class Style : BaseEntity<Guid>
 {
     /// <summary>
-    /// Html element to which style properties should be applied
+    /// Css selector
     /// </summary>
     /// <example>body, h1, p, button</example>
-    public string Element { get; init; } = null!;
+    public string Selector { get; init; } = null!;
 
     /// <summary>
     /// Css style properties
@@ -25,10 +25,10 @@ public class Style : BaseEntity<Guid>
         Id = Guid.NewGuid();
     }
 
-    public Style(string element, Dictionary<string, string> properties)
+    public Style(string selector, Dictionary<string, string> properties)
     {
         Id = Guid.NewGuid();
-        Element = element;
+        Selector = selector;
         Properties = properties;
     }
 }

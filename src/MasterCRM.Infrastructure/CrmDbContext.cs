@@ -66,7 +66,7 @@ public class CrmDbContext : IdentityDbContext<Master>
                 new Style
                 {
                     TemplateId = 1,
-                    Element = "body",
+                    Selector = "body",
                     Properties = new Dictionary<string, string>
                     {
                         {"background-color", "#100001"},
@@ -76,7 +76,7 @@ public class CrmDbContext : IdentityDbContext<Master>
                 new Style
                 {
                     TemplateId = 1,
-                    Element = "h1",
+                    Selector = "h1",
                     Properties = new Dictionary<string, string>
                     {
                         {"color", "#001100"}
@@ -85,7 +85,7 @@ public class CrmDbContext : IdentityDbContext<Master>
                 new Style
                 {
                     TemplateId = 2,
-                    Element = "body",
+                    Selector = "body",
                     Properties = new Dictionary<string, string>
                     {
                         {"background-color", "#000001"},
@@ -95,7 +95,7 @@ public class CrmDbContext : IdentityDbContext<Master>
                 new Style
                 {
                     TemplateId = 2,
-                    Element = "h1",
+                    Selector = "h1",
                     Properties = new Dictionary<string, string>
                     {
                         {"color", "#110000"}

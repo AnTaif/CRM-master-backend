@@ -1,14 +1,26 @@
+using System.Collections;
 using MasterCRM.Domain.Entities.Websites;
 
 namespace MasterCRM.Application.Services.Websites.Constructor;
 
 public interface IConstructorService
 {
-    public Task<IEnumerable<BlockDto>> GetMainSection(string masterid, Guid websiteId);
+    public Task<IEnumerable<StyleDto>?> GetGlobalStylesAsync(string masterId, Guid websiteId);
+
+    //public Task ChangeGlobalStylesAsync(string masterId, Guid websiteId);
+    
+    public Task<IEnumerable<BlockDto>> GetMainSectionAsync(string masterid, Guid websiteId);
 
     // public Task GetOrderRegistrationSection(string masterId, Guid websiteId);
     //
     // public Task GetProductCardSection(string masterId, Guid websiteId);
+}
+
+public record StyleDto
+{
+    public required string Selector { get; init; }
+    
+    public required Dictionary<string, string> Properties { get; init; }
 }
 
 public record BlockDto

@@ -76,6 +76,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IOrderHistoryService, OrderHistoryService>();
         services.AddTransient<IOrderProductService, OrderProductService>();
         services.AddTransient<IWebsiteService, WebsiteService>();
+        services.AddTransient<IConstructorService, ConstructorService>();
 
         return services;
     }

@@ -109,6 +109,26 @@ public class ProductController(IProductService productService) : ControllerBase
         }
     }
 
+    [HttpPatch("{id}/toggle-visibility")]
+    public async Task<IActionResult> ToggleVisibility([FromRoute] Guid id)
+    {
+        try
+        {
+            var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+            var productDto = await productService.ToggleVisibility(masterId, id);
+
+            if (productDto == null)
+                return NotFound();
+
+            return Ok(productDto);
+        }
+        catch (ForbidException)
+        {
+            return Forbid();
+        }
+    }
+
     /// <summary>
     /// Delete product by id
     /// </summary>

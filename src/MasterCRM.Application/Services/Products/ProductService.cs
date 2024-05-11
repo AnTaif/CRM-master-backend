@@ -67,6 +67,22 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         return product.ToDto();
     }
 
+    public async Task<ProductDto?> ToggleVisibility(string masterId, Guid productId)
+    {
+        var product = await repository.GetByIdAsync(productId);
+        
+        if (product == null)
+            return null;
+
+        if (masterId != product.MasterId)
+            throw new ForbidException("Current user is not the owner of the product");
+        
+        product.ChangeVisibility();
+        await repository.SaveChangesAsync();
+
+        return product.ToDto();
+    }
+
     public async Task<bool> TryDeleteAsync(Guid productId)
     {
         var product = await repository.GetByIdAsync(productId);

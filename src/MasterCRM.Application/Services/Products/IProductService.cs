@@ -14,5 +14,7 @@ public interface IProductService
 
     public Task<ProductDto?> ChangeAsync(string masterId, Guid productId, ChangeProductRequest request);
 
+    public Task<ProductDto?> ToggleVisibility(string masterId, Guid productId);
+
     public Task<bool> TryDeleteAsync(Guid productId);
 }

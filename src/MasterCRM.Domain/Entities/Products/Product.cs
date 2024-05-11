@@ -20,6 +20,8 @@ public class Product : BaseEntity<Guid>
     
     public DateTime CreationDate { get; set; }
 
+    public bool IsVisible { get; set; } = true;
+
     public virtual List<ProductPhoto> Photos { get; set; } = new();
 
     public Product(string masterId, string name, string description, string dimensions, Material material, double price)
@@ -47,4 +49,6 @@ public class Product : BaseEntity<Guid>
         if (dimensions != null)
             Dimensions = dimensions;
     }
+
+    public void ChangeVisibility() => IsVisible = !IsVisible;
 }

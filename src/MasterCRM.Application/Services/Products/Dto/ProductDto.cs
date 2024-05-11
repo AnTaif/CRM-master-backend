@@ -16,5 +16,7 @@ public record ProductDto
         
     public required string Dimensions { get; init; }
     
+    public required bool IsVisible { get; init; }
+    
     public required List<ProductPhotoDto> Photos { get; init; }
 }

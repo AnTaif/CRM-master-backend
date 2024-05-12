@@ -92,13 +92,31 @@ public class OrderService(
         
         await orderRepository.CreateAsync(newOrder);
         
-        await CreateOrUpdateClientAsync(newOrder, request.Client.FullName, request.Client.Email, request.Client.Phone);
+        await CreateOrSetClientAsync(newOrder, request.Client.FullName, request.Client.Email, request.Client.Phone);
         
         await historyService.AddNewOrderHistoryAsync(newOrder.Id, newOrder.Name, newOrder.CreatedAt);
         
         await orderRepository.SaveChangesAsync();
 
         return newOrder.ToDto();
+    }
+    
+    private async Task CreateOrSetClientAsync(Order order, string fullnameRequest, string emailRequest, string phoneRequest)
+    {
+        var client = await clientRepository.GetByEmailAsync(emailRequest);
+
+        if (client == null)
+        {
+            // Client not found - create new one
+            var newClient = new Client(order.MasterId, fullnameRequest, emailRequest, phoneRequest, order.CreatedAt);
+            await clientRepository.CreateAsync(newClient);
+            order.ClientId = newClient.Id;
+        }
+        else
+        {
+            client.Update(fullnameRequest, null, phoneRequest);
+            order.ClientId = client.Id;
+        }
     }
 
     public async Task<OrderDto?> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request)
@@ -110,68 +128,148 @@ public class OrderService(
         
         if (order.MasterId != masterId)
             throw new ForbidException("Current user is not the owner of the order");
-
-        order.Update(request.TotalAmount, request.Comment, request.Address);
         
-        if (request.TotalAmount != null || request.Comment != null || request.Address != null)
-        {
-            await historyService.AddOrderChangedHistoryAsync(
-                order.Id, request.TotalAmount, request.Comment, request.Address, DateTime.UtcNow);
-        }
+        if (request.TotalAmount != null || request.Comment != null || request.Address != null || request.IsCalculationAutomated != null)
+            await ChangeOrderInfoAsync(order, request);
 
         if (request.StageTab != null)
-        {
-            var stage = await stageRepository.GetWithTabByMaster(masterId, (short)request.StageTab);
-            
-            if (stage == null)
-                throw new NotFoundException("Stage not found");
-            
-            await historyService.AddStageChangedHistoryAsync(
-                order.Id, order.Stage, stage, DateTime.UtcNow);
-            
-            order.StageId = stage.Id;
-        }
-
-        // Update client or create new one
+            await ChangeOrderStageAsync(order, masterId, (short)request.StageTab);
+        
         if (request.Client != null)
-        {
-            var clientRequest = request.Client;
-            await CreateOrUpdateClientAsync(order, clientRequest.FullName, clientRequest.Email, clientRequest.Phone);
-
-            await historyService.AddClientChangedHistoryAsync(
-                order.Id, clientRequest.FullName, clientRequest.Email, clientRequest.Phone, DateTime.UtcNow);
-        }
+            await ChangeOrderClientAsync(order, masterId, request.Client);
         
         if (request.Products != null)
-        {
-            var products = new List<OrderProduct>();
-
-            foreach (var productRequest in request.Products)
-            {
-                var product = await productRepository.GetByIdAsync(productRequest.ProductId);
-            
-                if (product == null)
-                    throw new NotFoundException("Product not found");
-
-                products.Add(new OrderProduct
-                {
-                    ProductId = productRequest.ProductId,
-                    Quantity = productRequest.Quantity,
-                    UnitPrice = product.Price
-                });
-            }
-            
-            order.OrderProducts.Clear();
-            order.OrderProducts.AddRange(products);
-            
-            await historyService.AddOrderProductsChangedHistoryAsync(order.Id, products, DateTime.UtcNow);
-        }
+            await ChangeOrderProductsAsync(order, request.Products);
         
         orderRepository.Update(order);
         
         await orderRepository.SaveChangesAsync();
 
         return order.ToDto();
+    }
+
+    private async Task ChangeOrderInfoAsync(Order order, ChangeOrderRequest request)
+    {
+        double? changedTotalAmount = null;
+        string? changedComment = null;
+        string? changedAddress = null;
+        bool? changedCalculation = null;
+        if (request.TotalAmount != null && Math.Abs(order.TotalAmount - (double)request.TotalAmount) > 0.000001)
+        {
+            order.TotalAmount = (double)request.TotalAmount;
+            changedTotalAmount = (double)request.TotalAmount;
+        }
+        if (request.Comment != null && order.Comment != request.Comment)
+        {
+            order.Comment = request.Comment;
+            changedComment = request.Comment;
+        }
+        if (request.Address != null && order.Address != request.Address)
+        {
+            order.Address = request.Address;
+            changedAddress = request.Address;
+        }
+
+        if (request.IsCalculationAutomated != null && order.IsCalculationAutomated != request.IsCalculationAutomated)
+        {
+            order.IsCalculationAutomated = (bool)request.IsCalculationAutomated;
+            changedCalculation = (bool)request.IsCalculationAutomated;
+        }
+
+        await historyService.AddOrderChangedHistoryAsync(
+            order.Id, changedTotalAmount, changedComment, changedAddress, changedCalculation, DateTime.UtcNow);
+    }
+
+    private async Task ChangeOrderStageAsync(Order order, string masterId, short stageTab)
+    {
+        var stage = await stageRepository.GetWithTabByMaster(masterId, stageTab);
+            
+        if (stage == null)
+            throw new NotFoundException("Stage not found");
+        
+        if (order.Stage.Order == stageTab)
+            return;
+            
+        await historyService.AddStageChangedHistoryAsync(
+            order.Id, order.Stage, stage, DateTime.UtcNow);
+            
+        order.StageId = stage.Id;
+    }
+
+    /// <summary>
+    /// Updates order's client or create new one
+    /// </summary>
+    private async Task ChangeOrderClientAsync(Order order, string masterId, ChangeOrderClientRequest request)
+    {
+        string? changedFullname = null;
+        string? changedEmail = null;
+        string? changedPhone = null;
+
+        Client? client;
+        if (request.Email != null && order.Client.Email != request.Email)
+        {
+            // email changed
+            changedEmail = request.Email;
+            client = await clientRepository.GetByEmailAsync(changedEmail);
+
+            if (client == null)
+            {
+                // Client not found - create new one
+                client = new Client(masterId, request.FullName!, request.Email, request.Phone!, order.CreatedAt);
+                await clientRepository.CreateAsync(client);
+                order.ClientId = client.Id;
+            }
+            else
+                order.ClientId = client.Id;
+        }
+        else
+            client = order.Client;
+        
+        if (request.FullName != null && client.GetFullName() != request.FullName)
+        {
+            client.SetFullName(request.FullName);
+            changedFullname = request.FullName;
+        }
+
+        if (request.Phone != null && client.Phone != request.Phone)
+        {
+            client.Phone = request.Phone;
+            changedPhone = request.Phone;
+        }
+
+        await historyService.AddClientChangedHistoryAsync(
+            order.Id, changedFullname, changedEmail, changedPhone, DateTime.UtcNow);
+    }
+
+    private async Task ChangeOrderProductsAsync(Order order, IEnumerable<OrderProductRequest> request)
+    {
+        var products = new List<OrderProduct>();
+        var orderProducts = order.OrderProducts;
+        var isProductsChanged = false;
+        
+        foreach (var productRequest in request)
+        {
+            var product = await productRepository.GetByIdAsync(productRequest.ProductId);
+            
+            if (product == null)
+                throw new NotFoundException("Product not found");
+
+            if (!orderProducts.Any(oProduct =>
+                    productRequest.ProductId == product.Id && oProduct.Quantity == productRequest.Quantity))
+                isProductsChanged = true;
+
+            products.Add(new OrderProduct
+            {
+                ProductId = productRequest.ProductId,
+                Quantity = productRequest.Quantity,
+                UnitPrice = product.Price
+            });
+        }
+            
+        order.OrderProducts.Clear();
+        order.OrderProducts.AddRange(products);
+            
+        await historyService.AddOrderProductsChangedHistoryAsync(order.Id, isProductsChanged ? products : null, DateTime.UtcNow);
     }
 
     public async Task<bool> TryDeleteOrderAsync(string masterid, Guid orderId)
@@ -198,29 +296,6 @@ public class OrderService(
 
         await orderRepository.SaveChangesAsync();
         return true;
-    }
-
-    private async Task CreateOrUpdateClientAsync(Order order, string? fullnameRequest, string? emailRequest, string? phoneRequest)
-    {
-        var masterId = order.MasterId;
-        var fullname = fullnameRequest ?? order.Client.GetFullName();
-        var email = emailRequest ?? order.Client.Email;
-        var phone = phoneRequest ?? order.Client.Phone;
-        
-        var client = await clientRepository.GetByEmailAsync(email);
-
-        if (client == null)
-        {
-            // Client not found - create new one
-            var newClient = new Client(masterId, fullname, email, phone, order.CreatedAt);
-            await clientRepository.CreateAsync(newClient);
-            order.ClientId = newClient.Id;
-        }
-        else
-        {
-            client.Update(fullname, null, phone);
-            order.ClientId = client.Id;
-        }
     }
     
     private string GetOrderName(string fullname)

@@ -38,15 +38,15 @@ public class Product : BaseEntity<Guid>
 
     public void Update(string? name, string? description, double? price, string? materialStr, string? dimensions)
     {
-        if (name != null)
+        if (name != null && name != Name)
             Name = name;
-        if (description != null)
+        if (description != null && description != Description)
             Description = description;
-        if (price != null)
+        if (price != null && Math.Abs((double)price - Price) < 0.00001)
             Price = (double)price;
-        if (materialStr != null)
+        if (materialStr != null && materialStr != Material.ToString())
             Material = Enum.Parse<Material>(materialStr);
-        if (dimensions != null)
+        if (dimensions != null && dimensions != Dimensions)
             Dimensions = dimensions;
     }
 

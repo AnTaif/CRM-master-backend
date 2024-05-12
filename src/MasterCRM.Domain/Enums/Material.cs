@@ -8,8 +8,7 @@ public enum Material
     Fabric = 3, // ткань
     Metal = 4, // металл
     Glass = 5, // стекло 
-    Felt = 6, // войлок
-    Rubber = 7, // резина
-    Paper = 8, // бумага
-    Stone = 9, // камень
+    Rubber = 6, // резина
+    Paper = 7, // бумага
+    Stone = 8, // камень
 }

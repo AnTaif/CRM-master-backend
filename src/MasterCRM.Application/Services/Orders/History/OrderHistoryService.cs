@@ -20,7 +20,7 @@ public class OrderHistoryService(IOrderHistoryRepository historyRepository, IOrd
         
         var historyList = history.ToList();
         return historyList.Select(orderHistory =>
-            new OrderHistoryDto(orderHistory.Change, orderHistory.Type, orderHistory.Date));
+            new OrderHistoryDto(orderHistory.Type, orderHistory.Change, orderHistory.Date));
     }
 
     public async Task AddNewOrderHistoryAsync(Guid orderId, string orderName, DateTime date)
@@ -37,7 +37,8 @@ public class OrderHistoryService(IOrderHistoryRepository historyRepository, IOrd
         await historyRepository.CreateAsync(historyItem);
     }
     
-    public async Task AddOrderChangedHistoryAsync(Guid id, double? totalAmount, string? comment, string? address, DateTime date)
+    public async Task AddOrderChangedHistoryAsync(
+        Guid id, double? totalAmount, string? comment, string? address, bool? isCalculationAutomated, DateTime date)
     {
         if (totalAmount != null)
         {
@@ -75,10 +76,16 @@ public class OrderHistoryService(IOrderHistoryRepository historyRepository, IOrd
             };
             await historyRepository.CreateAsync(historyItem);
         }
+
+        if (isCalculationAutomated != null)
+            await AddCostCalculationChangedHistoryAsync(id, (bool)isCalculationAutomated, date);
     }
     
     public async Task AddStageChangedHistoryAsync(Guid id, Stage prevStage, Stage nextStage, DateTime date)
     {
+        if (prevStage.Order == nextStage.Order)
+            return;
+        
         var historyItem = new OrderHistory
         {
             Id = Guid.NewGuid(),
@@ -130,20 +137,42 @@ public class OrderHistoryService(IOrderHistoryRepository historyRepository, IOrd
         }
     }
     
-    public async Task AddOrderProductsChangedHistoryAsync(Guid id, IReadOnlyCollection<OrderProduct> products, DateTime date)
+    public async Task AddOrderProductsChangedHistoryAsync(Guid id, IReadOnlyCollection<OrderProduct>? products, DateTime date)
     {
+        if (products == null)
+            return;
+        
         var historyItem = new OrderHistory
         {
             Id = Guid.NewGuid(),
             OrderId = id,
-            Change = $"{products.Count} позиций на {products.Sum(product => product.Quantity * product.UnitPrice)} \u20bd",
+            Change = $"{products.Count} {GetNounForm(products.Count)} на сумму {products.Sum(product => product.Quantity * product.UnitPrice)} \u20bd",
             Type = "Товары заказа изменены",
-            Date = DateTime.UtcNow
+            Date = date
         };
         await historyRepository.CreateAsync(historyItem);
     }
     
-    public async Task AddCostCalculationChangedHistoryAsync(Guid orderId, bool isAutomatedNow, DateTime date)
+    private static string GetNounForm(int number)
+    {
+        var lastDigit = number % 10;
+        var lastTwoDigits = number % 100;
+
+        if (lastTwoDigits is >= 11 and <= 19)
+            return "позиций";
+
+        switch (lastDigit)
+        {
+            case 1:
+                return "позиция";
+            case 2: case 3: case 4:
+                return "позиции";
+            default:
+                return "позиций";
+        }
+    }
+    
+    private async Task AddCostCalculationChangedHistoryAsync(Guid orderId, bool isAutomatedNow, DateTime date)
     {
         var prev = isAutomatedNow ? "На основе стоимости товаров" : "Вручную";
         var next = isAutomatedNow ?  "Вручную" : "На основе стоимости товаров";
@@ -152,8 +181,8 @@ public class OrderHistoryService(IOrderHistoryRepository historyRepository, IOrd
             Id = Guid.NewGuid(),
             OrderId = orderId,
             Change = $"{prev} -> {next}",
-            Type = "Товары заказа изменены",
-            Date = DateTime.UtcNow
+            Type = "Изменен режим расчета суммы",
+            Date = date
         };
         await historyRepository.CreateAsync(historyItem);
     }

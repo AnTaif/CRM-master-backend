@@ -33,14 +33,4 @@ public class Order : BaseEntity<Guid>
     public virtual List<OrderProduct> OrderProducts { get; set; } = null!;
     
     public virtual List<OrderHistory> History { get; set; } = null!;
-
-    public void Update(double? totalAmount, string? comment, string? address)
-    {
-        if (totalAmount != null)
-            TotalAmount = (double)totalAmount;
-        if (comment != null)
-            Comment = comment;
-        if (address != null)
-            Address = address;
-    }
 }

@@ -20,17 +20,20 @@ DATABASE_PASSWORD="password"
 
 VK_SERVICE_TOKEN=token
 VK_API_VERSION=5.199
+
+SMTP_USER=jamarcus17@ethereal.email
+SMTP_PASSWORD=JeHtDvjWf3GvmKpzeZ
 ```
 
 4. Build and run the application using Docker Compose:
     ```bash
-    docker-compose up -d
+    docker compose up -d
     ```
 
 Once the webapi is running, you can access it at [http://localhost:8080](http://localhost:8080/swagger/index.html)
 
 To stop the application and remove the containers, run:
 ```bash
-docker-compose down
+docker compose down
 ```
 

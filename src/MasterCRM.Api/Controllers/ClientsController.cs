@@ -12,7 +12,7 @@ namespace MasterCRM.Api.Controllers;
 public class ClientsController(IClientService clientService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<ClientDto>> GetByCurrentUser()
+    public async Task<ActionResult<ClientItemResponse>> GetByCurrentUser()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         

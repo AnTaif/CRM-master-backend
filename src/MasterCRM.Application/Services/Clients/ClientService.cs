@@ -5,11 +5,12 @@ namespace MasterCRM.Application.Services.Clients;
 
 public class ClientService(IClientRepository clientRepository) : IClientService
 {
-    public async Task<IEnumerable<ClientItemResponse>> GetByMasterAsync(string masterId)
+    public async Task<GetClientsResponse> GetByMasterAsync(string masterId)
     {
         var clients = await clientRepository.GetByMasterAsync(masterId);
 
-        return clients.Select(client => client.ToItemResponse());
+        var clientsArray = clients.ToArray();
+        return new GetClientsResponse(clientsArray.Length, clientsArray.Select(client => client.ToItemResponse()));
     }
 
     public async Task<ClientDto?> GetByIdAsync(Guid id)

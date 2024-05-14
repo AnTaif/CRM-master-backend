@@ -4,7 +4,7 @@ namespace MasterCRM.Application.Services.Clients;
 
 public interface IClientService
 {
-    public Task<IEnumerable<ClientItemResponse>> GetByMasterAsync(string masterId);
+    public Task<GetClientsResponse> GetByMasterAsync(string masterId);
     
     public Task<ClientDto?> GetByIdAsync(Guid id);
     

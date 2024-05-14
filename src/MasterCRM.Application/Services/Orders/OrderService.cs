@@ -4,12 +4,12 @@ using MasterCRM.Application.Services.Clients;
 using MasterCRM.Application.Services.Orders.Dto;
 using MasterCRM.Application.Services.Orders.History;
 using MasterCRM.Application.Services.Orders.Requests;
-using MasterCRM.Application.Services.Orders.Responses;
 using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Application.Services.Products;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;
 using MasterCRM.Domain.Exceptions;
+using MasterCRM.Domain.Interfaces;
 
 namespace MasterCRM.Application.Services.Orders;
 
@@ -18,7 +18,8 @@ public class OrderService(
     IClientRepository clientRepository,
     IStageRepository stageRepository,
     IProductRepository productRepository,
-    IOrderHistoryService historyService) : IOrderService
+    IOrderHistoryService historyService,
+    IEmailSender emailSender) : IOrderService
 {
     public async Task<GetOrdersResponse> GetAllByMasterAsync(string masterId)
     {
@@ -92,16 +93,34 @@ public class OrderService(
         
         await orderRepository.CreateAsync(newOrder);
         
-        await CreateOrSetClientAsync(newOrder, request.Client.FullName, request.Client.Email, request.Client.Phone);
+        var client = await CreateOrSetClientAsync(newOrder, request.Client.FullName, request.Client.Email, request.Client.Phone);
         
         await historyService.AddNewOrderHistoryAsync(newOrder.Id, newOrder.Name, newOrder.CreatedAt);
         
         await orderRepository.SaveChangesAsync();
-
+        var order = await orderRepository.GetByIdAsync(newOrder.Id);
+        
+        await NotifyOrderCreated(order!, client);
+        
         return newOrder.ToDto();
     }
+
+    private async Task NotifyOrderCreated(Order order, Client client)
+    {
+        if (order.Master.Email != null)
+        {
+            var message = $"Доброго дня, {order.Master.GetFullName()}.\nПользователь {client.GetFullName()} оставил заявку на заказ.\n" +
+                          (string.IsNullOrWhiteSpace(order.Comment) ? $"Комментарий к заказу - {order.Comment}.\n" : "") +
+                          $"Контактные данные пользователя для связи: {client.Phone}, {client.Email}.\nС уважением,\nМастерскаЯ\n";
+            await emailSender.SendEmailAsync(order.Master.Email, "У вас новый заказ!", message);
+        }
+
+        var clientMessage =
+            $"Доброго дня, {client.GetFullName()}.\nВаш заказ успешно оформлен и отправлен мастеру.\nО переходе товара на следующую стадию вы узнаете в письме, которое придет на эту же почту.\nКонтактные данные мастера для связи: {order.Master.PhoneNumber}, {order.Master.Email}.\nС уважением,\nМастерскаЯ\n";
+        await emailSender.SendEmailAsync(client.Email, "Ваш заказ оформлен", clientMessage);
+    }
     
-    private async Task CreateOrSetClientAsync(Order order, string fullnameRequest, string emailRequest, string phoneRequest)
+    private async Task<Client> CreateOrSetClientAsync(Order order, string fullnameRequest, string emailRequest, string phoneRequest)
     {
         var client = await clientRepository.GetByEmailAsync(emailRequest);
 
@@ -111,12 +130,12 @@ public class OrderService(
             var newClient = new Client(order.MasterId, fullnameRequest, emailRequest, phoneRequest, order.CreatedAt);
             await clientRepository.CreateAsync(newClient);
             order.ClientId = newClient.Id;
+            return newClient;
         }
-        else
-        {
-            client.Update(fullnameRequest, null, phoneRequest);
-            order.ClientId = client.Id;
-        }
+
+        client.Update(fullnameRequest, null, phoneRequest);
+        order.ClientId = client.Id;
+        return client;
     }
 
     public async Task<OrderDto?> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request)
@@ -132,8 +151,9 @@ public class OrderService(
         if (request.TotalAmount != null || request.Comment != null || request.Address != null || request.IsCalculationAutomated != null)
             await ChangeOrderInfoAsync(order, request);
 
+        Stage? newStage = null;
         if (request.StageTab != null)
-            await ChangeOrderStageAsync(order, masterId, (short)request.StageTab);
+            newStage = await ChangeOrderStageAsync(order, masterId, (short)request.StageTab);
         
         if (request.Client != null)
             await ChangeOrderClientAsync(order, masterId, request.Client);
@@ -144,6 +164,9 @@ public class OrderService(
         orderRepository.Update(order);
         
         await orderRepository.SaveChangesAsync();
+
+        if (newStage != null)
+            await NotifyOrderStageChangedAsync(order, newStage.Name);
 
         return order.ToDto();
     }
@@ -180,7 +203,7 @@ public class OrderService(
             order.Id, changedTotalAmount, changedComment, changedAddress, changedCalculation, DateTime.UtcNow);
     }
 
-    private async Task ChangeOrderStageAsync(Order order, string masterId, short stageTab)
+    private async Task<Stage?> ChangeOrderStageAsync(Order order, string masterId, short stageTab)
     {
         var stage = await stageRepository.GetWithTabByMaster(masterId, stageTab);
             
@@ -188,12 +211,19 @@ public class OrderService(
             throw new NotFoundException("Stage not found");
         
         if (order.Stage.Order == stageTab)
-            return;
+            return null;
             
         await historyService.AddStageChangedHistoryAsync(
             order.Id, order.Stage, stage, DateTime.UtcNow);
             
         order.StageId = stage.Id;
+        return stage;
+    }
+
+    private async Task NotifyOrderStageChangedAsync(Order order, string newStage)
+    {
+        var message = $"Доброго дня, {order.Client.GetFullName()}.\nВаш заказ от {order.CreatedAt} перешел на следующую стадию {newStage}.\nКонтактные данные мастера для связи: {order.Master.PhoneNumber}, {order.Master.Email}.\nС уважением,\nМастерскаЯ";
+        await emailSender.SendEmailAsync(order.Client.Email, "Ваш заказ перешел на следующую стадию!", message);
     }
 
     /// <summary>

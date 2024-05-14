@@ -9,13 +9,13 @@ public class EmailSender : IEmailSender, IDisposable
     private readonly SmtpClient smtpClient;
     private readonly string senderEmail;
 
-    public EmailSender(SmtpSettings settings, string username, string password, string senderEmail)
+    public EmailSender(SmtpSettings settings, string username, string password)
     {
         smtpClient = new SmtpClient();
         smtpClient.Connect(settings.Host, settings.Port, useSsl: false);
         smtpClient.Authenticate(username, password);
 
-        this.senderEmail = senderEmail;
+        senderEmail = settings.Email;
     }
     
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)

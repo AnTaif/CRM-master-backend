@@ -20,6 +20,7 @@ public class OrderRepository(CrmDbContext context) : IOrderRepository
     public async Task<Order?> GetByIdAsync(Guid id) =>
         await dbSet
             .Include(order => order.Stage)
+            .Include(order => order.Master)
             .Include(order => order.Client)
             .Include(order => order.OrderProducts)
             .ThenInclude(orderProduct => orderProduct.Product)

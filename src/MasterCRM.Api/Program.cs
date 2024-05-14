@@ -1,3 +1,4 @@
+using System.Globalization;
 using DotNetEnv;
 using MasterCRM.Api.Extensions;
 using Microsoft.Extensions.FileProviders;
@@ -5,6 +6,12 @@ using Microsoft.Extensions.FileProviders;
 var builder = WebApplication.CreateBuilder(args);
 
 Env.Load("../../.env");
+
+const string newDateTimeFormat = "dd.MM.yyyy";
+var newCulture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+newCulture.DateTimeFormat.ShortDatePattern = newDateTimeFormat;
+CultureInfo.DefaultThreadCurrentCulture = newCulture;
+CultureInfo.DefaultThreadCurrentUICulture = newCulture;
 
 builder.Services.AddControllers();
 

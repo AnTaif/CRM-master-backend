@@ -6,6 +6,7 @@ namespace MasterCRM.Domain.Entities.Orders;
 public class Order : BaseEntity<Guid>
 {
     public required string MasterId { get; set; }
+    public Master Master { get; set; } = null!;
     
     //TODO: fix name changing when client changed
     public string Name { get; set; } = null!;

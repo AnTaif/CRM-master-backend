@@ -102,12 +102,11 @@ public static class ServiceCollectionExtensions
             new VkontakteService(vkApiVersion, vkServiceToken));
 
         var smtpSettings = configuration.GetSection("SmtpSettings").Get<SmtpSettings>() ??
-                           new SmtpSettings("smtp.ethereal.email", 587);
+                           new SmtpSettings("smtp.ethereal.email", 587, "noreply@masterskaya.online");
         var smtpUser = Environment.GetEnvironmentVariable("SMTP_USER") ?? "";
         var smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD") ?? "";
-        var smtpSenderEmail = Environment.GetEnvironmentVariable("SMTP_EMAIL") ?? "";
         services.AddTransient<IEmailSender, EmailSender>(_ => 
-            new EmailSender(smtpSettings, smtpUser, smtpPassword, smtpSenderEmail));
+            new EmailSender(smtpSettings, smtpUser, smtpPassword));
 
         return services;
     }

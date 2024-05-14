@@ -48,7 +48,7 @@ public static class OrderProductExtensions
             ProductId = orderProduct.Product.Id,
             Name = orderProduct.Product.Name,
             Quantity = orderProduct.Quantity,
-            Photo = orderProduct.Product.Photos.First().Url
+            Photo = orderProduct.Product.Photos.FirstOrDefault()?.Url
         };
     }
 }

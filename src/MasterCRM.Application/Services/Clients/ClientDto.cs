@@ -6,6 +6,8 @@ public record ClientDto
 {
     public required Guid Id { get; init; }
     
+    public required string Initials { get; init; }
+    
     public required string FullName { get; init; }
     
     public required string Email { get; init; }

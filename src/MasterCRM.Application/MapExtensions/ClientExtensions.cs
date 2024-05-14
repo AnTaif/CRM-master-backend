@@ -10,6 +10,7 @@ public static class ClientExtensions
         return new ClientDto
         {
             Id = client.Id,
+            Initials = client.Initials,
             FullName = client.GetFullName(),
             Email = client.Email,
             Phone = client.Phone,

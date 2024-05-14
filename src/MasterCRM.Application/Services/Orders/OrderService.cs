@@ -331,7 +331,7 @@ public class OrderService(
     private string GetOrderName(string fullname)
     {
         var splitFullname = fullname.Split();
-        var name = new StringBuilder("Заказ ");
+        var name = new StringBuilder();
 
         name.Append(splitFullname[0]);
         name.Append($" {splitFullname[1][0]}.");

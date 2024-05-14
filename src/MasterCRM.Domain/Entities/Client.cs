@@ -1,3 +1,4 @@
+using System.Text;
 using MasterCRM.Domain.Common;
 using MasterCRM.Domain.Entities.Orders;
 
@@ -7,7 +8,6 @@ public class Client : BaseEntity<Guid>
 {
     public string MasterId { get; init; }
     //public virtual Master Master { get; init; }
-
     public string FirstName { get; set; } = null!;
 
     public string LastName { get; set; } = null!;
@@ -21,6 +21,8 @@ public class Client : BaseEntity<Guid>
     public virtual List<Order> Orders { get; set; }
     
     public DateTime GetLastOrderDate() => Orders.Max(order => order.CreatedAt);
+    
+    public string Initials => GetInitials();
 
     public Client()
     {
@@ -71,5 +73,16 @@ public class Client : BaseEntity<Guid>
         LastName = names[0];
         FirstName = names[1];
         MiddleName = names.Length > 2 ? names[2] : null;
+    }
+
+    public string GetInitials()
+    {
+        var initials = new StringBuilder();
+
+        initials.Append(LastName);
+        initials.Append($" {FirstName[0]}.");
+        if (MiddleName != null)
+            initials.Append($"{MiddleName[0]}.");
+        return initials.ToString();
     }
 }

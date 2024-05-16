@@ -20,6 +20,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="Uploads\Templates\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
       <Content Include="..\..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>

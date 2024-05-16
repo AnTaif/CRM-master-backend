@@ -100,7 +100,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IWebsiteRepository, WebsiteRepository>();
         services.AddTransient<ITemplateRepository, TemplateRepository>();
         services.AddTransient<IConstructorBlockRepository, ConstructorBlockRepository>();
-        services.AddTransient<IStyleRepository, StyleRepository>();
+        services.AddTransient<IGlobalStylesRepository, GlobalStylesRepository>();
         
         services.AddTransient<IFileStorage, RootFileStorage>(_ => new RootFileStorage(uploadsPath, uploadsUrl));
 

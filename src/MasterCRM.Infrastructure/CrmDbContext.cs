@@ -31,7 +31,7 @@ public class CrmDbContext : IdentityDbContext<Master>
 
     public DbSet<ConstructorBlock> ConstructorBlocks { get; set; } = null!;
 
-    public DbSet<Style> Styles { get; set; } = null!;
+    public DbSet<GlobalStyles> GlobalStyles { get; set; } = null!;
 
     public CrmDbContext(DbContextOptions<CrmDbContext> options) : base(options)
     {
@@ -61,45 +61,27 @@ public class CrmDbContext : IdentityDbContext<Master>
                     Title = "Второй шаблон"
                 });
 
-        modelBuilder.Entity<Style>()
+        modelBuilder.Entity<GlobalStyles>()
             .HasData(
-                new Style
+                new GlobalStyles
                 {
                     TemplateId = 1,
-                    Selector = "body",
-                    Properties = new Dictionary<string, string>
-                    {
-                        {"background-color", "#100001"},
-                        {"color", "#000011"}
-                    } 
+                    WebsiteId = null,
+                    FontFamily = "Arial",
+                    BackgroundColor = "#00ff00",
+                    H1Color = "#f00000",
+                    PColor = "#00f000",
+                    ButtonColor = "#00000f"
                 },
-                new Style
-                {
-                    TemplateId = 1,
-                    Selector = "h1",
-                    Properties = new Dictionary<string, string>
-                    {
-                        {"color", "#001100"}
-                    } 
-                },
-                new Style
+                new GlobalStyles
                 {
                     TemplateId = 2,
-                    Selector = "body",
-                    Properties = new Dictionary<string, string>
-                    {
-                        {"background-color", "#000001"},
-                        {"color", "#110011"}
-                    } 
-                },
-                new Style
-                {
-                    TemplateId = 2,
-                    Selector = "h1",
-                    Properties = new Dictionary<string, string>
-                    {
-                        {"color", "#110000"}
-                    } 
+                    WebsiteId = null,
+                    FontFamily = "Arial",
+                    BackgroundColor = "#ffffff",
+                    H1Color = "#f00000",
+                    PColor = "#00f000",
+                    ButtonColor = "#00000f"
                 });
 
         modelBuilder.Entity<HeaderBlock>()

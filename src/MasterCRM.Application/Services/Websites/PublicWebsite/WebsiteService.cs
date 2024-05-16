@@ -10,14 +10,22 @@ public class WebsiteService(
         ITemplateRepository templateRepository, 
         IFileStorage fileStorage,
         IConstructorBlockRepository constructorBlockRepository,
-        IStyleRepository styleRepository) : IWebsiteService
+        IGlobalStylesRepository globalStylesRepository) : IWebsiteService
 {
-    public Task GetWebsite(Guid websiteId, string? masterId)
+    public async Task<WebsiteItemResponse?> GetWebsiteInfo(Guid websiteId, string? masterId)
     {
-        throw new NotImplementedException();
+        var website = await websiteRepository.GetByIdAsync(websiteId);
+
+        if (website == null)
+            return null;
+
+        if (masterId != website.OwnerId)
+            throw new ForbidException("Current user is not the owner of the website");
+
+        return new WebsiteItemResponse(website.Id, website.Title, website.AddressName, website.TemplateId);
     }
 
-    public async Task<WebsiteItemResponse?> CreateAsync(string masterId, string title)
+    public async Task<WebsiteItemResponse?> CreateAsync(string masterId, CreateWebsiteRequest request)
     {
         if (await websiteRepository.IsMasterHaveWebsite(masterId))
             return null;
@@ -25,14 +33,15 @@ public class WebsiteService(
         var newWebsite = new Website
         {
             Id = Guid.NewGuid(),
-            Title = title,
+            Title = request.Title,
+            AddressName = request.AddressName,
             OwnerId = masterId
         };
 
         await websiteRepository.CreateAsync(newWebsite);
         await websiteRepository.SaveChangesAsync();
 
-        return new WebsiteItemResponse(newWebsite.Id, newWebsite.Title, null);
+        return new WebsiteItemResponse(newWebsite.Id, newWebsite.Title, newWebsite.AddressName, null);
     }
 
     public async Task<WebsiteItemResponse?> SelectTemplateAsync(string masterId, Guid websiteId, int templateId)
@@ -51,20 +60,18 @@ public class WebsiteService(
             throw new NotFoundException("Template not found");
         
         website.TemplateId = template.Id;
-        
-        var websiteGlobalStyles = new List<Style>();
-        foreach (var style in template.GlobalStyles)
+
+        var templateStyles = template.GlobalStyles;
+        await globalStylesRepository.AddAsync(new GlobalStyles
         {
-            websiteGlobalStyles.Add(new Style
-            {
-                Selector = style.Selector,
-                Properties = new Dictionary<string, string>(style.Properties),
-                TemplateId = null,
-                WebsiteId = website.Id
-            });
-        }
-        
-        await styleRepository.AddRangeAsync(websiteGlobalStyles);
+            TemplateId = null,
+            WebsiteId = websiteId,
+            FontFamily = templateStyles.FontFamily,
+            BackgroundColor = templateStyles.BackgroundColor,
+            H1Color = templateStyles.H1Color,
+            PColor = templateStyles.PColor,
+            ButtonColor = templateStyles.ButtonColor
+        });
         
         var websiteComponents = new List<ConstructorBlock>();
         foreach (var component in template.Components)
@@ -125,7 +132,7 @@ public class WebsiteService(
 
         await websiteRepository.SaveChangesAsync();
 
-        return new WebsiteItemResponse(website.Id, website.Title, website.TemplateId);
+        return new WebsiteItemResponse(website.Id, website.Title, website.AddressName, website.TemplateId);
     }
 
     public async Task<WebsiteItemResponse?> ChangeWebsiteInfoAsync(string masterId, Guid websiteId, ChangeWebsiteInfoRequest request)
@@ -139,10 +146,11 @@ public class WebsiteService(
             throw new ForbidException("Current user is not the owner of the website");
 
         website.Title = request.Title ?? website.Title;
+        website.AddressName = request.AddressName ?? website.AddressName;
 
         websiteRepository.Update(website);
         await websiteRepository.SaveChangesAsync();
 
-        return new WebsiteItemResponse(website.Id, website.Title, website.TemplateId);
+        return new WebsiteItemResponse(website.Id, website.Title, website.AddressName, website.TemplateId);
     }
 }

@@ -28,7 +28,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         string userId, CreateProductRequest request, IEnumerable<UploadPhotoRequest> photoRequests)
     {
         var newProduct = new Product(userId, request.Name, request.Description, request.Dimensions, 
-            Enum.Parse<Material>(request.Material), request.Price);
+            request.Material.ConvertToMaterial(), request.Price);
         
         foreach (var uploadRequest in photoRequests)
         {
@@ -61,7 +61,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         if (userId != product.MasterId)
             throw new ForbidException("Current user is not the owner of the product");
 
-        product.Update(request.Name, request.Description, request.Price, request.Material, request.Dimensions);
+        product.Update(request.Name, request.Description, request.Price, request.Material?.ConvertToMaterial(), request.Dimensions);
         await repository.SaveChangesAsync();
 
         return product.ToDto();

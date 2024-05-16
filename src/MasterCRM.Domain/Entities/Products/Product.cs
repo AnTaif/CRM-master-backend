@@ -36,7 +36,7 @@ public class Product : BaseEntity<Guid>
         CreationDate = DateTime.UtcNow;
     }
 
-    public void Update(string? name, string? description, double? price, string? materialStr, string? dimensions)
+    public void Update(string? name, string? description, double? price, Material? material, string? dimensions)
     {
         if (name != null && name != Name)
             Name = name;
@@ -44,8 +44,8 @@ public class Product : BaseEntity<Guid>
             Description = description;
         if (price != null && Math.Abs((double)price - Price) < 0.00001)
             Price = (double)price;
-        if (materialStr != null && materialStr != Material.ToString())
-            Material = Enum.Parse<Material>(materialStr);
+        if (material != null && material != Material)
+            Material = (Material)material;
         if (dimensions != null && dimensions != Dimensions)
             Dimensions = dimensions;
     }

@@ -14,7 +14,7 @@ public static class ProductExtensions
             Name = product.Name,
             Description = product.Description,
             Price = product.Price,
-            Material = product.Material.ToString(),
+            Material = product.Material.ConvertToString(),
             Dimensions = product.Dimensions ?? "",
             IsVisible = product.IsVisible,
             Photos = product.Photos.OrderBy(photo => photo.Order).Select(productPhoto => productPhoto.ToDto()).ToList()

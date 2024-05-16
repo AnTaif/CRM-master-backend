@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Services\Website\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\MasterCRM.Domain\MasterCRM.Domain.csproj" />
     </ItemGroup>
 

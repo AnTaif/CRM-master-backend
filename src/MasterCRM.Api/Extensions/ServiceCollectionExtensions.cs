@@ -8,6 +8,9 @@ using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Application.Services.Products;
 using MasterCRM.Application.Services.Products.Photos;
 using MasterCRM.Application.Services.User;
+using MasterCRM.Application.Services.Websites.Constructor;
+using MasterCRM.Application.Services.Websites.PublicWebsite;
+using MasterCRM.Application.Services.Websites.Templates;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;
 using MasterCRM.Infrastructure;
@@ -72,6 +75,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IStageService, StageService>();
         services.AddTransient<IOrderHistoryService, OrderHistoryService>();
         services.AddTransient<IOrderProductService, OrderProductService>();
+        services.AddTransient<IWebsiteService, WebsiteService>();
+        services.AddTransient<IConstructorService, ConstructorService>();
 
         return services;
     }
@@ -92,6 +97,10 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IStageRepository, StageRepository>();
         services.AddTransient<IOrderHistoryRepository, OrderHistoryRepository>();
         services.AddTransient<IOrderProductRepository, OrderProductRepository>();
+        services.AddTransient<IWebsiteRepository, WebsiteRepository>();
+        services.AddTransient<ITemplateRepository, TemplateRepository>();
+        services.AddTransient<IConstructorBlockRepository, ConstructorBlockRepository>();
+        services.AddTransient<IGlobalStylesRepository, GlobalStylesRepository>();
         
         services.AddTransient<IFileStorage, RootFileStorage>(_ => new RootFileStorage(uploadsPath, uploadsUrl));
 

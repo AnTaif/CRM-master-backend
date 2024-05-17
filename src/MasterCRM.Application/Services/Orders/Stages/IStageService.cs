@@ -1,3 +1,6 @@
+using MasterCRM.Application.Services.Orders.Stages.Requests;
+using MasterCRM.Application.Services.Orders.Stages.Responses;
+
 namespace MasterCRM.Application.Services.Orders.Stages;
 
 public interface IStageService
@@ -10,12 +13,3 @@ public interface IStageService
         
     public Task<bool> TryDeleteAsync(Guid id);
 }
-
-public record StageDto(Guid Id, string Name, short Order, bool IsSystem);
-
-public record UpdateStageRequest(string? Name, short? Order);
-
-public record UpdateRangeRequest(IEnumerable<UpdateStageItemRequest>? UpdateStages,
-    IEnumerable<Guid>? DeleteStages);
-
-public record UpdateStageItemRequest(Guid Id, string? Name, short? Order);

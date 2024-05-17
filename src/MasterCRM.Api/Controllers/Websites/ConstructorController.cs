@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using MasterCRM.Application.Services.Websites.Constructor;
+using MasterCRM.Application.Services.Websites.Constructor.Requests;
+using MasterCRM.Application.Services.Websites.Constructor.Responses;
 using MasterCRM.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +14,7 @@ namespace MasterCRM.Api.Controllers.Websites;
 public class ConstructorController(IConstructorService constructorService) : ControllerBase
 {
     [HttpGet("global-styles")]
-    public async Task<ActionResult<IEnumerable<StyleDto>>> GetGlobalStyles([FromRoute] Guid websiteId)
+    public async Task<ActionResult<GlobalStylesDto>> GetGlobalStyles([FromRoute] Guid websiteId)
     {
         try
         {

@@ -1,3 +1,4 @@
+using MasterCRM.Application.Services.Orders.History.Responses;
 using MasterCRM.Domain.Entities.Orders;
 
 namespace MasterCRM.Application.Services.Orders.History;
@@ -17,5 +18,3 @@ public interface IOrderHistoryService
 
     public Task AddOrderProductsChangedHistoryAsync(Guid id, IReadOnlyCollection<OrderProduct>? products, DateTime date);
 }
-
-public record OrderHistoryDto(string Type, string Change, DateTime Date);

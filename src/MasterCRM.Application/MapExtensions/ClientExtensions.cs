@@ -1,4 +1,4 @@
-using MasterCRM.Application.Services.Clients;
+using MasterCRM.Application.Services.Clients.Responses;
 using MasterCRM.Domain.Entities;
 
 namespace MasterCRM.Application.MapExtensions;

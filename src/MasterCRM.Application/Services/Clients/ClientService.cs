@@ -1,5 +1,6 @@
 using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.Clients.Requests;
+using MasterCRM.Application.Services.Clients.Responses;
 
 namespace MasterCRM.Application.Services.Clients;
 

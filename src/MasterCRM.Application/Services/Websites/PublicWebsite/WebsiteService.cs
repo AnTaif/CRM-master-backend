@@ -1,3 +1,5 @@
+using MasterCRM.Application.Services.Websites.PublicWebsite.Requests;
+using MasterCRM.Application.Services.Websites.PublicWebsite.Responses;
 using MasterCRM.Application.Services.Websites.Templates;
 using MasterCRM.Domain.Entities.Websites;
 using MasterCRM.Domain.Exceptions;
@@ -12,7 +14,7 @@ public class WebsiteService(
         IConstructorBlockRepository constructorBlockRepository,
         IGlobalStylesRepository globalStylesRepository) : IWebsiteService
 {
-    public async Task<WebsiteItemResponse?> GetWebsiteInfo(Guid websiteId, string? masterId)
+    public async Task<WebsiteDto?> GetWebsiteInfo(Guid websiteId, string? masterId)
     {
         var website = await websiteRepository.GetByIdAsync(websiteId);
 
@@ -22,10 +24,10 @@ public class WebsiteService(
         if (masterId != website.OwnerId)
             throw new ForbidException("Current user is not the owner of the website");
 
-        return new WebsiteItemResponse(website.Id, website.Title, website.AddressName, website.TemplateId);
+        return new WebsiteDto(website.Id, website.Title, website.AddressName, website.TemplateId);
     }
 
-    public async Task<WebsiteItemResponse?> CreateAsync(string masterId, CreateWebsiteRequest request)
+    public async Task<WebsiteDto?> CreateAsync(string masterId, CreateWebsiteRequest request)
     {
         if (await websiteRepository.IsMasterHaveWebsite(masterId))
             return null;
@@ -41,11 +43,12 @@ public class WebsiteService(
         await websiteRepository.CreateAsync(newWebsite);
         await websiteRepository.SaveChangesAsync();
 
-        return new WebsiteItemResponse(newWebsite.Id, newWebsite.Title, newWebsite.AddressName, null);
+        return new WebsiteDto(newWebsite.Id, newWebsite.Title, newWebsite.AddressName, null);
     }
 
-    public async Task<WebsiteItemResponse?> SelectTemplateAsync(string masterId, Guid websiteId, int templateId)
+    public async Task<WebsiteDto?> SelectTemplateAsync(string masterId, Guid websiteId, SelectTemplateRequest request)
     {
+        var templateId = request.TemplateId;
         var website = await websiteRepository.GetByIdAsync(websiteId);
 
         if (website == null)
@@ -132,10 +135,10 @@ public class WebsiteService(
 
         await websiteRepository.SaveChangesAsync();
 
-        return new WebsiteItemResponse(website.Id, website.Title, website.AddressName, website.TemplateId);
+        return new WebsiteDto(website.Id, website.Title, website.AddressName, website.TemplateId);
     }
 
-    public async Task<WebsiteItemResponse?> ChangeWebsiteInfoAsync(string masterId, Guid websiteId, ChangeWebsiteInfoRequest request)
+    public async Task<WebsiteDto?> ChangeWebsiteInfoAsync(string masterId, Guid websiteId, ChangeWebsiteInfoRequest request)
     {
         var website = await websiteRepository.GetByIdAsync(websiteId);
 
@@ -151,6 +154,6 @@ public class WebsiteService(
         websiteRepository.Update(website);
         await websiteRepository.SaveChangesAsync();
 
-        return new WebsiteItemResponse(website.Id, website.Title, website.AddressName, website.TemplateId);
+        return new WebsiteDto(website.Id, website.Title, website.AddressName, website.TemplateId);
     }
 }

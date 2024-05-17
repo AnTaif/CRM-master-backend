@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using MasterCRM.Application.Services.Websites.PublicWebsite;
+using MasterCRM.Application.Services.Websites.PublicWebsite.Requests;
 using MasterCRM.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -61,13 +62,13 @@ public class WebsiteController(IWebsiteService websiteService) : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("{websiteId}/template")]
-    public async Task<IActionResult> SelectTemplate([FromRoute] Guid websiteId, int templateId)
+    [HttpPost("{websiteId}/select-template")]
+    public async Task<IActionResult> SelectTemplate([FromRoute] Guid websiteId, SelectTemplateRequest request)
     {
         try
         {
             var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var response = await websiteService.SelectTemplateAsync(masterId, websiteId, templateId);
+            var response = await websiteService.SelectTemplateAsync(masterId, websiteId, request);
 
             if (response == null)
                 return NotFound("Website not found");

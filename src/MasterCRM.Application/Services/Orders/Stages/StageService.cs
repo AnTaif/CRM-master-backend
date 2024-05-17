@@ -1,4 +1,6 @@
 using MasterCRM.Application.MapExtensions;
+using MasterCRM.Application.Services.Orders.Stages.Requests;
+using MasterCRM.Application.Services.Orders.Stages.Responses;
 using MasterCRM.Domain.Entities.Orders;
 
 namespace MasterCRM.Application.Services.Orders.Stages;

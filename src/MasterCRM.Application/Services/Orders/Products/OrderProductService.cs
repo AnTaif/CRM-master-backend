@@ -1,6 +1,6 @@
 using MasterCRM.Application.MapExtensions;
-using MasterCRM.Application.Services.Orders.Dto;
-using MasterCRM.Application.Services.Orders.Requests;
+using MasterCRM.Application.Services.Orders.Products.Requests;
+using MasterCRM.Application.Services.Orders.Products.Responses;
 using MasterCRM.Application.Services.Products;
 using MasterCRM.Domain.Entities.Orders;
 

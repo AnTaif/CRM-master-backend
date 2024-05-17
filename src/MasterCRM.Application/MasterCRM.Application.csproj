@@ -19,4 +19,8 @@
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Services\Websites\Templates\Requests\" />
+    </ItemGroup>
 </Project>

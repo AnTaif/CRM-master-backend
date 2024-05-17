@@ -1,7 +1,8 @@
 using System.Security.Claims;
 using MasterCRM.Application.Services.Products;
-using MasterCRM.Application.Services.Products.Dto;
+using MasterCRM.Application.Services.Products.Photos.Requests;
 using MasterCRM.Application.Services.Products.Requests;
+using MasterCRM.Application.Services.Products.Responses;
 using MasterCRM.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

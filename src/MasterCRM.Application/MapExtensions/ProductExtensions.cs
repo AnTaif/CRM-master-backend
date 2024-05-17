@@ -1,4 +1,4 @@
-using MasterCRM.Application.Services.Products.Dto;
+using MasterCRM.Application.Services.Products.Responses;
 using MasterCRM.Domain.Entities.Products;
 
 namespace MasterCRM.Application.MapExtensions;

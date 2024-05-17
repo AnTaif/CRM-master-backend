@@ -1,5 +1,3 @@
-using MasterCRM.Application.Services.Orders.Dto;
-
 namespace MasterCRM.Application.Services.Orders.Responses;
 
 /// <summary>

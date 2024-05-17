@@ -1,5 +1,5 @@
-using MasterCRM.Application.Services.Orders.Dto;
-using MasterCRM.Application.Services.Orders.Requests;
+using MasterCRM.Application.Services.Orders.Products.Requests;
+using MasterCRM.Application.Services.Orders.Products.Responses;
 
 namespace MasterCRM.Application.Services.Orders.Products;
 

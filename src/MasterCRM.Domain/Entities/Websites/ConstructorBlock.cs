@@ -43,30 +43,3 @@ public class FooterBlock : ConstructorBlock
 {
     public int Type { get; set; } = 0;
 }
-
-public enum BlockType
-{
-    Header = 0,
-    Footer = 1,
-    Text = 2,
-    H1 = 3,
-    Catalog = 4,
-}
-
-/*
-foreach (var block in store.Blocks.OrderBy(b => b.Order))
-{
-    if (block is TextBlock textBlock)
-    {
-        htmlBuilder.Append($"<div><h2>{textBlock.Title}</h2><p>{textBlock.Text}</p></div>");
-    }
-    else if (block is ImageBlock imageBlock)
-    {
-        htmlBuilder.Append($"<div><h2>{imageBlock.Title}</h2><img src='{imageBlock.ImageUrl}' alt=''></div>");
-    }
-    else if (block is CatalogBlock catalogBlock)
-    {
-        htmlBuilder.Append($"<div><h2>{catalogBlock.Title}</h2><p>Catalog with style: {catalogBlock.CardStyle}</p></div>");
-    }
-}
-*/

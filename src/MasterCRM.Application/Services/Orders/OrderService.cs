@@ -1,9 +1,10 @@
 using System.Text;
 using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.Clients;
-using MasterCRM.Application.Services.Orders.Dto;
 using MasterCRM.Application.Services.Orders.History;
+using MasterCRM.Application.Services.Orders.Products.Requests;
 using MasterCRM.Application.Services.Orders.Requests;
+using MasterCRM.Application.Services.Orders.Responses;
 using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Application.Services.Products;
 using MasterCRM.Domain.Entities;
@@ -316,13 +317,9 @@ public class OrderService(
 
         orderRepository.Delete(order);
 
-        var clientOrders = await orderRepository.GetAllByPredicateAsync(o => o.ClientId == clientId);
-
-        if (!clientOrders.Any())
-        {
-            var client = await clientRepository.GetByIdAsync(clientId);
-            clientRepository.Delete(client!);
-        }
+        var client = await clientRepository.GetByIdAsync(clientId);
+        if (client!.Orders.Count <= 1)
+            clientRepository.Delete(client);
 
         await orderRepository.SaveChangesAsync();
         return true;

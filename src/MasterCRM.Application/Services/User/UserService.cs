@@ -1,5 +1,6 @@
 using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.User.Requests;
+using MasterCRM.Application.Services.User.Responses;
 using MasterCRM.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 

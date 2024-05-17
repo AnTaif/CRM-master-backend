@@ -1,4 +1,5 @@
-using MasterCRM.Application.Services.Orders.Dto;
+using MasterCRM.Application.Services.Orders.Products;
+using MasterCRM.Application.Services.Orders.Products.Responses;
 using MasterCRM.Application.Services.Orders.Responses;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using MasterCRM.Application.Services.Clients;
 using MasterCRM.Application.Services.Clients.Requests;
+using MasterCRM.Application.Services.Clients.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

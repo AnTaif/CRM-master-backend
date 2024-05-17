@@ -1,5 +1,6 @@
 using MasterCRM.Application.MapExtensions;
-using MasterCRM.Application.Services.Products.Dto;
+using MasterCRM.Application.Services.Products.Photos.Requests;
+using MasterCRM.Application.Services.Products.Photos.Responses;
 using MasterCRM.Application.Services.Products.Requests;
 using MasterCRM.Domain.Entities.Products;
 using MasterCRM.Domain.Interfaces;

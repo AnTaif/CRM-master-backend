@@ -1,5 +1,5 @@
-using MasterCRM.Application.Services.Products.Dto;
-using MasterCRM.Application.Services.Products.Requests;
+using MasterCRM.Application.Services.Products.Photos.Requests;
+using MasterCRM.Application.Services.Products.Photos.Responses;
 
 namespace MasterCRM.Application.Services.Products.Photos;
 
@@ -11,5 +11,3 @@ public interface IProductPhotoService
     
     public Task<bool> TryDeletePhotoAsync(Guid productId, Guid photoId);
 }
-
-public record UpdateProductPhotosRequest(Guid Id, short Order);

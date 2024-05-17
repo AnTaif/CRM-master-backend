@@ -1,3 +1,5 @@
+using MasterCRM.Application.Services.Orders.Products.Requests;
+
 namespace MasterCRM.Application.Services.Orders.Requests;
 
 public record ChangeOrderRequest

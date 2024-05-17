@@ -1,5 +1,6 @@
-using MasterCRM.Application.Services.Products.Dto;
+using MasterCRM.Application.Services.Products.Photos.Requests;
 using MasterCRM.Application.Services.Products.Requests;
+using MasterCRM.Application.Services.Products.Responses;
 
 namespace MasterCRM.Application.Services.Products;
 

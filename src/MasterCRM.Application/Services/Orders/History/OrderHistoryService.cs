@@ -1,3 +1,4 @@
+using MasterCRM.Application.Services.Orders.History.Responses;
 using MasterCRM.Domain.Entities.Orders;
 using MasterCRM.Domain.Exceptions;
 

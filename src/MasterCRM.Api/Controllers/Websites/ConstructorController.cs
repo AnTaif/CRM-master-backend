@@ -61,11 +61,50 @@ public class ConstructorController(IConstructorService constructorService) : Con
         }
     }
     
-    // [HttpGet("main")]
-    // public async Task GetMainSection()
-    // {
-    //     throw new NotImplementedException();
-    // }
+    [HttpGet("blocks/main")]
+    public async Task<ActionResult<IEnumerable<BlockDto>>> GetMainSection([FromRoute] Guid websiteId)
+    {
+        try
+        {
+            var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+            var response = await constructorService.GetMainSectionAsync(masterId, websiteId);
+
+            return Ok(response);
+        }
+        catch (ForbidException)
+        {
+            return StatusCode(403);
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+    }
+
+    [HttpPut("blocks/{id}")]
+    public async Task<ActionResult<BlockDto>> ChangeBlock([FromRoute] Guid websiteId, [FromRoute] Guid id, ChangeBlockRequest request)
+    {
+        try
+        {
+            var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+            var response = await constructorService.ChangeBlockAsync(masterId, websiteId, id, request);
+
+            if (response == null)
+                return NotFound("Block bot found");
+            
+            return Ok(response);
+        }
+        catch (ForbidException)
+        {
+            return StatusCode(403);
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+    }
     
     // [HttpGet("order")]
     // public async Task GetOrderRegistrationSection()

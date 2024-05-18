@@ -9,7 +9,9 @@ public interface IConstructorService
 
     public Task<GlobalStylesDto?> ChangeGlobalStylesAsync(string masterId, Guid websiteId, ChangeGlobalStylesRequest request);
     
-    public Task<IEnumerable<BlockDto>> GetMainSectionAsync(string masterid, Guid websiteId);
+    public Task<IEnumerable<BlockDto>> GetMainSectionAsync(string masterId, Guid websiteId);
+
+    public Task<BlockDto?> ChangeBlockAsync(string masterId, Guid websiteId, Guid id, ChangeBlockRequest request);
 
     // public Task GetOrderRegistrationSection(string masterId, Guid websiteId);
     //

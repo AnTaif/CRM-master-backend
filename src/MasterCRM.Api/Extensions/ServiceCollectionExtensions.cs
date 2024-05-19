@@ -31,7 +31,7 @@ namespace MasterCRM.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    private const string uploadsUrl = "http://localhost:8080/uploads/";
+    private static string uploadsUrl => $"{GetRunningHost()}/uploads/";
 
     public static IServiceCollection AddCustomAuth(this IServiceCollection services)
     {
@@ -144,4 +144,7 @@ public static class ServiceCollectionExtensions
             
         return $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
     }
+
+    private static string GetRunningHost() => 
+        Environment.GetEnvironmentVariable("RUNNING_HOST") ?? "http://localhost:8080";
 }

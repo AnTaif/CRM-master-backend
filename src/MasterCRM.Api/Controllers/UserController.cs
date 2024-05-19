@@ -41,7 +41,7 @@ public class UserController(IUserService userService) : ControllerBase
         return Ok(userInfoResponse);
     }
     
-    [HttpPut("/password")]
+    [HttpPatch("password")]
     public async Task<IActionResult> ChangeUserPassword(ChangePasswordRequest request)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

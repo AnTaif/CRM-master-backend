@@ -6,7 +6,9 @@ public record BlockDto
     
     public required string BlockType { get; init; }
     
+    public string Title { get; init; }
+    
     public required short Order { get; init; }
 
-    public Dictionary<string, string> Properties { get; init; } = new();
+    public BlockPropertiesDto Properties { get; set; } = null!;
 }

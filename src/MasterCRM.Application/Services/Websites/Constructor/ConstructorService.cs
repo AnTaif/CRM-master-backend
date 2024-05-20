@@ -80,54 +80,35 @@ public class ConstructorService(IWebsiteRepository websiteRepository, IGlobalSty
         if (block == null)
             return null;
         
-        // switch (block)
-        // {
-        //     case HeaderBlock headerBlock:
-        //         if (request.Type.HasValue)
-        //             headerBlock.Type = request.Type.Value;
-        //         break;
-        //     case TextBlock textBlock:
-        //         if (!string.IsNullOrEmpty(request.Text))
-        //             textBlock.Text = request.Text;
-        //         break;
-        //     case H1Block h1Block:
-        //         if (!string.IsNullOrEmpty(request.H1Text))
-        //             h1Block.H1Text = request.H1Text;
-        //         if (!string.IsNullOrEmpty(request.PText))
-        //             h1Block.PText = request.PText;
-        //         if (!string.IsNullOrEmpty(request.ImageUrl))
-        //             h1Block.ImageUrl = request.ImageUrl;
-        //         break;
-        //     case CatalogBlock catalogBlock:
-        //         if (request.Type.HasValue)
-        //             catalogBlock.Type = request.Type.Value;
-        //         break;
-        //     case FooterBlock footerBlock:
-        //         if (request.Type.HasValue)
-        //             footerBlock.Type = request.Type.Value;
-        //         break;
-        //     default:
-        //         throw new InvalidOperationException("Unknown block type");
-        // }
-        
         switch (block)
         {
             case HeaderBlock headerBlock:
-                headerBlock.Type = int.Parse(request.Properties["type"]);
+                if (request.Type.HasValue)
+                    headerBlock.Type = request.Type.Value;
                 break;
             case TextBlock textBlock:
-                textBlock.Text = request.Properties["text"];
+                if (!string.IsNullOrEmpty(request.Text))
+                    textBlock.Text = request.Text;
                 break;
             case H1Block h1Block:
-                h1Block.H1Text = request.Properties["h1Text"];
-                h1Block.PText = request.Properties.ContainsKey("pText") ? request.Properties["pText"] : null;
-                h1Block.ImageUrl = request.Properties["imageUrl"];
+                if (!string.IsNullOrEmpty(request.H1Text))
+                    h1Block.H1Text = request.H1Text;
+                if (!string.IsNullOrEmpty(request.PText))
+                    h1Block.PText = request.PText;
+                if (!string.IsNullOrEmpty(request.ImageUrl))
+                    h1Block.ImageUrl = request.ImageUrl;
                 break;
             case CatalogBlock catalogBlock:
-                catalogBlock.Type = int.Parse(request.Properties["type"]);
+                if (request.Type.HasValue)
+                    catalogBlock.Type = request.Type.Value;
+                break;
+            case MultipleTextBlock multipleTextBlock:
+                if (request.TextSections != null)
+                    multipleTextBlock.TextSections = new Dictionary<string, string>(request.TextSections);
                 break;
             case FooterBlock footerBlock:
-                footerBlock.Type = int.Parse(request.Properties["type"]);
+                if (request.Type.HasValue)
+                    footerBlock.Type = request.Type.Value;
                 break;
             default:
                 throw new InvalidOperationException("Unknown block type");

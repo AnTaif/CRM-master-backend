@@ -7,4 +7,5 @@ public enum BlockType
     Text = 2,
     H1 = 3,
     Catalog = 4,
+    MultipleText = 5,
 }

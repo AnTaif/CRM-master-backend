@@ -1,6 +1,6 @@
-namespace MasterCRM.Application.Services.Websites.Constructor.Requests;
+namespace MasterCRM.Application.Services.Websites.Constructor.Responses;
 
-public class ChangeBlockRequest
+public record BlockPropertiesDto
 {
     public string? Text { get; init; }
     

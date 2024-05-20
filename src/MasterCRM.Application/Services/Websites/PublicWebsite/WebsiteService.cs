@@ -130,7 +130,9 @@ public class WebsiteService(
                         Order = multipleTextBlock.Order,
                         TemplateId = null,
                         WebsiteId = website.Id,
-                        TextSections = new Dictionary<string, string>(multipleTextBlock.TextSections)
+                        TextSections = multipleTextBlock.TextSections
+                            .Select(section => new TextSection(section.Title, section.Text, section.Id))
+                            .ToList()
                     });
                     break;
                 case FooterBlock footerBlock:

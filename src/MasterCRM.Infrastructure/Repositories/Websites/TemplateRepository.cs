@@ -12,5 +12,6 @@ public class TemplateRepository(CrmDbContext context) : ITemplateRepository
         await dbSet
             .Include(template => template.GlobalStyles)
             .Include(template => template.Components)
+                .ThenInclude(component => (component as MultipleTextBlock)!.TextSections)
             .FirstOrDefaultAsync(template => template.Id == id);
 }

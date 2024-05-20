@@ -104,10 +104,17 @@ public class ConstructorService(IWebsiteRepository websiteRepository, IGlobalSty
                 break;
             case MultipleTextBlock multipleTextBlock:
                 if (request.TextSections != null)
-                    multipleTextBlock.TextSections = new Dictionary<string, string>(request.TextSections);
-                break;
-            case MultipleTextBlock multipleTextBlock:
-                multipleTextBlock.TextSections = request.Properties;
+                {
+                    var sections = await blockRepository.GetTextSectionByBlockAsync(multipleTextBlock.Id);
+                    
+                    blockRepository.RemoveSections(sections);
+                    
+                    var newSections = request.TextSections
+                        .Select(dto => new TextSection(dto.Title, dto.Text, multipleTextBlock.Id))
+                        .ToList();
+
+                    await blockRepository.AddSectionsAsync(newSections);
+                }
                 break;
             case FooterBlock footerBlock:
                 if (request.Type.HasValue)

@@ -147,47 +147,49 @@ public class CrmDbContext : IdentityDbContext<Master>
                 new TextBlock
                 {
                     TemplateId = 1,
-                    Order = 3,
+                    Order = 4,
                     Title = "Подробнее о нас",
                     Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl."
                 },
                 new TextBlock
                 {
                     TemplateId = 2,
-                    Order = 3,
+                    Order = 4,
                     Title = "Подробнее о нас",
                     Text =
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl."
                 });
 
+        var multipleBlockId = Guid.NewGuid();
         modelBuilder.Entity<MultipleTextBlock>()
             .HasData(
                 new MultipleTextBlock
                 {
+                    Id = multipleBlockId,
                     Title = "Преимущества",
-                    Order = 0,
-                    TemplateId = 1,
-                    TextSections = new Dictionary<string, string>
-                    {
-                        {"Уникальность изделий", "Каждое украшение создается вручную, что гарантирует его неповторимость и эксклюзивность."},
-                        {"Творческий дизайн", "Наши мастера постоянно разрабатывают новые и оригинальные модели, чтобы вы всегда могли найти что-то свежее и стильное."},
-                        {"Высокое качество материалов", "Мы используем только проверенные и высококачественные материалы, обеспечивая долговечность и эстетичность каждого изделия."}
-                    }
+                    Order = 3,
+                    TemplateId = 1
                 });
+
+        modelBuilder.Entity<TextSection>()
+            .HasData(
+                new TextSection("Уникальность изделий", "Каждое украшение создается вручную, что гарантирует его неповторимость и эксклюзивность.", multipleBlockId),
+                new TextSection("Творческий дизайн", "Наши мастера постоянно разрабатывают новые и оригинальные модели, чтобы вы всегда могли найти что-то свежее и стильное.", multipleBlockId),
+                new TextSection("Высокое качество материалов", "Мы используем только проверенные и высококачественные материалы, обеспечивая долговечность и эстетичность каждого изделия.", multipleBlockId));
         
         modelBuilder.Entity<FooterBlock>()
             .HasData(
                 new FooterBlock
                 {
                     TemplateId = 1,
-                    Order = 4,
+                    Order = 5,
                     Title = "Свяжитесь со мной",
                     Type = 0
                 },
                 new FooterBlock
                 {
                     TemplateId = 2,
-                    Order = 4,
+                    Order = 5,
                     Title = "Свяжитесь со мной",
                     Type = 0
                 });

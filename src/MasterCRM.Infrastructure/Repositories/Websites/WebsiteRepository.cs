@@ -16,6 +16,7 @@ public class WebsiteRepository(CrmDbContext context) : IWebsiteRepository
         await dbSet
             .Include(website => website.GlobalStyles)
             .Include(website => website.Components)
+                .ThenInclude(component => (component as MultipleTextBlock)!.TextSections)
             .FirstOrDefaultAsync(website => website.Id == id);
     
     public async Task CreateAsync(Website website) => await dbSet.AddAsync(website);

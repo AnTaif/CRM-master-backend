@@ -58,7 +58,9 @@ public static class ConstructorBlockExtensions
             },
             MultipleTextBlock multipleTextBlock => new BlockPropertiesDto
             {
-                TextSections = new Dictionary<string, string>(multipleTextBlock.TextSections)
+                TextSections = multipleTextBlock.TextSections
+                    .Select(section => new TextSectionDto(section.Title,section.Text))
+                    .ToList()
             },
             FooterBlock footerBlock => new BlockPropertiesDto
             {

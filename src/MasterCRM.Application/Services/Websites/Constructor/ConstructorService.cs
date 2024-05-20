@@ -126,6 +126,9 @@ public class ConstructorService(IWebsiteRepository websiteRepository, IGlobalSty
             case CatalogBlock catalogBlock:
                 catalogBlock.Type = int.Parse(request.Properties["type"]);
                 break;
+            case MultipleTextBlock multipleTextBlock:
+                multipleTextBlock.TextSections = request.Properties;
+                break;
             case FooterBlock footerBlock:
                 footerBlock.Type = int.Parse(request.Properties["type"]);
                 break;

@@ -8,59 +8,61 @@ public static class ConstructorBlockExtensions
 {
     public static BlockDto ToDto(this ConstructorBlock block)
     {
+        var blockDto = new BlockDto
+        {
+            Id = block.Id,
+            BlockType = block.GetBlockType().ToString(),
+            Title = block.Title,
+            Order = block.Order,
+            Properties = block.ToPropertiesDto()
+        };
+
+        return blockDto;
+    }
+
+    public static BlockType GetBlockType(this ConstructorBlock block)
+    {
         return block switch
         {
-            HeaderBlock headerBlock => new BlockDto
+            HeaderBlock => BlockType.Header,
+            TextBlock => BlockType.Text,
+            H1Block => BlockType.H1,
+            CatalogBlock => BlockType.Catalog,
+            MultipleTextBlock => BlockType.MultipleText,
+            FooterBlock => BlockType.Footer,
+            _ => throw new ArgumentException("Unknown block type", nameof(block))
+        };
+    }
+
+    public static BlockPropertiesDto ToPropertiesDto(this ConstructorBlock block)
+    {
+        return block switch
+        {
+            HeaderBlock headerBlock => new BlockPropertiesDto
             {
-                Id = headerBlock.Id,
-                BlockType = BlockType.Header.ToString(),
-                Order = headerBlock.Order,
-                Properties = new Dictionary<string, string>
-                {
-                    {"type", headerBlock.Type.ToString()}
-                }
+                Type = headerBlock.Type
             },
-            TextBlock textBlock => new BlockDto
+            TextBlock textBlock => new BlockPropertiesDto
             {
-                Id = textBlock.Id,
-                BlockType = BlockType.Text.ToString(),
-                Order = textBlock.Order,
-                Properties = new Dictionary<string, string>()
-                {
-                    {"text", textBlock.Text}
-                }
+                Text = textBlock.Text
             },
-            H1Block h1Block => new BlockDto
+            H1Block h1Block => new BlockPropertiesDto
             {
-                Id = h1Block.Id,
-                BlockType = BlockType.H1.ToString(),
-                Order = h1Block.Order,
-                Properties = new Dictionary<string, string>
-                {
-                    {"h1Text", h1Block.H1Text},
-                    {"pText", h1Block.PText ?? ""},
-                    {"imageUrl", h1Block.ImageUrl}
-                }
+                H1Text = h1Block.H1Text,
+                PText = h1Block.PText,
+                ImageUrl = h1Block.ImageUrl
             },
-            CatalogBlock catalogBlock => new BlockDto
+            CatalogBlock catalogBlock => new BlockPropertiesDto
             {
-                Id = catalogBlock.Id,
-                BlockType = BlockType.Catalog.ToString(),
-                Order = catalogBlock.Order,
-                Properties = new Dictionary<string, string>
-                {
-                    {"type", catalogBlock.Type.ToString()}
-                }
+                Type = catalogBlock.Type
             },
-            FooterBlock footerBlock => new BlockDto
+            MultipleTextBlock multipleTextBlock => new BlockPropertiesDto
             {
-                Id = footerBlock.Id,
-                BlockType = BlockType.Footer.ToString(),
-                Order = footerBlock.Order,
-                Properties = new Dictionary<string, string>
-                {
-                    {"type", footerBlock.Type.ToString()}
-                }
+                TextSections = new Dictionary<string, string>(multipleTextBlock.TextSections)
+            },
+            FooterBlock footerBlock => new BlockPropertiesDto
+            {
+                Type = footerBlock.Type
             },
             _ => throw new ArgumentException("Unknown block type", nameof(block))
         };

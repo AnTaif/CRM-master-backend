@@ -9,6 +9,8 @@ namespace MasterCRM.Infrastructure;
 
 public class CrmDbContext : IdentityDbContext<Master>
 {
+    private readonly string uploadUrl = "http://localhost:8080/uploads";
+    
     public DbSet<Master> Masters { get; set; } = null!; // Identity model
     
     public DbSet<Product> Products { get; set; } = null!;
@@ -90,12 +92,14 @@ public class CrmDbContext : IdentityDbContext<Master>
                 {
                     TemplateId = 1,
                     Order = 0,
+                    Title = "",
                     Type = 0
                 },
                 new HeaderBlock
                 {
                     TemplateId = 2,
                     Order = 0,
+                    Title = "",
                     Type = 0
                 });
         
@@ -105,34 +109,20 @@ public class CrmDbContext : IdentityDbContext<Master>
                 {
                     TemplateId = 1,
                     Order = 1,
-                    H1Text = "H1 text",
-                    PText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl. Fusce a lacus ullamcorper, ultrices neque eu, cursus risus. Cras nisl purus, dignissim in efficitur quis, aliquam id odio. Suspendisse eu risus accumsan, iaculis augue id, porta elit. Fusce faucibus, erat vitae faucibus sagittis, dui dolor tincidunt urna, ut vulputate leo lorem ac eros. Aenean fermentum posuere mattis. Suspendisse scelerisque felis diam, sed ultrices ante luctus sed. Fusce posuere nunc a felis eleifend, et sollicitudin mi eleifend.",
-                    ImageUrl = "http://localhost:8080/uploads/templates/aa214299-cea2-4dbb-9a79-30f07c6bc5f6.png"
+                    Title = "",
+                    H1Text = "Душевная мастерская",
+                    PText = "Добро пожаловать в нашу handmade мастерскую, где мы создаем уникальные украшения вручную с любовью и вниманием к деталям. Каждый элемент, от колец до ожерелий, сделан из высококачественных материалов, чтобы подчеркнуть вашу индивидуальность и стиль.",
+                    ImageUrl = $"{uploadUrl}/templates/aa214299-cea2-4dbb-9a79-30f07c6bc5f6.png"
                 },
                 new H1Block
                 {
                     TemplateId = 2,
                     Order = 1,
+                    Title = "",
                     H1Text = "H1 text",
                     PText =
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl. Fusce a lacus ullamcorper, ultrices neque eu, cursus risus. Cras nisl purus, dignissim in efficitur quis, aliquam id odio. Suspendisse eu risus accumsan, iaculis augue id, porta elit. Fusce faucibus, erat vitae faucibus sagittis, dui dolor tincidunt urna, ut vulputate leo lorem ac eros. Aenean fermentum posuere mattis. Suspendisse scelerisque felis diam, sed ultrices ante luctus sed. Fusce posuere nunc a felis eleifend, et sollicitudin mi eleifend.",
-                    ImageUrl = "http://localhost:8080/uploads/templates/b655a1db-18cb-47cb-8939-7e2e5f6116d4.png"
-                });
-        
-        modelBuilder.Entity<TextBlock>()
-            .HasData(
-                new TextBlock
-                {
-                    TemplateId = 1,
-                    Order = 2,
-                    Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl. Fusce a lacus ullamcorper, ultrices neque eu, cursus risus. Cras nisl purus, dignissim in efficitur quis, aliquam id odio. Suspendisse eu risus accumsan, iaculis augue id, porta elit. Fusce faucibus, erat vitae faucibus sagittis, dui dolor tincidunt urna, ut vulputate leo lorem ac eros. Aenean fermentum posuere mattis. Suspendisse scelerisque felis diam, sed ultrices ante luctus sed. Fusce posuere nunc a felis eleifend, et sollicitudin mi eleifend."
-                },
-                new TextBlock
-                {
-                    TemplateId = 2,
-                    Order = 2,
-                    Text =
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl. Fusce a lacus ullamcorper, ultrices neque eu, cursus risus. Cras nisl purus, dignissim in efficitur quis, aliquam id odio. Suspendisse eu risus accumsan, iaculis augue id, porta elit. Fusce faucibus, erat vitae faucibus sagittis, dui dolor tincidunt urna, ut vulputate leo lorem ac eros. Aenean fermentum posuere mattis. Suspendisse scelerisque felis diam, sed ultrices ante luctus sed. Fusce posuere nunc a felis eleifend, et sollicitudin mi eleifend."
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in.",
+                    ImageUrl = $"{uploadUrl}/templates/b655a1db-18cb-47cb-8939-7e2e5f6116d4.png"
                 });
         
         modelBuilder.Entity<CatalogBlock>()
@@ -140,14 +130,49 @@ public class CrmDbContext : IdentityDbContext<Master>
                 new CatalogBlock
                 {
                     TemplateId = 1,
-                    Order = 3,
+                    Order = 2,
+                    Title = "Каталог",
                     Type = 0
                 },
                 new CatalogBlock
                 {
                     TemplateId = 2,
-                    Order = 3,
+                    Order = 2,
+                    Title = "Каталог",
                     Type = 0
+                });
+        
+        modelBuilder.Entity<TextBlock>()
+            .HasData(
+                new TextBlock
+                {
+                    TemplateId = 1,
+                    Order = 3,
+                    Title = "Подробнее о нас",
+                    Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl."
+                },
+                new TextBlock
+                {
+                    TemplateId = 2,
+                    Order = 3,
+                    Title = "Подробнее о нас",
+                    Text =
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl."
+                });
+
+        modelBuilder.Entity<MultipleTextBlock>()
+            .HasData(
+                new MultipleTextBlock
+                {
+                    Title = "Преимущества",
+                    Order = 0,
+                    TemplateId = 1,
+                    TextSections = new Dictionary<string, string>
+                    {
+                        {"Уникальность изделий", "Каждое украшение создается вручную, что гарантирует его неповторимость и эксклюзивность."},
+                        {"Творческий дизайн", "Наши мастера постоянно разрабатывают новые и оригинальные модели, чтобы вы всегда могли найти что-то свежее и стильное."},
+                        {"Высокое качество материалов", "Мы используем только проверенные и высококачественные материалы, обеспечивая долговечность и эстетичность каждого изделия."}
+                    }
                 });
         
         modelBuilder.Entity<FooterBlock>()
@@ -156,12 +181,14 @@ public class CrmDbContext : IdentityDbContext<Master>
                 {
                     TemplateId = 1,
                     Order = 4,
+                    Title = "Свяжитесь со мной",
                     Type = 0
                 },
                 new FooterBlock
                 {
                     TemplateId = 2,
                     Order = 4,
+                    Title = "Свяжитесь со мной",
                     Type = 0
                 });
         

@@ -84,6 +84,7 @@ public class WebsiteService(
                 case HeaderBlock headerBlock:
                     websiteComponents.Add(new HeaderBlock
                     {
+                        Title = headerBlock.Title,
                         Order = headerBlock.Order,
                         TemplateId = null,
                         WebsiteId = website.Id,
@@ -93,6 +94,7 @@ public class WebsiteService(
                 case H1Block h1Block:
                     websiteComponents.Add(new H1Block
                     {
+                        Title = h1Block.Title,
                         Order = h1Block.Order,
                         TemplateId = null,
                         WebsiteId = website.Id,
@@ -104,6 +106,7 @@ public class WebsiteService(
                 case TextBlock textBlock:
                     websiteComponents.Add(new TextBlock
                     {
+                        Title = textBlock.Title,
                         Order = textBlock.Order,
                         TemplateId = null,
                         WebsiteId = website.Id,
@@ -113,15 +116,27 @@ public class WebsiteService(
                 case CatalogBlock catalogBlock:
                     websiteComponents.Add(new CatalogBlock
                     {
+                        Title = catalogBlock.Title,
                         Order = catalogBlock.Order,
                         TemplateId = null,
                         WebsiteId = website.Id,
                         Type = catalogBlock.Type
                     });
                     break;
+                case MultipleTextBlock multipleTextBlock:
+                    websiteComponents.Add(new MultipleTextBlock
+                    {
+                        Title = multipleTextBlock.Title,
+                        Order = multipleTextBlock.Order,
+                        TemplateId = null,
+                        WebsiteId = website.Id,
+                        TextSections = new Dictionary<string, string>(multipleTextBlock.TextSections)
+                    });
+                    break;
                 case FooterBlock footerBlock:
                     websiteComponents.Add(new FooterBlock
                     {
+                        Title = footerBlock.Title,
                         Order = footerBlock.Order,
                         TemplateId = null,
                         WebsiteId = website.Id,

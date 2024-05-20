@@ -3,6 +3,7 @@ using System;
 using MasterCRM.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MasterCRM.Infrastructure.Migrations
 {
     [DbContext(typeof(CrmDbContext))]
-    partial class CrmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240520142944_constructorMigration2")]
+    partial class constructorMigration2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -419,7 +422,7 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c15e72e9-9c27-41b5-be5e-cd5203daf7d4"),
+                            Id = new Guid("b9d1083e-7f6e-4025-831f-206cdc9cb448"),
                             BackgroundColor = "#00ff00",
                             ButtonColor = "#00000f",
                             FontFamily = "Arial",
@@ -429,7 +432,7 @@ namespace MasterCRM.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("2a4385be-5839-4bf9-a7cf-987f14c2c2e1"),
+                            Id = new Guid("cd084094-fa3d-4390-8eb8-4df36e010dfb"),
                             BackgroundColor = "#ffffff",
                             ButtonColor = "#00000f",
                             FontFamily = "Arial",
@@ -465,53 +468,6 @@ namespace MasterCRM.Infrastructure.Migrations
                         {
                             Id = 2,
                             Title = "Второй шаблон"
-                        });
-                });
-
-            modelBuilder.Entity("MasterCRM.Domain.Entities.Websites.TextSection", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("MultipleTextBlockId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MultipleTextBlockId");
-
-                    b.ToTable("TextSection");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("4bad308e-b4c8-4f74-85be-3ebd50f558ae"),
-                            MultipleTextBlockId = new Guid("1deb6106-9542-457b-af0d-2d53c9dcbe52"),
-                            Text = "Каждое украшение создается вручную, что гарантирует его неповторимость и эксклюзивность.",
-                            Title = "Уникальность изделий"
-                        },
-                        new
-                        {
-                            Id = new Guid("c0ffbf33-15dd-44a0-90e3-d39d2ea60d5c"),
-                            MultipleTextBlockId = new Guid("1deb6106-9542-457b-af0d-2d53c9dcbe52"),
-                            Text = "Наши мастера постоянно разрабатывают новые и оригинальные модели, чтобы вы всегда могли найти что-то свежее и стильное.",
-                            Title = "Творческий дизайн"
-                        },
-                        new
-                        {
-                            Id = new Guid("77abed1d-c9ba-4457-ba53-3451b8180e39"),
-                            MultipleTextBlockId = new Guid("1deb6106-9542-457b-af0d-2d53c9dcbe52"),
-                            Text = "Мы используем только проверенные и высококачественные материалы, обеспечивая долговечность и эстетичность каждого изделия.",
-                            Title = "Высокое качество материалов"
                         });
                 });
 
@@ -687,7 +643,7 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("77606987-1940-416a-b89f-ff12ff64ed35"),
+                            Id = new Guid("065c3936-c1cb-4b8a-8ee7-3d3f97fd95be"),
                             Order = (short)2,
                             TemplateId = 1,
                             Title = "Каталог",
@@ -695,7 +651,7 @@ namespace MasterCRM.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("bcf86cbb-15ef-46e1-ad63-45461587b1d0"),
+                            Id = new Guid("5a34c90d-84c0-4de2-a27d-3a2eb60e5cd0"),
                             Order = (short)2,
                             TemplateId = 2,
                             Title = "Каталог",
@@ -721,7 +677,7 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d4fc0253-1b3e-4df8-9e33-4493808b9cb3"),
+                            Id = new Guid("71dd08bf-d466-424e-8d87-f2595193fafe"),
                             Order = (short)4,
                             TemplateId = 1,
                             Title = "Свяжитесь со мной",
@@ -729,7 +685,7 @@ namespace MasterCRM.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("f439ac9b-381b-4c34-a95d-af38620f8687"),
+                            Id = new Guid("ad02f43c-3d1b-4fe5-a35c-c63d045ffdbd"),
                             Order = (short)4,
                             TemplateId = 2,
                             Title = "Свяжитесь со мной",
@@ -757,7 +713,7 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b6efc0d1-885c-4c68-aa11-8e03bd8e61e4"),
+                            Id = new Guid("f900133a-11e6-4d38-80e2-4ed64e610432"),
                             Order = (short)1,
                             TemplateId = 1,
                             Title = "",
@@ -767,7 +723,7 @@ namespace MasterCRM.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("1e5439bc-040e-4085-acef-93b2bd60192f"),
+                            Id = new Guid("559911f9-d9ff-473b-9ef4-7c2affaba0bf"),
                             Order = (short)1,
                             TemplateId = 2,
                             Title = "",
@@ -795,7 +751,7 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("3d431cc1-e8fc-4aea-b20d-6b629a9e1be1"),
+                            Id = new Guid("7de9f3f7-3669-49ff-b0e6-cfa79214cddb"),
                             Order = (short)0,
                             TemplateId = 1,
                             Title = "",
@@ -803,7 +759,7 @@ namespace MasterCRM.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("80775f01-dfcd-4ba8-9f68-7e6d2e2b4989"),
+                            Id = new Guid("79c4499e-b187-4309-b193-af46f0044e0d"),
                             Order = (short)0,
                             TemplateId = 2,
                             Title = "",
@@ -815,15 +771,20 @@ namespace MasterCRM.Infrastructure.Migrations
                 {
                     b.HasBaseType("MasterCRM.Domain.Entities.Websites.ConstructorBlock");
 
+                    b.Property<ValueTuple<string, string>[]>("TextSections")
+                        .IsRequired()
+                        .HasColumnType("record[]");
+
                     b.HasDiscriminator().HasValue("MultipleTextBlock");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1deb6106-9542-457b-af0d-2d53c9dcbe52"),
+                            Id = new Guid("e578179c-2536-42d3-a659-435a4151d46d"),
                             Order = (short)0,
                             TemplateId = 1,
-                            Title = "Преимущества"
+                            Title = "Преимущества",
+                            TextSections = new[] { ("Уникальность изделий", "Каждое украшение создается вручную, что гарантирует его неповторимость и эксклюзивность."), ("Творческий дизайн", "Наши мастера постоянно разрабатывают новые и оригинальные модели, чтобы вы всегда могли найти что-то свежее и стильное."), ("Высокое качество материалов", "Мы используем только проверенные и высококачественные материалы, обеспечивая долговечность и эстетичность каждого изделия.") }
                         });
                 });
 
@@ -840,7 +801,7 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a16d40f2-93d9-4ff8-8b49-80604d257288"),
+                            Id = new Guid("0d51c52f-28ab-49db-9120-ace17a18ba9a"),
                             Order = (short)3,
                             TemplateId = 1,
                             Title = "Подробнее о нас",
@@ -848,7 +809,7 @@ namespace MasterCRM.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("c99d0f65-bd32-4730-b858-b2ed9a1fab42"),
+                            Id = new Guid("ed9d36c9-4f20-460d-9f72-d8260aecb454"),
                             Order = (short)3,
                             TemplateId = 2,
                             Title = "Подробнее о нас",
@@ -938,15 +899,6 @@ namespace MasterCRM.Infrastructure.Migrations
                     b.HasOne("MasterCRM.Domain.Entities.Websites.Website", null)
                         .WithOne("GlobalStyles")
                         .HasForeignKey("MasterCRM.Domain.Entities.Websites.GlobalStyles", "WebsiteId");
-                });
-
-            modelBuilder.Entity("MasterCRM.Domain.Entities.Websites.TextSection", b =>
-                {
-                    b.HasOne("MasterCRM.Domain.Entities.Websites.MultipleTextBlock", null)
-                        .WithMany("TextSections")
-                        .HasForeignKey("MultipleTextBlockId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("MasterCRM.Domain.Entities.Websites.Website", b =>
@@ -1042,11 +994,6 @@ namespace MasterCRM.Infrastructure.Migrations
 
                     b.Navigation("GlobalStyles")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("MasterCRM.Domain.Entities.Websites.MultipleTextBlock", b =>
-                {
-                    b.Navigation("TextSections");
                 });
 #pragma warning restore 612, 618
         }

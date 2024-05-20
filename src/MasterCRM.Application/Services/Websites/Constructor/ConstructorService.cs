@@ -106,6 +106,9 @@ public class ConstructorService(IWebsiteRepository websiteRepository, IGlobalSty
                 if (request.TextSections != null)
                     multipleTextBlock.TextSections = new Dictionary<string, string>(request.TextSections);
                 break;
+            case MultipleTextBlock multipleTextBlock:
+                multipleTextBlock.TextSections = request.Properties;
+                break;
             case FooterBlock footerBlock:
                 if (request.Type.HasValue)
                     footerBlock.Type = request.Type.Value;

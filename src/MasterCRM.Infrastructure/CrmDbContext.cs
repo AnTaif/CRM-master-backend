@@ -2,14 +2,16 @@ using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;
 using MasterCRM.Domain.Entities.Products;
 using MasterCRM.Domain.Entities.Websites;
+using MasterCRM.Infrastructure.FileStorages;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace MasterCRM.Infrastructure;
 
 public class CrmDbContext : IdentityDbContext<Master>
 {
-    private readonly string uploadUrl = "http://localhost:8080/uploads";
+    private readonly string uploadUrl;
     
     public DbSet<Master> Masters { get; set; } = null!; // Identity model
     
@@ -35,9 +37,10 @@ public class CrmDbContext : IdentityDbContext<Master>
 
     public DbSet<GlobalStyles> GlobalStyles { get; set; } = null!;
 
-    public CrmDbContext(DbContextOptions<CrmDbContext> options) : base(options)
+    public CrmDbContext(IOptions<UploadsSettings> uploadsSettings, DbContextOptions<CrmDbContext> options) : base(options)
     {
         Database.EnsureCreated();
+        uploadUrl = uploadsSettings.Value.UploadsUrl;
     }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)

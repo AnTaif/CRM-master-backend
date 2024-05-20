@@ -1,11 +1,12 @@
 using MasterCRM.Domain.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace MasterCRM.Infrastructure.FileStorages;
 
-public class RootFileStorage(string rootPath, string uploadUrlBase) : IFileStorage
+public class RootFileStorage(IOptions<UploadsSettings> uploadsSettings) : IFileStorage
 {
-    private string publicUploadPath => Path.Combine(rootPath, "Public");
-    private string templatesUploadPath => Path.Combine(rootPath, "Templates");
+    private string publicUploadPath => Path.Combine(uploadsSettings.Value.UploadsPath, "Public");
+    private string templatesUploadPath => Path.Combine(uploadsSettings.Value.UploadsPath, "Templates");
     
     public async Task<string> UploadAsync(Stream stream, string fileName)
     {
@@ -13,7 +14,7 @@ public class RootFileStorage(string rootPath, string uploadUrlBase) : IFileStora
         await using var fileStream = new FileStream(filePath, FileMode.Create);
         await stream.CopyToAsync(fileStream);
 
-        return uploadUrlBase + fileName;
+        return uploadsSettings.Value.UploadsUrl + fileName;
     }
 
     public string CopyToPublic(string templateUrl)
@@ -27,7 +28,7 @@ public class RootFileStorage(string rootPath, string uploadUrlBase) : IFileStora
         var destFilePath = Path.Combine(publicUploadPath, destFileName);
         
         File.Copy(filePath, destFilePath);
-        return uploadUrlBase + destFileName;
+        return uploadsSettings.Value.UploadsUrl + destFileName;
     }
 
     public bool TryDelete(string url)

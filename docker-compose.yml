@@ -15,7 +15,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       DB_CONTAINER: "mastercrm.db"
-      RUNNING_HOST: "http://localhost:8080" 
+      UPLOADS_URL: "http://localhost:8080/uploads/" 
   mastercrm.db:
     container_name: mastercrm.db
     image: postgres:latest

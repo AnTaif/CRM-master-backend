@@ -31,7 +31,7 @@ namespace MasterCRM.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    private static string uploadsUrl => $"{GetRunningHost()}/uploads/";
+    private static string uploadsUrl => GetUploadsUrl();
 
     public static IServiceCollection AddCustomAuth(this IServiceCollection services)
     {
@@ -91,6 +91,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddInfrastructureLayer(
         this IServiceCollection services, ConfigurationManager configuration, string uploadsPath)
     {
+        services.Configure<UploadsSettings>(options =>
+        {
+            options.UploadsPath = uploadsPath;
+            options.UploadsUrl = uploadsUrl;
+        });
+        
         var connectionString = GetConnectionString();
         services.AddDbContext<CrmDbContext>(options =>
         {
@@ -109,7 +115,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IConstructorBlockRepository, ConstructorBlockRepository>();
         services.AddTransient<IGlobalStylesRepository, GlobalStylesRepository>();
         
-        services.AddTransient<IFileStorage, RootFileStorage>(_ => new RootFileStorage(uploadsPath, uploadsUrl));
+        services.AddTransient<IFileStorage, RootFileStorage>();
 
         var vkServiceToken = Environment.GetEnvironmentVariable("VK_SERVICE_TOKEN") ?? "";
         var vkApiVersion = Environment.GetEnvironmentVariable("VK_API_VERSION") ?? "";
@@ -145,6 +151,6 @@ public static class ServiceCollectionExtensions
         return $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
     }
 
-    private static string GetRunningHost() => 
-        Environment.GetEnvironmentVariable("RUNNING_HOST") ?? "http://localhost:8080";
+    private static string GetUploadsUrl() => 
+        Environment.GetEnvironmentVariable("UPLOADS_URL") ?? "http://localhost:8080/uploads/";
 }

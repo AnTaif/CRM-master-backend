@@ -7,6 +7,8 @@ namespace MasterCRM.Application.Services.Products;
 public interface IProductService
 {
     public Task<IEnumerable<ProductDto>> GetUserProductsAsync(string userId);
+
+    public Task<IEnumerable<ProductDto>> GetWebsiteProductsAsync(Guid websiteId);
     
     public Task<ProductDto?> GetProductByIdAsync(Guid productId);
 

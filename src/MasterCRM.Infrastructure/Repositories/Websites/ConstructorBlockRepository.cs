@@ -28,5 +28,7 @@ public class ConstructorBlockRepository(CrmDbContext context) : IConstructorBloc
     public async Task AddAsync(ConstructorBlock block) => await dbSet.AddAsync(block);
 
     public async Task AddRangeAsync(IEnumerable<ConstructorBlock> blocks) => await dbSet.AddRangeAsync(blocks);
+    public void RemoveRangeAsync(IEnumerable<ConstructorBlock> blocks) => dbSet.RemoveRange(blocks);
+
     public async Task SaveChangesAsync() => await context.SaveChangesAsync();
 }

@@ -10,5 +10,7 @@ public interface IGlobalStylesRepository
 
     public void Update(GlobalStyles styles);
 
+    public void Remove(GlobalStyles styles);
+
     public Task SaveChangesAsync();
 }

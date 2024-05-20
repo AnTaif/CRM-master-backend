@@ -10,17 +10,17 @@ namespace MasterCRM.Api.Controllers.Websites;
 
 [ApiController]
 [Authorize]
-[Route("websites/{websiteId}/constructor")]
+[Route("website/constructor")]
 public class ConstructorController(IConstructorService constructorService) : ControllerBase
 {
     [HttpGet("global-styles")]
-    public async Task<ActionResult<GlobalStylesDto>> GetGlobalStyles([FromRoute] Guid websiteId)
+    public async Task<ActionResult<GlobalStylesDto>> GetGlobalStyles()
     {
         try
         {
             var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-            var response = await constructorService.GetGlobalStylesAsync(masterId, websiteId);
+            var response = await constructorService.GetGlobalStylesAsync(masterId);
 
             if (response == null)
                 return NotFound("GlobalStyles not found");
@@ -38,13 +38,13 @@ public class ConstructorController(IConstructorService constructorService) : Con
     }
 
     [HttpPut("global-styles")]
-    public async Task<IActionResult> ChangeGlobalStyles([FromRoute] Guid websiteId, ChangeGlobalStylesRequest request)
+    public async Task<IActionResult> ChangeGlobalStyles(ChangeGlobalStylesRequest request)
     {
         try
         {
             var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-            var response = await constructorService.ChangeGlobalStylesAsync(masterId, websiteId, request);
+            var response = await constructorService.ChangeGlobalStylesAsync(masterId, request);
 
             if (response == null)
                 return NotFound("GlobalStyle not found");
@@ -62,13 +62,13 @@ public class ConstructorController(IConstructorService constructorService) : Con
     }
     
     [HttpGet("blocks/main")]
-    public async Task<ActionResult<IEnumerable<BlockDto>>> GetMainSection([FromRoute] Guid websiteId)
+    public async Task<ActionResult<IEnumerable<BlockDto>>> GetMainSection()
     {
         try
         {
             var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-            var response = await constructorService.GetMainSectionAsync(masterId, websiteId);
+            var response = await constructorService.GetMainSectionAsync(masterId);
 
             return Ok(response);
         }
@@ -83,13 +83,13 @@ public class ConstructorController(IConstructorService constructorService) : Con
     }
 
     [HttpPut("blocks/{id}")]
-    public async Task<ActionResult<BlockDto>> ChangeBlock([FromRoute] Guid websiteId, [FromRoute] Guid id, ChangeBlockRequest request)
+    public async Task<ActionResult<BlockDto>> ChangeBlock([FromRoute] Guid id, ChangeBlockRequest request)
     {
         try
         {
             var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-            var response = await constructorService.ChangeBlockAsync(masterId, websiteId, id, request);
+            var response = await constructorService.ChangeBlockAsync(masterId, id, request);
 
             if (response == null)
                 return NotFound("Block bot found");

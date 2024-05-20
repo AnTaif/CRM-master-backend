@@ -25,6 +25,8 @@ public class Master : IdentityUser
     public string? TelegramLink { get;  set; }
     
     public int? VkId { get; set; }
+    
+    public Guid? WebsiteId { get; set; }
 
     public Master()
     {

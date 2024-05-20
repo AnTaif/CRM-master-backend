@@ -1,9 +1,11 @@
 using MasterCRM.Application.Services.Websites.PublicWebsite.Requests;
 using MasterCRM.Application.Services.Websites.PublicWebsite.Responses;
 using MasterCRM.Application.Services.Websites.Templates;
+using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Websites;
 using MasterCRM.Domain.Exceptions;
 using MasterCRM.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 namespace MasterCRM.Application.Services.Websites.PublicWebsite;
 
@@ -12,11 +14,20 @@ public class WebsiteService(
         ITemplateRepository templateRepository, 
         IFileStorage fileStorage,
         IConstructorBlockRepository constructorBlockRepository,
-        IGlobalStylesRepository globalStylesRepository) : IWebsiteService
+        IGlobalStylesRepository globalStylesRepository,
+        UserManager<Master> userManager) : IWebsiteService
 {
-    public async Task<WebsiteDto?> GetWebsiteInfo(Guid websiteId, string? masterId)
+    public async Task<WebsiteDto?> GetWebsiteInfo(string masterId)
     {
-        var website = await websiteRepository.GetByIdAsync(websiteId);
+        var master = await userManager.FindByIdAsync(masterId);
+
+        if (master == null)
+            throw new NotFoundException("Master not found");
+        
+        if (master.WebsiteId == null)
+            throw new NotFoundException("Website not found");
+        
+        var website = await websiteRepository.GetByIdAsync((Guid)master.WebsiteId);
 
         if (website == null)
             return null;
@@ -29,7 +40,12 @@ public class WebsiteService(
 
     public async Task<WebsiteDto?> CreateAsync(string masterId, CreateWebsiteRequest request)
     {
-        if (await websiteRepository.IsMasterHaveWebsite(masterId))
+        var master = await userManager.FindByIdAsync(masterId);
+
+        if (master == null)
+            throw new NotFoundException("Master not found");
+        
+        if (master.WebsiteId != null)
             return null;
         
         var newWebsite = new Website
@@ -41,21 +57,28 @@ public class WebsiteService(
         };
 
         await websiteRepository.CreateAsync(newWebsite);
+        master.WebsiteId = newWebsite.Id;
         await websiteRepository.SaveChangesAsync();
 
         return new WebsiteDto(newWebsite.Id, newWebsite.Title, newWebsite.AddressName, null);
     }
 
-    public async Task<WebsiteDto?> SelectTemplateAsync(string masterId, Guid websiteId, SelectTemplateRequest request)
+    public async Task<WebsiteDto?> SelectTemplateAsync(string masterId, SelectTemplateRequest request)
     {
+        var master = await userManager.FindByIdAsync(masterId);
+
+        if (master == null)
+            throw new NotFoundException("Master not found");
+        
+        if (master.WebsiteId == null)
+            throw new NotFoundException("Website not found");
+        
         var templateId = request.TemplateId;
+        var websiteId = (Guid)master.WebsiteId;
         var website = await websiteRepository.GetByIdAsync(websiteId);
 
         if (website == null)
             return null;
-
-        if (masterId != website.OwnerId)
-            throw new ForbidException("Current user is not the owner of the website");
 
         var template = await templateRepository.GetByIdAsync(templateId);
 
@@ -63,8 +86,10 @@ public class WebsiteService(
             throw new NotFoundException("Template not found");
         
         website.TemplateId = template.Id;
-
+        
         var templateStyles = template.GlobalStyles;
+        
+        globalStylesRepository.Remove(website.GlobalStyles);
         await globalStylesRepository.AddAsync(new GlobalStyles
         {
             TemplateId = null,
@@ -147,7 +172,7 @@ public class WebsiteService(
                     break;
             }
         }
-        
+        constructorBlockRepository.RemoveRangeAsync(website.Components);
         await constructorBlockRepository.AddRangeAsync(websiteComponents);
 
         await websiteRepository.SaveChangesAsync();
@@ -155,8 +180,17 @@ public class WebsiteService(
         return new WebsiteDto(website.Id, website.Title, website.AddressName, website.TemplateId);
     }
 
-    public async Task<WebsiteDto?> ChangeWebsiteInfoAsync(string masterId, Guid websiteId, ChangeWebsiteInfoRequest request)
+    public async Task<WebsiteDto?> ChangeWebsiteInfoAsync(string masterId, ChangeWebsiteInfoRequest request)
     {
+        var master = await userManager.FindByIdAsync(masterId);
+
+        if (master == null)
+            throw new NotFoundException("Master not found");
+        
+        if (master.WebsiteId == null)
+            throw new NotFoundException("Website not found");
+
+        var websiteId = (Guid)master.WebsiteId;
         var website = await websiteRepository.GetByIdAsync(websiteId);
 
         if (website == null)

@@ -2,17 +2,32 @@ using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.Products.Photos.Requests;
 using MasterCRM.Application.Services.Products.Requests;
 using MasterCRM.Application.Services.Products.Responses;
+using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Products;
 using MasterCRM.Domain.Exceptions;
 using MasterCRM.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Application.Services.Products;
 
-public class ProductService(IProductRepository repository, IFileStorage fileStorage) : IProductService
+public class ProductService(IProductRepository repository, IFileStorage fileStorage, UserManager<Master> userManager) : IProductService
 {
     public async Task<IEnumerable<ProductDto>> GetUserProductsAsync(string userId)
     {
         var products = await repository.GetByUserIdAsync(userId);
+
+        return products.Select(product => product.ToDto());
+    }
+
+    public async Task<IEnumerable<ProductDto>> GetWebsiteProductsAsync(Guid websiteId)
+    {
+        var master = await userManager.Users.FirstOrDefaultAsync(master => master.WebsiteId == websiteId);
+
+        if (master == null)
+            throw new NotFoundException("Master not found");
+        
+        var products = await repository.GetVisibleByMasterAsync(master.Id);
 
         return products.Select(product => product.ToDto());
     }

@@ -18,5 +18,7 @@ public interface IConstructorBlockRepository
 
     public Task AddRangeAsync(IEnumerable<ConstructorBlock> blocks);
 
+    public void RemoveRangeAsync(IEnumerable<ConstructorBlock> blocks);
+
     public Task SaveChangesAsync();
 }

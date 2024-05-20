@@ -11,6 +11,12 @@ public class ProductRepository(CrmDbContext context) : IProductRepository
     public async Task<IEnumerable<Product>> GetByUserIdAsync(string userId) => 
         await dbSet.Include(p => p.Photos).Where(p => p.MasterId == userId).ToListAsync();
 
+    public async Task<IEnumerable<Product>> GetVisibleByMasterAsync(string masterId) =>
+        await dbSet
+            .Include(p => p.Photos)
+            .Where(p => p.MasterId == masterId && p.IsVisible)
+            .ToListAsync();
+    
     public async Task<Product?> GetByIdAsync(Guid id) =>
         await dbSet.Include(product => product.Photos).FirstOrDefaultAsync(e => e.Id == id);
 

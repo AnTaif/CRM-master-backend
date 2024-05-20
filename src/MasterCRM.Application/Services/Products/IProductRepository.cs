@@ -5,6 +5,8 @@ namespace MasterCRM.Application.Services.Products;
 public interface IProductRepository
 {
     Task<IEnumerable<Product>> GetByUserIdAsync(string userId);
+
+    Task<IEnumerable<Product>> GetVisibleByMasterAsync(string masterId);
     
     Task<Product?> GetByIdAsync(Guid id);
 

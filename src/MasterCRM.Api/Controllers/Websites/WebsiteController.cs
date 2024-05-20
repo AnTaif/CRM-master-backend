@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using MasterCRM.Application.Services.Products;
 using MasterCRM.Application.Services.Websites.PublicWebsite;
 using MasterCRM.Application.Services.Websites.PublicWebsite.Requests;
 using MasterCRM.Domain.Exceptions;
@@ -9,16 +10,16 @@ namespace MasterCRM.Api.Controllers.Websites;
 
 [ApiController]
 [Authorize]
-[Route("websites")]
-public class WebsiteController(IWebsiteService websiteService) : ControllerBase
+[Route("website")]
+public class WebsiteController(IWebsiteService websiteService, IProductService productService) : ControllerBase
 {
-    [HttpGet("{websiteId}/info")]
-    public async Task<IActionResult> Get([FromRoute] Guid websiteId)
+    [HttpGet("info")]
+    public async Task<IActionResult> Get()
     {
         try
         {
             var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var response = await websiteService.GetWebsiteInfo(websiteId, masterId);
+            var response = await websiteService.GetWebsiteInfo(masterId);
 
             if (response == null)
                 return NotFound();
@@ -31,13 +32,13 @@ public class WebsiteController(IWebsiteService websiteService) : ControllerBase
         }
     }
     
-    [HttpPut("{websiteId}/info")]
-    public async Task<IActionResult> ChangeInfo([FromRoute] Guid websiteId, ChangeWebsiteInfoRequest request)
+    [HttpPut("info")]
+    public async Task<IActionResult> ChangeInfo(ChangeWebsiteInfoRequest request)
     {
         try
         {
             var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var response = await websiteService.ChangeWebsiteInfoAsync(masterId, websiteId, request);
+            var response = await websiteService.ChangeWebsiteInfoAsync(masterId, request);
 
             if (response == null)
                 return NotFound();
@@ -62,13 +63,13 @@ public class WebsiteController(IWebsiteService websiteService) : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("{websiteId}/select-template")]
-    public async Task<IActionResult> SelectTemplate([FromRoute] Guid websiteId, SelectTemplateRequest request)
+    [HttpPost("select-template")]
+    public async Task<IActionResult> SelectTemplate(SelectTemplateRequest request)
     {
         try
         {
             var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var response = await websiteService.SelectTemplateAsync(masterId, websiteId, request);
+            var response = await websiteService.SelectTemplateAsync(masterId, request);
 
             if (response == null)
                 return NotFound("Website not found");
@@ -82,6 +83,22 @@ public class WebsiteController(IWebsiteService websiteService) : ControllerBase
         catch (ForbidException)
         {
             return StatusCode(403);
+        }
+    }
+
+    [AllowAnonymous]
+    [HttpGet("{websiteId}/products")]
+    public async Task<IActionResult> GetVisibleProducts([FromRoute] Guid websiteId)
+    {
+        try
+        {
+            var response = await productService.GetWebsiteProductsAsync(websiteId);
+
+            return Ok(response);
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
         }
     }
 }

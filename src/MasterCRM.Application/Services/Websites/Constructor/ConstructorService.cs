@@ -1,16 +1,27 @@
 using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.Websites.Constructor.Requests;
 using MasterCRM.Application.Services.Websites.Constructor.Responses;
+using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Websites;
 using MasterCRM.Domain.Exceptions;
+using Microsoft.AspNetCore.Identity;
 
 namespace MasterCRM.Application.Services.Websites.Constructor;
 
 public class ConstructorService(IWebsiteRepository websiteRepository, IGlobalStylesRepository globalStylesRepository,
-    IConstructorBlockRepository blockRepository) : IConstructorService
+    IConstructorBlockRepository blockRepository, UserManager<Master> userManager) : IConstructorService
 {
-    public async Task<GlobalStylesDto?> GetGlobalStylesAsync(string masterId, Guid websiteId)
+    public async Task<GlobalStylesDto?> GetGlobalStylesAsync(string masterId)
     {
+        var master = await userManager.FindByIdAsync(masterId);
+
+        if (master == null)
+            throw new NotFoundException("Master not found");
+        
+        if (master.WebsiteId == null)
+            throw new NotFoundException("Website not found");
+
+        var websiteId = (Guid)master.WebsiteId;
         var website = await websiteRepository.GetByIdAsync(websiteId);
 
         if (website == null)
@@ -24,8 +35,17 @@ public class ConstructorService(IWebsiteRepository websiteRepository, IGlobalSty
         return globalStyles?.ToDto();
     }
 
-    public async Task<GlobalStylesDto?> ChangeGlobalStylesAsync(string masterId, Guid websiteId, ChangeGlobalStylesRequest request)
+    public async Task<GlobalStylesDto?> ChangeGlobalStylesAsync(string masterId, ChangeGlobalStylesRequest request)
     {
+        var master = await userManager.FindByIdAsync(masterId);
+
+        if (master == null)
+            throw new NotFoundException("Master not found");
+        
+        if (master.WebsiteId == null)
+            throw new NotFoundException("Website not found");
+
+        var websiteId = (Guid)master.WebsiteId;
         var website = await websiteRepository.GetByIdAsync(websiteId);
 
         if (website == null)
@@ -50,8 +70,17 @@ public class ConstructorService(IWebsiteRepository websiteRepository, IGlobalSty
         return globalStyles.ToDto();
     }
 
-    public async Task<IEnumerable<BlockDto>> GetMainSectionAsync(string masterId, Guid websiteId)
+    public async Task<IEnumerable<BlockDto>> GetMainSectionAsync(string masterId)
     {
+        var master = await userManager.FindByIdAsync(masterId);
+
+        if (master == null)
+            throw new NotFoundException("Master not found");
+        
+        if (master.WebsiteId == null)
+            throw new NotFoundException("Website not found");
+
+        var websiteId = (Guid)master.WebsiteId;
         var website = await websiteRepository.GetByIdAsync(websiteId);
 
         if (website == null)
@@ -65,8 +94,17 @@ public class ConstructorService(IWebsiteRepository websiteRepository, IGlobalSty
         return mainBlocks.Select(block => block.ToDto());
     }
 
-    public async Task<BlockDto?> ChangeBlockAsync(string masterId, Guid websiteId, Guid id, ChangeBlockRequest request)
+    public async Task<BlockDto?> ChangeBlockAsync(string masterId, Guid id, ChangeBlockRequest request)
     {
+        var master = await userManager.FindByIdAsync(masterId);
+
+        if (master == null)
+            throw new NotFoundException("Master not found");
+        
+        if (master.WebsiteId == null)
+            throw new NotFoundException("Website not found");
+
+        var websiteId = (Guid)master.WebsiteId;
         var website = await websiteRepository.GetByIdAsync(websiteId);
 
         if (website == null)

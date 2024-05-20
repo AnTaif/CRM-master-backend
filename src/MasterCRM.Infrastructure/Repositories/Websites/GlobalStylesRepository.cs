@@ -15,6 +15,7 @@ public class GlobalStylesRepository(CrmDbContext context) : IGlobalStylesReposit
     public async Task AddAsync(GlobalStyles styles) => await dbSet.AddAsync(styles);
 
     public void Update(GlobalStyles styles) => dbSet.Update(styles);
+    public void Remove(GlobalStyles styles) => dbSet.Remove(styles);
 
     public async Task SaveChangesAsync() => await context.SaveChangesAsync();
 }

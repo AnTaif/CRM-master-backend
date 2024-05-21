@@ -89,7 +89,8 @@ public class WebsiteService(
         
         var templateStyles = template.GlobalStyles;
         
-        globalStylesRepository.Remove(website.GlobalStyles);
+        if (website.GlobalStyles != null)
+            globalStylesRepository.Remove(website.GlobalStyles);
         await globalStylesRepository.AddAsync(new GlobalStyles
         {
             TemplateId = null,
@@ -172,7 +173,8 @@ public class WebsiteService(
                     break;
             }
         }
-        constructorBlockRepository.RemoveRangeAsync(website.Components);
+        if (website.Components != null)
+            constructorBlockRepository.RemoveRangeAsync(website.Components);
         await constructorBlockRepository.AddRangeAsync(websiteComponents);
 
         await websiteRepository.SaveChangesAsync();

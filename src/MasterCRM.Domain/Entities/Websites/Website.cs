@@ -16,9 +16,9 @@ public class Website : BaseEntity<Guid>
     
     public int? TemplateId { get; set; }
 
-    public GlobalStyles GlobalStyles { get; set; } = null!;
+    public GlobalStyles? GlobalStyles { get; set; }
 
-    public List<ConstructorBlock> Components { get; set; } = null!;
+    public List<ConstructorBlock>? Components { get; set; }
     
     // TODO: order/product sections
     // public ConstructorBlock OrderSection { get; set; }

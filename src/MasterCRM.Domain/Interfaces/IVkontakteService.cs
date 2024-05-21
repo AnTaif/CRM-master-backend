@@ -7,6 +7,6 @@ public interface IVkontakteService
     public Task<VkProfileResponse?> GetProfileInfoAsync(string accessToken);
 }
 
-public record ExchangeTokenResponse(string AccessToken, int UserId, string Email, string? Phone);
+public record ExchangeTokenResponse(string AccessToken, int UserId, string? Email, string? Phone);
 
 public record VkProfileResponse(string FirstName, string LastName, string ScreenName);

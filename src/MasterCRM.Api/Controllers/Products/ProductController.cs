@@ -16,11 +16,11 @@ public class ProductController(IProductService productService) : ControllerBase
 {
     private readonly string[] allowedExtensions = {".jpg", ".jpeg", ".png"};
     
-    //TODO: add isVisible parameter
     /// <summary>
     /// Returns all products of the current authorized user
     /// </summary>
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<ProductDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -31,31 +31,30 @@ public class ProductController(IProductService productService) : ControllerBase
     }
 
     /// <summary>
-    /// Returns all products of the specified user
-    /// </summary>
-    [HttpGet("user/{userId}")]
-    [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByUser([FromRoute] string userId)
-    {
-        var response = await productService.GetUserProductsAsync(userId);
-        
-        return Ok(response);
-    }
-
-    /// <summary>
     /// Get product by id
     /// </summary>
     /// <returns>Product dto model</returns>
     [HttpGet("{id}")]
-    [AllowAnonymous]
+    [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<ProductDto>> Get([FromRoute] Guid id)
     {
-        var productDto = await productService.GetProductByIdAsync(id);
+        try
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            
+            var productDto = await productService.GetProductByIdAsync(userId, id);
 
-        if (productDto == null)
-            return NotFound();
+            if (productDto == null)
+                return NotFound("Product not found");
 
-        return Ok(productDto);
+            return Ok(productDto);
+        }
+        catch (ForbidException)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
     }
 
     /// <summary>
@@ -65,6 +64,8 @@ public class ProductController(IProductService productService) : ControllerBase
     /// <param name="formFiles">Product photos</param>
     /// <returns>Product dto model</returns>
     [HttpPost]
+    [ProducesResponseType(typeof(ProductDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProductDto>> Create([FromForm]CreateProductRequest request, IEnumerable<IFormFile> formFiles)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -83,7 +84,7 @@ public class ProductController(IProductService productService) : ControllerBase
         
         var productDto = await productService.CreateAsync(userId, request, fileRequests);
 
-        return Ok(productDto);
+        return CreatedAtAction(nameof(Create), productDto);
     }
 
     /// <summary>
@@ -91,6 +92,9 @@ public class ProductController(IProductService productService) : ControllerBase
     /// </summary>
     /// <returns>Product dto model</returns>
     [HttpPut("{id}")]
+    [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<ProductDto>> Change([FromRoute] Guid id, ChangeProductRequest request)
     {
         try
@@ -100,17 +104,20 @@ public class ProductController(IProductService productService) : ControllerBase
             var productDto = await productService.ChangeAsync(userId, id, request);
 
             if (productDto == null)
-                return NotFound();
+                return NotFound("Product not found");
 
             return Ok(productDto);
         }
         catch (ForbidException)
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
     }
 
     [HttpPatch("{id}/toggle-visibility")]
+    [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> ToggleVisibility([FromRoute] Guid id)
     {
         try
@@ -120,13 +127,13 @@ public class ProductController(IProductService productService) : ControllerBase
             var productDto = await productService.ToggleVisibility(masterId, id);
 
             if (productDto == null)
-                return NotFound();
+                return NotFound("Product not found");
 
             return Ok(productDto);
         }
         catch (ForbidException)
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
     }
 
@@ -134,23 +141,25 @@ public class ProductController(IProductService productService) : ControllerBase
     /// Delete product by id
     /// </summary>
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        
-        var product = await productService.GetProductByIdAsync(id);
+        try
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        if (product == null)
-            return NotFound();
+            var success = await productService.TryDeleteAsync(userId, id);
 
-        if (userId != product.UserId)
-            return Forbid();
+            if (!success)
+                return NotFound("Product not found");
 
-        var success = await productService.TryDeleteAsync(id);
-
-        if (!success)
-            return BadRequest();
-
-        return NoContent();
+            return NoContent();
+        }
+        catch (ForbidException)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
     }
 }

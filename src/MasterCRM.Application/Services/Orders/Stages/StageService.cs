@@ -2,6 +2,7 @@ using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.Orders.Stages.Requests;
 using MasterCRM.Application.Services.Orders.Stages.Responses;
 using MasterCRM.Domain.Entities.Orders;
+using MasterCRM.Domain.Exceptions;
 
 namespace MasterCRM.Application.Services.Orders.Stages;
 
@@ -14,12 +15,15 @@ public class StageService(IStageRepository stageRepository) : IStageService
         return stages.Select(stage => stage.ToDto()).ToList();
     }
 
-    public async Task<StageDto?> UpdateAsync(Guid id, UpdateStageRequest request)
+    public async Task<StageDto?> UpdateAsync(string masterId, Guid id, UpdateStageRequest request)
     {
         var stage = await stageRepository.GetByIdAsync(id);
 
         if (stage == null)
             return null;
+
+        if (stage.MasterId != masterId)
+            throw new ForbidException("Current user is not the owner of the stage");
 
         stage.Update(request.Name, request.Order);
         await stageRepository.SaveChangesAsync();
@@ -27,7 +31,7 @@ public class StageService(IStageRepository stageRepository) : IStageService
         return stage.ToDto();
     }
 
-    public async Task<List<StageDto>?> UpdateRangeAsync(UpdateRangeRequest request)
+    public async Task<List<StageDto>?> UpdateRangeAsync(string masterId, UpdateRangeRequest request)
     {
         var stages = new List<Stage>();
 
@@ -40,6 +44,9 @@ public class StageService(IStageRepository stageRepository) : IStageService
 
                 if (stage == null)
                     return null;
+                
+                if (stage.MasterId != masterId)
+                    throw new ForbidException("Current user is not the owner of the stage");
 
                 stage.Update(updateRequest.Name, updateRequest.Order);
                 stages.Add(stage);
@@ -54,7 +61,10 @@ public class StageService(IStageRepository stageRepository) : IStageService
                 var deletedStage = await stageRepository.GetByIdAsync(deletedStageId);
 
                 if (deletedStage == null)
-                    throw new Exception($"Stage with this id: \"{deletedStageId}\" not found");
+                    return null;
+                
+                if (deletedStage.MasterId != masterId)
+                    throw new ForbidException("Current user is not the owner of the stage");
                 
                 stageRepository.Delete(deletedStage);
             }
@@ -64,12 +74,15 @@ public class StageService(IStageRepository stageRepository) : IStageService
         return stages.Select(stage => stage.ToDto()).ToList();
     }
 
-    public async Task<bool> TryDeleteAsync(Guid id)
+    public async Task<bool> TryDeleteAsync(string masterId, Guid id)
     {
         var stage = await stageRepository.GetByIdAsync(id);
 
         if (stage == null)
             return false;
+        
+        if (stage.MasterId != masterId)
+            throw new ForbidException("Current user is not the owner of the stage");
 
         if (stage.IsSystem)
             return false;

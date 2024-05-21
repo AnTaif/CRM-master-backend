@@ -24,7 +24,7 @@ public class VkAuthService(
         var exchangeTokenResponse = await vkontakteService.ExchangeSilentTokenAsync(queryPayload);
 
         if (exchangeTokenResponse == null)
-            throw new Exception("VK token exchange failed");
+            return null; 
         
         var vkId = exchangeTokenResponse.UserId;
         var email = exchangeTokenResponse.Email;
@@ -43,7 +43,7 @@ public class VkAuthService(
             
             var newUser = new Master
             {
-                UserName = exchangeTokenResponse.Email,
+                UserName = exchangeTokenResponse.Email ?? $"vk{vkId}",
                 Email = exchangeTokenResponse.Email,
                 PhoneNumber = exchangeTokenResponse.Phone ?? "",
                 FirstName = userInfo.FirstName,
@@ -66,12 +66,12 @@ public class VkAuthService(
         return new VkLoginResponse(true, null, null, null, null);
     }
 
-    public async Task<string> LinkAsync(string userId, string queryPayload)
+    public async Task<string?> LinkAsync(string userId, string queryPayload)
     {
         var user = await userManager.FindByIdAsync(userId);
         
         if (user == null)
-            throw new NotFoundException("User not found");
+            throw new Exception("User not found");
         
         var exchangeTokenResponse = await vkontakteService.ExchangeSilentTokenAsync(queryPayload);
 
@@ -83,7 +83,7 @@ public class VkAuthService(
         var isVkIdAlreadyUsed = await userManager.Users.AnyAsync(master => master.VkId == vkId);
 
         if (isVkIdAlreadyUsed)
-            throw new Exception("VK ID is already used by another user");
+            return null;
         
         user.VkId = vkId;
         
@@ -96,38 +96,10 @@ public class VkAuthService(
     {
         var defaultStages = new List<Stage>
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                MasterId = masterId,
-                Name = "Новый заказ",
-                StageType = StageType.Start,
-                Order = 0
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                MasterId = masterId,
-                Name = "В работе",
-                StageType = StageType.Default,
-                Order = 1
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                MasterId = masterId,
-                Name = "Доставка",
-                StageType = StageType.Default,
-                Order = 2
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                MasterId = masterId,
-                Name = "Архив",
-                StageType = StageType.End,
-                Order = 3
-            },
+            new() { MasterId = masterId, Name = "Новый заказ", StageType = StageType.Start, Order = 0 },
+            new() { MasterId = masterId, Name = "В работе", StageType = StageType.Default, Order = 1 },
+            new() { MasterId = masterId, Name = "Доставка", StageType = StageType.Default, Order = 2 },
+            new() { MasterId = masterId, Name = "Архив", StageType = StageType.End, Order = 3 },
         };
 
         await stageRepository.AddRangeAsync(defaultStages);

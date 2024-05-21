@@ -14,6 +14,9 @@ namespace MasterCRM.Api.Controllers.Websites;
 public class ConstructorController(IConstructorService constructorService) : ControllerBase
 {
     [HttpGet("global-styles")]
+    [ProducesResponseType(typeof(GlobalStylesDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<GlobalStylesDto>> GetGlobalStyles()
     {
         try
@@ -33,11 +36,14 @@ public class ConstructorController(IConstructorService constructorService) : Con
         }
         catch (ForbidException)
         {
-            return StatusCode(403);
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
     }
 
     [HttpPut("global-styles")]
+    [ProducesResponseType(typeof(GlobalStylesDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> ChangeGlobalStyles(ChangeGlobalStylesRequest request)
     {
         try
@@ -57,11 +63,14 @@ public class ConstructorController(IConstructorService constructorService) : Con
         }
         catch (ForbidException)
         {
-            return StatusCode(403);
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
     }
     
     [HttpGet("blocks/main")]
+    [ProducesResponseType(typeof(IEnumerable<BlockDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<IEnumerable<BlockDto>>> GetMainSection()
     {
         try
@@ -74,7 +83,7 @@ public class ConstructorController(IConstructorService constructorService) : Con
         }
         catch (ForbidException)
         {
-            return StatusCode(403);
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
         catch (NotFoundException e)
         {
@@ -83,6 +92,9 @@ public class ConstructorController(IConstructorService constructorService) : Con
     }
 
     [HttpPut("blocks/{id}")]
+    [ProducesResponseType(typeof(IEnumerable<BlockDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<BlockDto>> ChangeBlock([FromRoute] Guid id, ChangeBlockRequest request)
     {
         try
@@ -98,7 +110,7 @@ public class ConstructorController(IConstructorService constructorService) : Con
         }
         catch (ForbidException)
         {
-            return StatusCode(403);
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
         catch (NotFoundException e)
         {

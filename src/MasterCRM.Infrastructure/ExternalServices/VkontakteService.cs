@@ -37,7 +37,7 @@ public class VkontakteService(string apiVersion, string serviceToken) : IVkontak
         var userId = responseJson["user_id"]?.ToString();
         var email = responseJson["email"]?.ToString();
 
-        if (accessToken == null || userId == null || email == null)
+        if (accessToken == null || userId == null)
             return null;
         
         return new ExchangeTokenResponse(accessToken, int.Parse(userId), email, null);

@@ -4,6 +4,8 @@ namespace MasterCRM.Domain.Entities.Orders;
 
 public class Stage : BaseEntity<Guid>
 {
+    public new Guid Id { get; set; } = Guid.NewGuid();
+    
     public required string MasterId { get; init; }
 
     public required string Name { get; set; }

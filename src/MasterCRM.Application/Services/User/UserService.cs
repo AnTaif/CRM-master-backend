@@ -2,6 +2,7 @@ using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.User.Requests;
 using MasterCRM.Application.Services.User.Responses;
 using MasterCRM.Domain.Entities;
+using MasterCRM.Domain.Exceptions;
 using Microsoft.AspNetCore.Identity;
 
 namespace MasterCRM.Application.Services.User;
@@ -38,15 +39,15 @@ public class UserService(UserManager<Master> userManager) : IUserService
         return user.ToDto();
     }
 
-    public async Task<bool> TryChangePasswordAsync(string id, ChangePasswordRequest request)
+    public async Task<IdentityResult> TryChangePasswordAsync(string id, ChangePasswordRequest request)
     {
         var user = await userManager.FindByIdAsync(id);
 
         if (user == null)
-            return false;
+            throw new NotFoundException("User not found");
         
         var result = await userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
 
-        return result.Succeeded;
+        return result;
     }
 }

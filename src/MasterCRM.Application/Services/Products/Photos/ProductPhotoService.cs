@@ -1,8 +1,8 @@
 using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.Products.Photos.Requests;
 using MasterCRM.Application.Services.Products.Photos.Responses;
-using MasterCRM.Application.Services.Products.Requests;
 using MasterCRM.Domain.Entities.Products;
+using MasterCRM.Domain.Exceptions;
 using MasterCRM.Domain.Interfaces;
 
 namespace MasterCRM.Application.Services.Products.Photos;
@@ -12,12 +12,15 @@ public class ProductPhotoService(
     IFileStorage fileStorage, 
     IProductPhotoRepository productPhotoRepository) : IProductPhotoService
 {
-    public async Task<IEnumerable<ProductPhotoDto>?> AddPhotosToProductAsync(Guid productId, IEnumerable<UploadPhotoRequest> request)
+    public async Task<IEnumerable<ProductPhotoDto>?> AddPhotosToProductAsync(string userId, Guid productId, IEnumerable<UploadPhotoRequest> request)
     {
         var product = await productRepository.GetByIdAsync(productId);
 
         if (product == null)
             return null;
+
+        if (product.MasterId != userId)
+            throw new ForbidException("Current user is not the owner of the product");
 
         var photos = new List<ProductPhoto>();
         foreach (var uploadRequest in request)
@@ -42,12 +45,15 @@ public class ProductPhotoService(
         return photos.Select(photo => photo.ToDto());
     }
 
-    public async Task<IEnumerable<ProductPhotoDto>> UpdateRangeAsync(Guid productId, IEnumerable<UpdateProductPhotosRequest> requests)
+    public async Task<IEnumerable<ProductPhotoDto>?> UpdateRangeAsync(string userId, Guid productId, IEnumerable<UpdateProductPhotosRequest> requests)
     {
         var product = await productRepository.GetByIdAsync(productId);
 
         if (product == null)
-            throw new Exception("Product not found");
+            return null;
+        
+        if (product.MasterId != userId)
+            throw new ForbidException("Current user is not the owner of the product");
 
         var photos = new List<ProductPhoto>();
         foreach (var request in requests)
@@ -55,7 +61,7 @@ public class ProductPhotoService(
             var productPhoto = await productPhotoRepository.GetByIdAsync(request.Id);
 
             if (productPhoto == null)
-                throw new Exception("ProductPhoto not found");
+                throw new NotFoundException("ProductPhoto not found");
             
             productPhoto.Update(request.Order, null);
             photos.Add(productPhoto);
@@ -66,16 +72,22 @@ public class ProductPhotoService(
         return photos.Select(photo => photo.ToDto());
     }
     
-    public async Task<bool> TryDeletePhotoAsync(Guid productId, Guid photoId)
+    public async Task<bool> TryDeletePhotoAsync(string userId, Guid productId, Guid photoId)
     {
         var product = await productRepository.GetByIdAsync(productId);
 
-        var photo = product?.Photos.FirstOrDefault(photo => photo.Id == photoId);
+        if (product == null)
+            return false;
+        
+        if (product.MasterId != userId)
+            throw new ForbidException("Current user is not the owner of the product");
+
+        var photo = product.Photos.FirstOrDefault(photo => photo.Id == photoId);
         
         if (photo == null)
-            return false;
+            return true;
 
-        product!.Photos.Remove(photo);
+        product.Photos.Remove(photo);
         await productRepository.SaveChangesAsync();
         return fileStorage.TryDelete(photo.Url);
     }

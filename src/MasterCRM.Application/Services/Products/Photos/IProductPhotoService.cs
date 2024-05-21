@@ -5,9 +5,9 @@ namespace MasterCRM.Application.Services.Products.Photos;
 
 public interface IProductPhotoService
 {
-    public Task<IEnumerable<ProductPhotoDto>?> AddPhotosToProductAsync(Guid productId, IEnumerable<UploadPhotoRequest> request);
+    public Task<IEnumerable<ProductPhotoDto>?> AddPhotosToProductAsync(string userId, Guid productId, IEnumerable<UploadPhotoRequest> request);
 
-    public Task<IEnumerable<ProductPhotoDto>> UpdateRangeAsync(Guid productId, IEnumerable<UpdateProductPhotosRequest> requests);
+    public Task<IEnumerable<ProductPhotoDto>?> UpdateRangeAsync(string userId, Guid productId, IEnumerable<UpdateProductPhotosRequest> requests);
     
-    public Task<bool> TryDeletePhotoAsync(Guid productId, Guid photoId);
+    public Task<bool> TryDeletePhotoAsync(string userId, Guid productId, Guid photoId);
 }

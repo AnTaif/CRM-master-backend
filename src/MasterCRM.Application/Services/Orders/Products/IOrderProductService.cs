@@ -5,9 +5,9 @@ namespace MasterCRM.Application.Services.Orders.Products;
 
 public interface IOrderProductService
 {
-    public Task<OrderProductDto?> UpdateAsync(Guid orderProductId, OrderProductRequest request);
+    public Task<OrderProductDto?> UpdateAsync(string masterId, Guid orderProductId, OrderProductRequest request);
 
-    public Task<OrderProductDto> CreateAsync(Guid orderId, OrderProductRequest request);
+    public Task<OrderProductDto> CreateAsync(string masterId, Guid orderId, OrderProductRequest request);
 
-    public Task<bool> TryDeleteAsync(Guid orderProductId);
+    public Task<bool> TryDeleteAsync(string masterId, Guid orderProductId);
 }

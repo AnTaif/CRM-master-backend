@@ -1,8 +1,6 @@
 using MasterCRM.Application.Services.Auth.DefaultAuth;
 using MasterCRM.Application.Services.Auth.DefaultAuth.Requests;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 
 namespace MasterCRM.Api.Controllers.Auth;
 
@@ -14,28 +12,31 @@ public class AuthController(IAuthService authService) : ControllerBase
     /// Registers a new user with email and password
     /// </summary>
     [HttpPost("register")]
-    [ProducesResponseType(typeof(IdentityResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(IDictionary<string, string[]>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register(RegisterUserRequest request)
     {
         var result = await authService.RegisterAsync(request);
 
-        if (!result.Succeeded)
-            return BadRequest();
-
-        return CreatedAtAction(nameof(Register), result);
+        if (result.Succeeded) 
+            return CreatedAtAction(nameof(Register), null);
+        
+        var errors = result.Errors.ToDictionary(e => e.Code, e => new[] { e.Description });
+        return BadRequest(errors);
     }
     
     /// <summary>
     /// Logs in the user using email and password
     /// </summary>
     [HttpPost("login")]
-    [ProducesResponseType(typeof(SignInResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login(LoginRequest request)
     {
         var result = await authService.LoginAsync(request);
 
         if (!result.Succeeded)
-            return BadRequest();
+            return BadRequest("Invalid login attempt");
 
         return NoContent();
     }
@@ -44,6 +45,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     /// Logs out the user
     /// </summary>
     [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Logout()
     {
         await authService.LogoutAsync();

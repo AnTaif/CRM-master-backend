@@ -32,11 +32,17 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         return products.Select(product => product.ToDto());
     }
 
-    public async Task<ProductDto?> GetProductByIdAsync(Guid productId)
+    public async Task<ProductDto?> GetProductByIdAsync(string masterId, Guid productId)
     {
         var product = await repository.GetByIdAsync(productId);
 
-        return product?.ToDto();
+        if (product == null)
+            return null;
+
+        if (product.MasterId != masterId)
+            throw new ForbidException("Current user is not the owner of the product");
+        
+        return product.ToDto();
     }
 
     public async Task<ProductDto> CreateAsync(
@@ -98,12 +104,15 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         return product.ToDto();
     }
 
-    public async Task<bool> TryDeleteAsync(Guid productId)
+    public async Task<bool> TryDeleteAsync(string masterId, Guid productId)
     {
         var product = await repository.GetByIdAsync(productId);
 
         if (product == null)
             return false;
+
+        if (product.MasterId != masterId)
+            throw new ForbidException("Current user is not the owner of the product");
 
         var urls = product.Photos.Select(photo => photo.Url).ToList();
 

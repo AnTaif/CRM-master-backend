@@ -13,15 +13,8 @@ namespace MasterCRM.Api.Controllers.Orders;
 [Route("orders")]
 public class OrderController(IOrderService orderService) : ControllerBase
 {
-    // [HttpGet]
-    // public async Task<ActionResult<IEnumerable<GetOrderItemResponse>>> GetAllByMaster()
-    // {
-    //     var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-    //     
-    //     return Ok(await orderService.GetAllByMasterAsync(masterId));
-    // }
-    
     [HttpGet]
+    [ProducesResponseType(typeof(GetOrdersResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult<GetOrdersResponse>> GetWithStageByMaster([FromQuery] short? tab)
     {
         var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -33,6 +26,9 @@ public class OrderController(IOrderService orderService) : ControllerBase
     }
     
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<OrderDto>> GetOrderById([FromRoute] Guid id)
     {
         try
@@ -42,27 +38,39 @@ public class OrderController(IOrderService orderService) : ControllerBase
             var order = await orderService.GetOrderByIdAsync(masterId, id);
             
             if (order is null)
-                return NotFound();
+                return NotFound("Order not found");
             
             return Ok(order);
         }
         catch (ForbidException)
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
     }
     
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateOrder(CreateOrderRequest request)
+    [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<OrderDto>> CreateOrder(CreateOrderRequest request)
     {
-        var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        
-        var orderId = await orderService.CreateOrderAsync(masterId, request);
-        
-        return Ok(orderId);
+        try
+        {
+            var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            
+            var orderDto = await orderService.CreateOrderAsync(masterId, request);
+            
+            return Ok(orderDto);
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
     }
 
     [HttpPut("{id}")]
+    [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<OrderDto>> UpdateOrder([FromRoute] Guid id, ChangeOrderRequest request)
     {
         try
@@ -78,7 +86,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
         }
         catch (ForbidException)
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
         catch (NotFoundException e)
         {
@@ -87,6 +95,9 @@ public class OrderController(IOrderService orderService) : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> DeleteOrder([FromRoute] Guid id)
     {
         try
@@ -96,13 +107,13 @@ public class OrderController(IOrderService orderService) : ControllerBase
             var result = await orderService.TryDeleteOrderAsync(masterId, id);
             
             if (!result)
-                return NotFound();
+                return NotFound("Order not found");
             
             return NoContent();
         }
         catch (ForbidException)
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
     }
 }

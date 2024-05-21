@@ -10,7 +10,7 @@ public interface IProductService
 
     public Task<IEnumerable<ProductDto>> GetWebsiteProductsAsync(Guid websiteId);
     
-    public Task<ProductDto?> GetProductByIdAsync(Guid productId);
+    public Task<ProductDto?> GetProductByIdAsync(string masterId, Guid productId);
 
     public Task<ProductDto> CreateAsync(
         string userId, CreateProductRequest request, IEnumerable<UploadPhotoRequest> photoRequests);
@@ -19,5 +19,5 @@ public interface IProductService
 
     public Task<ProductDto?> ToggleVisibility(string masterId, Guid productId);
 
-    public Task<bool> TryDeleteAsync(Guid productId);
+    public Task<bool> TryDeleteAsync(string masterId, Guid productId);
 }

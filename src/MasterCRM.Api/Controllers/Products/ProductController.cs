@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MasterCRM.Api.Controllers.Products;
 
 [ApiController]
-[Authorize(AuthenticationSchemes = "BearerToken")]
+[Authorize]
 [Route("products")]
 public class ProductController(IProductService productService) : ControllerBase
 {

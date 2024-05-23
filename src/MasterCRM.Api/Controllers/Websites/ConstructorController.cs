@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MasterCRM.Api.Controllers.Websites;
 
 [ApiController]
-[Authorize(AuthenticationSchemes = "BearerToken")]
+[Authorize]
 [Route("website/constructor")]
 public class ConstructorController(IConstructorService constructorService) : ControllerBase
 {

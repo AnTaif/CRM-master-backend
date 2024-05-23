@@ -21,7 +21,7 @@ builder.Services.AddSwaggerGen();
 var corsOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]?>();
 builder.Services.AddCustomCors(corsOrigins);
 
-builder.Services.AddAuth();
+builder.Services.AddCustomAuth();
 
 var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "Uploads");
 builder.Services.AddInfrastructureLayer(builder.Configuration, uploadsPath);

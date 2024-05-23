@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MasterCRM.Api.Controllers.Orders;
 
 [ApiController]
-[Authorize(AuthenticationSchemes = "BearerToken")]
+[Authorize]
 [Route("orders/{orderId}/history")]
 public class OrderHistoryController(IOrderHistoryService historyService) : ControllerBase
 {

@@ -33,7 +33,7 @@ public static class ServiceCollectionExtensions
 {
     private static string uploadsUrl => GetUploadsUrl();
 
-    public static IServiceCollection AddAuth(this IServiceCollection services)
+    public static IServiceCollection AddCustomAuth(this IServiceCollection services)
     {
         services.AddAuthentication().AddBearerToken();
         services.AddAuthorization();

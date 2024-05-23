@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MasterCRM.Api.Controllers.Websites;
 
 [ApiController]
-[Authorize(AuthenticationSchemes = "BearerToken")]
+[Authorize]
 [Route("website")]
 public class WebsiteController(IWebsiteService websiteService, IProductService productService) : ControllerBase
 {

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MasterCRM.Api.Controllers;
 
 [ApiController]
-[Authorize(AuthenticationSchemes = "BearerToken")]
+[Authorize]
 [Route("clients")]
 public class ClientsController(IClientService clientService) : ControllerBase
 {

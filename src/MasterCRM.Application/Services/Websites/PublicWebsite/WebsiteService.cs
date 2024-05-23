@@ -52,7 +52,7 @@ public class WebsiteService(
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
-            AddressName = request.AddressName,
+            AddressName = request.AddressName, // TODO: Check that AddressName is unique
             OwnerId = masterId
         };
 
@@ -202,6 +202,7 @@ public class WebsiteService(
             throw new ForbidException("Current user is not the owner of the website");
 
         website.Title = request.Title ?? website.Title;
+        // TODO: Check that AddressName is unique
         website.AddressName = request.AddressName ?? website.AddressName;
 
         websiteRepository.Update(website);

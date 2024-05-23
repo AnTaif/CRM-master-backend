@@ -25,7 +25,7 @@ public class ProductService(IProductRepository repository, IFileStorage fileStor
         var master = await userManager.Users.FirstOrDefaultAsync(master => master.WebsiteId == websiteId);
 
         if (master == null)
-            throw new NotFoundException("Master not found");
+            throw new NotFoundException("Website not found");
         
         var products = await repository.GetVisibleByMasterAsync(master.Id);
 

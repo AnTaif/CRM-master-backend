@@ -4,6 +4,7 @@ using MasterCRM.Application.Services.User.Responses;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Exceptions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Application.Services.User;
 
@@ -12,6 +13,13 @@ public class UserService(UserManager<Master> userManager) : IUserService
     public async Task<UserDto?> GetInfoAsync(string id)
     {
         var user = await userManager.FindByIdAsync(id);
+
+        return user?.ToDto();
+    }
+
+    public async Task<UserDto?> GetInfoByWebsiteAsync(Guid websiteId)
+    {
+        var user = await userManager.Users.FirstOrDefaultAsync(user => user.WebsiteId == websiteId);
 
         return user?.ToDto();
     }

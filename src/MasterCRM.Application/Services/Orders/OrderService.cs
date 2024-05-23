@@ -11,6 +11,8 @@ using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;
 using MasterCRM.Domain.Exceptions;
 using MasterCRM.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Application.Services.Orders;
 
@@ -20,7 +22,8 @@ public class OrderService(
     IStageRepository stageRepository,
     IProductRepository productRepository,
     IOrderHistoryService historyService,
-    IEmailSender emailSender) : IOrderService
+    IEmailSender emailSender,
+    UserManager<Master> userManager) : IOrderService
 {
     public async Task<GetOrdersResponse> GetAllByMasterAsync(string masterId)
     {
@@ -101,12 +104,74 @@ public class OrderService(
         await orderRepository.SaveChangesAsync();
         var order = await orderRepository.GetByIdAsync(newOrder.Id);
         
-        await NotifyOrderCreated(order!, client);
+        await NotifyClientOrderCreated(order!, client);
         
         return newOrder.ToDto();
     }
 
-    private async Task NotifyOrderCreated(Order order, Client client)
+    public async Task CreateOrderForWebsiteAsync(Guid websiteId, CreateWebsiteOrderRequest request)
+    {
+        var master = await userManager.Users.FirstOrDefaultAsync(master => master.WebsiteId == websiteId);
+
+        if (master == null)
+            throw new NotFoundException("Website not found");
+        
+        var masterId = master.Id;
+        
+        var stage = await stageRepository.GetStartByMasterAsync(masterId);
+
+        if (stage == null)
+            throw new NotFoundException("Start stage not found");
+        
+        var products = new List<OrderProduct>();
+        var totalAmount = 0.0; 
+
+        foreach (var productRequest in request.Products)
+        {
+            var product = await productRepository.GetByIdAsync(productRequest.ProductId);
+            
+            if (product == null)
+                throw new NotFoundException("Product not found");
+
+            products.Add(new OrderProduct
+            {
+                ProductId = productRequest.ProductId,
+                Quantity = productRequest.Quantity,
+                UnitPrice = product.Price
+            });
+
+            totalAmount += product.Price * productRequest.Quantity;
+        }
+        
+        var newOrder = new Order
+        {
+            Id = Guid.NewGuid(),
+            MasterId = masterId,
+            Name = GetOrderName(request.Client.FullName),
+            Address = request.Address,
+            StageId = stage.Id,
+            TotalAmount = totalAmount,
+            IsCalculationAutomated = true,
+            Comment = request.Comment,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            OrderProducts = products
+        };
+        
+        await orderRepository.CreateAsync(newOrder);
+        
+        var client = await CreateOrSetClientAsync(newOrder, request.Client.FullName, request.Client.Email, request.Client.Phone);
+        
+        await historyService.AddNewOrderHistoryAsync(newOrder.Id, newOrder.Name, newOrder.CreatedAt);
+        
+        await orderRepository.SaveChangesAsync();
+        var order = await orderRepository.GetByIdAsync(newOrder.Id);
+
+        await NotifyMasterOrderCreated(order!, client);
+        await NotifyClientOrderCreated(order!, client);
+    }
+
+    private async Task NotifyMasterOrderCreated(Order order, Client client)
     {
         if (order.Master.Email != null)
         {
@@ -115,7 +180,10 @@ public class OrderService(
                           $"Контактные данные пользователя для связи: {client.Phone}, {client.Email}.\nС уважением,\nМастерскаЯ\n";
             await emailSender.SendEmailAsync(order.Master.Email, "У вас новый заказ!", message);
         }
+    }
 
+    private async Task NotifyClientOrderCreated(Order order, Client client)
+    {
         var clientMessage =
             $"Доброго дня, {client.GetFullName()}.\nВаш заказ успешно оформлен и отправлен мастеру.\nО переходе товара на следующую стадию вы узнаете в письме, которое придет на эту же почту.\nКонтактные данные мастера для связи: {order.Master.PhoneNumber}, {order.Master.Email}.\nС уважением,\nМастерскаЯ\n";
         await emailSender.SendEmailAsync(client.Email, "Ваш заказ оформлен", clientMessage);

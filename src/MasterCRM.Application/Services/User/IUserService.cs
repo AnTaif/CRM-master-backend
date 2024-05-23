@@ -8,6 +8,8 @@ public interface IUserService
 {
     public Task<UserDto?> GetInfoAsync(string id);
 
+    public Task<UserDto?> GetInfoByWebsiteAsync(Guid websiteId);
+
     public Task<UserDto?> ChangeInfoAsync(string id, ChangeUserInfoRequest request);
     
     public Task<IdentityResult> TryChangePasswordAsync(string id, ChangePasswordRequest request);

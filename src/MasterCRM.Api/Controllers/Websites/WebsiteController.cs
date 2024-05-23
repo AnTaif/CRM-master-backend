@@ -1,6 +1,10 @@
 using System.Security.Claims;
+using MasterCRM.Application.Services.Orders;
+using MasterCRM.Application.Services.Orders.Requests;
 using MasterCRM.Application.Services.Products;
 using MasterCRM.Application.Services.Products.Responses;
+using MasterCRM.Application.Services.User;
+using MasterCRM.Application.Services.User.Responses;
 using MasterCRM.Application.Services.Websites.PublicWebsite;
 using MasterCRM.Application.Services.Websites.PublicWebsite.Requests;
 using MasterCRM.Application.Services.Websites.PublicWebsite.Responses;
@@ -13,7 +17,8 @@ namespace MasterCRM.Api.Controllers.Websites;
 [ApiController]
 [Authorize]
 [Route("website")]
-public class WebsiteController(IWebsiteService websiteService, IProductService productService) : ControllerBase
+public class WebsiteController(IWebsiteService websiteService, IProductService productService,
+    IUserService userService, IOrderService orderService) : ControllerBase
 {
     [HttpGet("info")]
     [ProducesResponseType(typeof(WebsiteDto), StatusCodes.Status200OK)]
@@ -111,6 +116,37 @@ public class WebsiteController(IWebsiteService websiteService, IProductService p
             var response = await productService.GetWebsiteProductsAsync(websiteId);
 
             return Ok(response);
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+    }
+
+    [AllowAnonymous]
+    [HttpGet("{websiteId}/master-info")]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMasterInfo([FromRoute] Guid websiteId)
+    {
+        var masterDto = await userService.GetInfoByWebsiteAsync(websiteId);
+
+        if (masterDto == null)
+            return NotFound("Website not found");
+
+        return Ok(masterDto);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("{websiteId}/orders")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CreateOrder([FromRoute] Guid websiteId, CreateWebsiteOrderRequest request)
+    {
+        try
+        {
+            await orderService.CreateOrderForWebsiteAsync(websiteId, request);
+            return CreatedAtAction(nameof(CreateOrder), null);
         }
         catch (NotFoundException e)
         {

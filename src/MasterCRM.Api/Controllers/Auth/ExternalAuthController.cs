@@ -57,7 +57,7 @@ public class ExternalAuthController(IVkAuthService vkAuthService) : ControllerBa
     /// </summary>
     /// <param name="vkQuery">Query payload from VK ID response</param>
     /// <returns>VK id of the linked account</returns>
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "BearerToken")]
     [HttpPost("link/vk")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]

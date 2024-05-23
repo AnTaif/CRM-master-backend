@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MasterCRM.Api.Controllers.Orders;
 
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = "BearerToken")]
 [Route("orders/{orderId}/products")]
 public class OrderProductController(IOrderProductService orderProductService) : ControllerBase
 {

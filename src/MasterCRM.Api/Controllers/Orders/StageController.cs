@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MasterCRM.Api.Controllers.Orders;
 
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = "BearerToken")]
 [Route("orders/stages")]
 public class StageController(IStageService stageService) : ControllerBase
 {

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MasterCRM.Api.Controllers.Products;
 
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = "BearerToken")]
 [Route("products/{productId}/photos")]
 public class ProductPhotoController(IProductPhotoService productPhotoService) : ControllerBase
 {

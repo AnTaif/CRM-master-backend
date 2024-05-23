@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MasterCRM.Api.Controllers;
 
-[Authorize]
 [ApiController]
+[Authorize(AuthenticationSchemes = "BearerToken")]
 [Route("user")]
 public class UserController(IUserService userService) : ControllerBase
 {

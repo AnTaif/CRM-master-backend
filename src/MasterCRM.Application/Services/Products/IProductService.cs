@@ -8,7 +8,7 @@ public interface IProductService
 {
     public Task<IEnumerable<ProductDto>> GetUserProductsAsync(string userId);
 
-    public Task<IEnumerable<ProductDto>> GetWebsiteProductsAsync(Guid websiteId);
+    public Task<IEnumerable<ProductDto>> GetWebsiteProductsAsync(string websiteAddress);
     
     public Task<ProductDto?> GetProductByIdAsync(string masterId, Guid productId);
 

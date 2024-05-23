@@ -65,6 +65,10 @@ public class OrderController(IOrderService orderService) : ControllerBase
         {
             return NotFound(e.Message);
         }
+        catch (ForbidException e)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, e.Message);
+        }
     }
 
     [HttpPut("{id}")]
@@ -84,9 +88,9 @@ public class OrderController(IOrderService orderService) : ControllerBase
 
             return Ok(response);
         }
-        catch (ForbidException)
+        catch (ForbidException e)
         {
-            return StatusCode(StatusCodes.Status403Forbidden);
+            return StatusCode(StatusCodes.Status403Forbidden, e.Message);
         }
         catch (NotFoundException e)
         {

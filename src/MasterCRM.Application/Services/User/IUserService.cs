@@ -8,7 +8,7 @@ public interface IUserService
 {
     public Task<UserDto?> GetInfoAsync(string id);
 
-    public Task<UserDto?> GetInfoByWebsiteAsync(Guid websiteId);
+    public Task<UserDto?> GetInfoByWebsiteAsync(string websiteAddress);
 
     public Task<UserDto?> ChangeInfoAsync(string id, ChangeUserInfoRequest request);
     

@@ -75,12 +75,16 @@ public class WebsiteController(IWebsiteService websiteService, IProductService p
 
             if (response == null)
                 return BadRequest("Master already have website");
-            
+
             return CreatedAtAction(nameof(Create), response);
         }
         catch (NotFoundException e)
         {
             return NotFound(e.Message);
+        }
+        catch (BadRequestException e)
+        {
+            return BadRequest(e.Message);
         }
     }
 
@@ -106,14 +110,14 @@ public class WebsiteController(IWebsiteService websiteService, IProductService p
     }
 
     [AllowAnonymous]
-    [HttpGet("{websiteId}/products")]
+    [HttpGet("{address}/products")]
     [ProducesResponseType(typeof(IEnumerable<ProductDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetVisibleProducts([FromRoute] Guid websiteId)
+    public async Task<IActionResult> GetVisibleProducts([FromRoute] string address)
     {
         try
         {
-            var response = await productService.GetWebsiteProductsAsync(websiteId);
+            var response = await productService.GetWebsiteProductsAsync(address);
 
             return Ok(response);
         }
@@ -124,33 +128,44 @@ public class WebsiteController(IWebsiteService websiteService, IProductService p
     }
 
     [AllowAnonymous]
-    [HttpGet("{websiteId}/master-info")]
+    [HttpGet("{address}/master-info")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetMasterInfo([FromRoute] Guid websiteId)
-    {
-        var masterDto = await userService.GetInfoByWebsiteAsync(websiteId);
-
-        if (masterDto == null)
-            return NotFound("Website not found");
-
-        return Ok(masterDto);
-    }
-
-    [AllowAnonymous]
-    [HttpPost("{websiteId}/orders")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> CreateOrder([FromRoute] Guid websiteId, CreateWebsiteOrderRequest request)
+    public async Task<IActionResult> GetMasterInfo([FromRoute] string address)
     {
         try
         {
-            await orderService.CreateOrderForWebsiteAsync(websiteId, request);
+            var masterDto = await userService.GetInfoByWebsiteAsync(address);
+
+            if (masterDto == null)
+                return NotFound("Master not found");
+
+            return Ok(masterDto);
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+    }
+
+    [AllowAnonymous]
+    [HttpPost("{address}/orders")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CreateOrder([FromRoute] string address, CreateWebsiteOrderRequest request)
+    {
+        try
+        {
+            await orderService.CreateOrderForWebsiteAsync(address, request);
             return CreatedAtAction(nameof(CreateOrder), null);
         }
         catch (NotFoundException e)
         {
             return NotFound(e.Message);
+        }
+        catch (ForbidException e)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, e.Message);
         }
     }
 }

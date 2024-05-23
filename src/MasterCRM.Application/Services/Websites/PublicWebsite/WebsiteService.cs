@@ -47,15 +47,18 @@ public class WebsiteService(
         
         if (master.WebsiteId != null)
             return null;
-        
+
+        if (!await websiteRepository.IsAddressUnique(request.AddressName))
+            throw new BadRequestException("Website address name is already in use: " + request.AddressName);
+            
         var newWebsite = new Website
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
-            AddressName = request.AddressName, // TODO: Check that AddressName is unique
+            AddressName = request.AddressName,
             OwnerId = masterId
         };
-
+            
         await websiteRepository.CreateAsync(newWebsite);
         master.WebsiteId = newWebsite.Id;
         await websiteRepository.SaveChangesAsync();

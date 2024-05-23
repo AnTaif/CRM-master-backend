@@ -45,6 +45,10 @@ public class CrmDbContext : IdentityDbContext<Master>
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Website>()
+            .HasIndex(w => w.AddressName)
+            .IsUnique();
+        
         modelBuilder.Entity<ConstructorBlock>()
             .HasDiscriminator<string>("BlockType")
             .HasValue<HeaderBlock>("Header")

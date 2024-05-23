@@ -13,7 +13,7 @@ public interface IOrderService
     
     public Task<OrderDto> CreateOrderAsync(string masterId, CreateOrderRequest request);
 
-    public Task CreateOrderForWebsiteAsync(Guid websiteId, CreateWebsiteOrderRequest request);
+    public Task CreateOrderForWebsiteAsync(string websiteAddress, CreateWebsiteOrderRequest request);
     
     public Task<OrderDto?> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request);
     

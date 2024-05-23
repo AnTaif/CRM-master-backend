@@ -1,6 +1,7 @@
 using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.User.Requests;
 using MasterCRM.Application.Services.User.Responses;
+using MasterCRM.Application.Services.Websites;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Exceptions;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Application.Services.User;
 
-public class UserService(UserManager<Master> userManager) : IUserService
+public class UserService(UserManager<Master> userManager, IWebsiteRepository websiteRepository) : IUserService
 {
     public async Task<UserDto?> GetInfoAsync(string id)
     {
@@ -17,9 +18,14 @@ public class UserService(UserManager<Master> userManager) : IUserService
         return user?.ToDto();
     }
 
-    public async Task<UserDto?> GetInfoByWebsiteAsync(Guid websiteId)
+    public async Task<UserDto?> GetInfoByWebsiteAsync(string websiteAddress)
     {
-        var user = await userManager.Users.FirstOrDefaultAsync(user => user.WebsiteId == websiteId);
+        var userId = await websiteRepository.GetOwnerIdAsync(websiteAddress);
+
+        if (userId == null)
+            throw new NotFoundException("Website not found");
+        
+        var user = await userManager.FindByIdAsync(userId);
 
         return user?.ToDto();
     }

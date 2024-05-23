@@ -7,12 +7,11 @@ using MasterCRM.Application.Services.Orders.Requests;
 using MasterCRM.Application.Services.Orders.Responses;
 using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Application.Services.Products;
+using MasterCRM.Application.Services.Websites;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;
 using MasterCRM.Domain.Exceptions;
 using MasterCRM.Domain.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Application.Services.Orders;
 
@@ -23,7 +22,7 @@ public class OrderService(
     IProductRepository productRepository,
     IOrderHistoryService historyService,
     IEmailSender emailSender,
-    UserManager<Master> userManager) : IOrderService
+    IWebsiteRepository websiteRepository) : IOrderService
 {
     public async Task<GetOrdersResponse> GetAllByMasterAsync(string masterId)
     {
@@ -71,6 +70,9 @@ public class OrderService(
             
             if (product == null)
                 throw new NotFoundException("Product not found");
+            
+            if (product.MasterId != masterId)
+                throw new ForbidException($"Product \"{product.Name}\" from another master");
 
             products.Add(new OrderProduct
             {
@@ -109,14 +111,12 @@ public class OrderService(
         return newOrder.ToDto();
     }
 
-    public async Task CreateOrderForWebsiteAsync(Guid websiteId, CreateWebsiteOrderRequest request)
+    public async Task CreateOrderForWebsiteAsync(string websiteAddress, CreateWebsiteOrderRequest request)
     {
-        var master = await userManager.Users.FirstOrDefaultAsync(master => master.WebsiteId == websiteId);
+        var masterId = await websiteRepository.GetOwnerIdAsync(websiteAddress);
 
-        if (master == null)
+        if (masterId == null)
             throw new NotFoundException("Website not found");
-        
-        var masterId = master.Id;
         
         var stage = await stageRepository.GetStartByMasterAsync(masterId);
 
@@ -132,6 +132,9 @@ public class OrderService(
             
             if (product == null)
                 throw new NotFoundException("Product not found");
+
+            if (product.MasterId != masterId)
+                throw new ForbidException($"Product \"{product.Name}\" from another master");
 
             products.Add(new OrderProduct
             {
@@ -352,6 +355,9 @@ public class OrderService(
             
             if (product == null)
                 throw new NotFoundException("Product not found");
+
+            if (product.MasterId != order.MasterId)
+                throw new ForbidException($"Product \"{product.Name}\" from another master");
 
             if (!orderProducts.Any(oProduct =>
                     productRequest.ProductId == product.Id && oProduct.Quantity == productRequest.Quantity))

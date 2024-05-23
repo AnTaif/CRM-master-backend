@@ -66,6 +66,28 @@ public class WebsiteService(
         return new WebsiteDto(newWebsite.Id, newWebsite.Title, newWebsite.AddressName, null);
     }
 
+    public async Task<bool> TryDeleteAsync(string masterId)
+    {
+        var master = await userManager.FindByIdAsync(masterId);
+
+        if (master == null)
+            throw new NotFoundException("Master not found");
+        
+        if (master.WebsiteId == null)
+            throw new NotFoundException("Website not found");
+        
+        var website = await websiteRepository.GetByIdAsync((Guid)master.WebsiteId);
+
+        if (website == null)
+            return false;
+        
+        websiteRepository.Delete(website);
+        master.WebsiteId = null;
+        await websiteRepository.SaveChangesAsync();
+
+        return true;
+    }
+
     public async Task<WebsiteDto?> SelectTemplateAsync(string masterId, SelectTemplateRequest request)
     {
         var master = await userManager.FindByIdAsync(masterId);

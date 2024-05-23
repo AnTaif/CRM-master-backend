@@ -1,5 +1,4 @@
 using MasterCRM.Application.Services.Websites;
-using MasterCRM.Application.Services.Websites.PublicWebsite;
 using MasterCRM.Domain.Entities.Websites;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +30,7 @@ public class WebsiteRepository(CrmDbContext context) : IWebsiteRepository
         !await dbSet.AnyAsync(w => w.AddressName.Equals(address));
 
     public void Update(Website website) => dbSet.Update(website);
-    
+    public void Delete(Website website) => dbSet.Remove(website);
+
     public async Task SaveChangesAsync() => await context.SaveChangesAsync();
 }

@@ -8,6 +8,8 @@ public interface IWebsiteService
     public Task<WebsiteDto?> GetWebsiteInfo(string masterId);
     
     public Task<WebsiteDto?> CreateAsync(string masterId, CreateWebsiteRequest request);
+
+    public Task<bool> TryDeleteAsync(string masterId);
     
     public Task<WebsiteDto?> SelectTemplateAsync(string masterId, SelectTemplateRequest request);
 

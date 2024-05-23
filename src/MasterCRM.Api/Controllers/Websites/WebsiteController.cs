@@ -88,6 +88,27 @@ public class WebsiteController(IWebsiteService websiteService, IProductService p
         }
     }
 
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteWebsite()
+    {
+        try
+        {
+            var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var result = await websiteService.TryDeleteAsync(masterId);
+
+            if (!result)
+                return NotFound("Website not found");
+
+            return NoContent();
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+    }
+
     [HttpPost("select-template")]
     [ProducesResponseType(typeof(WebsiteDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]

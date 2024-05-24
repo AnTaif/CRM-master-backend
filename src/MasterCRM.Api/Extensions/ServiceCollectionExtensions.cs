@@ -84,6 +84,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IOrderProductService, OrderProductService>();
         services.AddTransient<IWebsiteService, WebsiteService>();
         services.AddTransient<IConstructorService, ConstructorService>();
+        services.AddTransient<ITemplateService, TemplateService>();
 
         return services;
     }

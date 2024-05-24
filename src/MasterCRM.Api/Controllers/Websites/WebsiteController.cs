@@ -53,12 +53,16 @@ public class WebsiteController(IWebsiteService websiteService, IProductService p
 
             if (response == null)
                 return NotFound("Website not found");
-            
+
             return Ok(response);
         }
         catch (NotFoundException e)
         {
             return NotFound(e.Message);
+        }
+        catch (BadRequestException e)
+        {
+            return BadRequest(e.Message);
         }
     }
     

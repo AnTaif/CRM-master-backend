@@ -153,13 +153,6 @@ public class CrmDbContext : IdentityDbContext<Master>
             .HasData(
                 new TextBlock
                 {
-                    TemplateId = 1,
-                    Order = 4,
-                    Title = "Подробнее о нас",
-                    Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in. Ut at ex ut ante blandit gravida a eu nisl."
-                },
-                new TextBlock
-                {
                     TemplateId = 2,
                     Order = 4,
                     Title = "Подробнее о нас",

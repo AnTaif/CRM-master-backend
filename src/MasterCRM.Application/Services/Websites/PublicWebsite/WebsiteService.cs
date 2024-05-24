@@ -227,8 +227,13 @@ public class WebsiteService(
             throw new ForbidException("Current user is not the owner of the website");
 
         website.Title = request.Title ?? website.Title;
-        // TODO: Check that AddressName is unique
-        website.AddressName = request.AddressName ?? website.AddressName;
+
+        if (request.AddressName != null && !website.AddressName.Equals(request.AddressName))
+        {
+            if (!await websiteRepository.IsAddressUnique(request.AddressName))
+                throw new BadRequestException("Website address name is already in use: " + request.AddressName);
+            website.AddressName = request.AddressName;
+        }
 
         websiteRepository.Update(website);
         await websiteRepository.SaveChangesAsync();

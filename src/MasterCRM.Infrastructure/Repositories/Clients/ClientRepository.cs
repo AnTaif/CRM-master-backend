@@ -1,5 +1,6 @@
 using MasterCRM.Application.Services.Clients;
 using MasterCRM.Domain.Entities;
+using MasterCRM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Infrastructure.Repositories.Clients;

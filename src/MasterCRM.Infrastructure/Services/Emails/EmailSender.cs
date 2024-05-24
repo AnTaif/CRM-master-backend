@@ -2,7 +2,7 @@ using MailKit.Net.Smtp;
 using MasterCRM.Domain.Interfaces;
 using MimeKit;
 
-namespace MasterCRM.Infrastructure.Emails;
+namespace MasterCRM.Infrastructure.Services.Emails;
 
 public class EmailSender : IEmailSender, IDisposable
 {

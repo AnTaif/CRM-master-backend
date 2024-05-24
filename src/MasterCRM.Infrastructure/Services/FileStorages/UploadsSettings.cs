@@ -1,4 +1,4 @@
-namespace MasterCRM.Infrastructure.FileStorages;
+namespace MasterCRM.Infrastructure.Services.FileStorages;
 
 public class UploadsSettings
 {

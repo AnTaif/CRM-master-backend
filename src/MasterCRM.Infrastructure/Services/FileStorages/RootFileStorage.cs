@@ -1,7 +1,7 @@
 using MasterCRM.Domain.Interfaces;
 using Microsoft.Extensions.Options;
 
-namespace MasterCRM.Infrastructure.FileStorages;
+namespace MasterCRM.Infrastructure.Services.FileStorages;
 
 public class RootFileStorage(IOptions<UploadsSettings> uploadsSettings) : IFileStorage
 {

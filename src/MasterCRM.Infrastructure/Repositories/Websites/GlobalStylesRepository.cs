@@ -1,6 +1,7 @@
 using MasterCRM.Application.Services.Websites;
 using MasterCRM.Application.Services.Websites.PublicWebsite;
 using MasterCRM.Domain.Entities.Websites;
+using MasterCRM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Infrastructure.Repositories.Websites;

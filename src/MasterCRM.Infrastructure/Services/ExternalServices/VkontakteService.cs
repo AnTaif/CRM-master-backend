@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
 using MasterCRM.Domain.Interfaces;
 
-namespace MasterCRM.Infrastructure.ExternalServices;
+namespace MasterCRM.Infrastructure.Services.ExternalServices;
 
 public class VkontakteService(string apiVersion, string serviceToken) : IVkontakteService
 {

@@ -1,5 +1,6 @@
 using MasterCRM.Application.Services.Products.Photos;
 using MasterCRM.Domain.Entities.Products;
+using MasterCRM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Infrastructure.Repositories.Products;

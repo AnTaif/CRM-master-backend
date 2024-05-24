@@ -20,4 +20,8 @@
       <ProjectReference Include="..\MasterCRM.Application\MasterCRM.Application.csproj" />
       <ProjectReference Include="..\MasterCRM.Domain\MasterCRM.Domain.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Services\" />
+    </ItemGroup>
 </Project>

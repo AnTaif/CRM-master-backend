@@ -1,5 +1,6 @@
 using MasterCRM.Application.Services.Orders.Products;
 using MasterCRM.Domain.Entities.Orders;
+using MasterCRM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace MasterCRM.Infrastructure.Repositories.Orders;

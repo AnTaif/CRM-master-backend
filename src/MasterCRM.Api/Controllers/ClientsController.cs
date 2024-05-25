@@ -48,7 +48,7 @@ public class ClientsController(IClientService clientService) : ControllerBase
     }
     
     [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ClientItemResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] ChangeClientRequest request)
@@ -57,12 +57,12 @@ public class ClientsController(IClientService clientService) : ControllerBase
         {
             var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             
-            var result = await clientService.TryChangeAsync(masterId, id, request);
+            var dto = await clientService.ChangeAsync(masterId, id, request);
             
-            if (!result)
+            if (dto == null)
                 return NotFound("Client not found");
             
-            return NoContent();
+            return Ok(dto);
         }
         catch (ForbidException)
         {

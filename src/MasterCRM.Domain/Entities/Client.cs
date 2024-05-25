@@ -50,11 +50,20 @@ public class Client : BaseEntity<Guid>
     public void Update(string? fullName, string? email, string? phone)
     {
         if (fullName != null)
+        {
             SetFullName(fullName);
+            UpdateOrdersNames();
+        }
         if (email != null)
             Email = email;
         if (phone != null)
             Phone = phone;
+    }
+
+    private void UpdateOrdersNames()
+    {
+        foreach (var order in Orders)
+            order.Name = GetInitials();
     }
 
     public string GetFullName()

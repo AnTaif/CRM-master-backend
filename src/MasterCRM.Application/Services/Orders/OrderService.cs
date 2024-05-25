@@ -331,6 +331,7 @@ public class OrderService(
         {
             client.SetFullName(request.FullName);
             changedFullname = request.FullName;
+            order.Name = client.GetInitials();
         }
 
         if (request.Phone != null && client.Phone != request.Phone)

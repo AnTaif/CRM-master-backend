@@ -1,4 +1,3 @@
-using System.Text;
 using MasterCRM.Domain.Common;
 
 namespace MasterCRM.Domain.Entities.Orders;

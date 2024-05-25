@@ -9,7 +9,7 @@ public interface IClientService
     
     public Task<ClientDto?> GetByIdAsync(string masterId, Guid id);
     
-    public Task<bool> TryChangeAsync(string masterId, Guid id, ChangeClientRequest request);
+    public Task<ClientItemResponse?> ChangeAsync(string masterId, Guid id, ChangeClientRequest request);
     
     public Task<bool> TryDeleteAsync(string masterId, Guid id);
 }

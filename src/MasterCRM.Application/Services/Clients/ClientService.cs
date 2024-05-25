@@ -28,12 +28,12 @@ public class ClientService(IClientRepository clientRepository) : IClientService
         return client.ToDto();
     }
     
-    public async Task<bool> TryChangeAsync(string masterId, Guid id, ChangeClientRequest request)
+    public async Task<ClientItemResponse?> ChangeAsync(string masterId, Guid id, ChangeClientRequest request)
     {
         var client = await clientRepository.GetByIdAsync(id);
         
         if (client == null)
-            return false;
+            return null;
         
         if (client.MasterId != masterId)
             throw new ForbidException("Current user is not the owner of the client");
@@ -41,7 +41,7 @@ public class ClientService(IClientRepository clientRepository) : IClientService
         client.Update(request.FullName, request.Email, request.Phone);
         
         await clientRepository.SaveChangesAsync();
-        return true;
+        return client.ToItemResponse();
     }
 
     public async Task<bool> TryDeleteAsync(string masterId, Guid id)

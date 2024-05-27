@@ -14,9 +14,7 @@ using MasterCRM.Application.Services.Websites.PublicWebsite;
 using MasterCRM.Application.Services.Websites.Templates;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;
-using MasterCRM.Infrastructure;
 using MasterCRM.Infrastructure.Data;
-using MasterCRM.Infrastructure.Repositories;
 using MasterCRM.Infrastructure.Repositories.Clients;
 using MasterCRM.Infrastructure.Repositories.Orders;
 using MasterCRM.Infrastructure.Repositories.Products;
@@ -131,6 +129,7 @@ public static class ServiceCollectionExtensions
         var smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD") ?? "";
         services.AddTransient<IEmailSender, EmailSender>(_ => 
             new EmailSender(smtpSettings, smtpUser, smtpPassword));
+        services.AddTransient<IEmailTemplateService, EmailTemplateService>();
 
         return services;
     }

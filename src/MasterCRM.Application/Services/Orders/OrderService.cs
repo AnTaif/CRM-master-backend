@@ -22,6 +22,7 @@ public class OrderService(
     IProductRepository productRepository,
     IOrderHistoryService historyService,
     IEmailSender emailSender,
+    IEmailTemplateService emailTemplateService,
     IWebsiteRepository websiteRepository) : IOrderService
 {
     public async Task<GetOrdersResponse> GetAllByMasterAsync(string masterId)
@@ -178,18 +179,15 @@ public class OrderService(
     {
         if (order.Master.Email != null)
         {
-            var message = $"Доброго дня, {order.Master.GetFullName()}.\nПользователь {client.GetFullName()} оставил заявку на заказ.\n" +
-                          (string.IsNullOrWhiteSpace(order.Comment) ? $"Комментарий к заказу - {order.Comment}.\n" : "") +
-                          $"Контактные данные пользователя для связи: {client.Phone}, {client.Email}.\nС уважением,\nМастерскаЯ\n";
+            var message = emailTemplateService.GetMasterOrderCreatedTemplate(order, client);
             await emailSender.SendEmailAsync(order.Master.Email, "У вас новый заказ!", message);
         }
     }
 
     private async Task NotifyClientOrderCreated(Order order, Client client)
     {
-        var clientMessage =
-            $"Доброго дня, {client.GetFullName()}.\nВаш заказ успешно оформлен и отправлен мастеру.\nО переходе товара на следующую стадию вы узнаете в письме, которое придет на эту же почту.\nКонтактные данные мастера для связи: {order.Master.PhoneNumber}, {order.Master.Email}.\nС уважением,\nМастерскаЯ\n";
-        await emailSender.SendEmailAsync(client.Email, "Ваш заказ оформлен", clientMessage);
+        var message = emailTemplateService.GetClientOrderCreatedTemplate(order, client);
+        await emailSender.SendEmailAsync(client.Email, "Ваш заказ оформлен", message);
     }
     
     private async Task<Client> CreateOrSetClientAsync(Order order, string fullnameRequest, string emailRequest, string phoneRequest)
@@ -294,7 +292,7 @@ public class OrderService(
 
     private async Task NotifyOrderStageChangedAsync(Order order, string newStage)
     {
-        var message = $"Доброго дня, {order.Client.GetFullName()}.\nВаш заказ от {order.CreatedAt} перешел на следующую стадию {newStage}.\nКонтактные данные мастера для связи: {order.Master.PhoneNumber}, {order.Master.Email}.\nС уважением,\nМастерскаЯ";
+        var message = emailTemplateService.GetOrderStageChangedTemplate(order, newStage);
         await emailSender.SendEmailAsync(order.Client.Email, "Ваш заказ перешел на следующую стадию!", message);
     }
 

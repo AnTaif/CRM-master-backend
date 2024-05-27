@@ -17,5 +17,7 @@ public class GetOrderItemResponse
     
     public required string Address { get; init; }
     
+    public required DateTime Date { get; init; }
+    
     public required OrderClientDto Client { get; init; }
 }

@@ -34,6 +34,7 @@ public static class OrderExtensions
             TotalAmount = order.TotalAmount,
             Comment = order.Comment,
             Address = order.Address,
+            Date = order.CreatedAt,
             Client = order.Client.ToOrderDto()
         };
     }

@@ -10,7 +10,9 @@ public interface IStageRepository
 
     public Task<Stage?> GetByIdAsync(Guid id);
 
-    public Task<Stage?> GetWithTabByMaster(string masterId, short stageTab); 
+    public Task<Stage?> GetWithTabByMaster(string masterId, short stageTab);
+
+    public Task<IEnumerable<Stage>> GetAllByMasterAsync(string masterId);
     
     public Task<IEnumerable<Stage>> GetAllByPredicateAsync(Expression<Func<Stage, bool>> predicate);
     
@@ -19,6 +21,8 @@ public interface IStageRepository
     public void UpdateRange(IEnumerable<Stage> stages);
 
     public void Delete(Stage stage);
+    
+    public Task AddAsync(Stage stage);
     
     public Task AddRangeAsync(IEnumerable<Stage> stages);
 

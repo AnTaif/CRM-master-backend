@@ -18,6 +18,9 @@ public class StageRepository(CrmDbContext context) : IStageRepository
     public async Task<Stage?> GetWithTabByMaster(string masterId, short stageTab) =>
         await dbSet.Where(stage => stage.MasterId == masterId).FirstOrDefaultAsync(stage => stage.Order == stageTab);
 
+    public async Task<IEnumerable<Stage>> GetAllByMasterAsync(string masterId) =>
+        await dbSet.Where(stage => stage.MasterId == masterId).OrderBy(stage => stage.Order).ToListAsync();
+
     public async Task<IEnumerable<Stage>> GetAllByPredicateAsync(Expression<Func<Stage, bool>> predicate) => 
         await dbSet.Where(predicate).OrderBy(stage => stage.Order).ToListAsync();
 
@@ -26,6 +29,7 @@ public class StageRepository(CrmDbContext context) : IStageRepository
     public void UpdateRange(IEnumerable<Stage> stages) => dbSet.UpdateRange(stages);
 
     public void Delete(Stage stage) => dbSet.Remove(stage);
+    public async Task AddAsync(Stage stage) => await dbSet.AddAsync(stage);
 
     public async Task AddRangeAsync(IEnumerable<Stage> stages) => await dbSet.AddRangeAsync(stages);
 

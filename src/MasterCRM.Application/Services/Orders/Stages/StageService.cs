@@ -10,7 +10,7 @@ public class StageService(IStageRepository stageRepository) : IStageService
 {
     public async Task<List<StageDto>> GetByMasterAsync(string masterId)
     {
-        var stages = await stageRepository.GetAllByPredicateAsync(stage => stage.MasterId == masterId);
+        var stages = await stageRepository.GetAllByMasterAsync(masterId);
 
         return stages.Select(stage => stage.ToDto()).ToList();
     }
@@ -33,7 +33,23 @@ public class StageService(IStageRepository stageRepository) : IStageService
 
     public async Task<List<StageDto>?> UpdateRangeAsync(string masterId, UpdateRangeRequest request)
     {
-        var stages = new List<Stage>();
+        var addRequests = request.AddStages;
+        if (addRequests != null)
+        {
+            foreach (var addRequest in addRequests)
+            {
+                var newStage = new Stage
+                {
+                    Id = Guid.NewGuid(),
+                    MasterId = masterId,
+                    Name = addRequest.Name,
+                    StageType = StageType.Default,
+                    Order = addRequest.Order
+                };
+
+                await stageRepository.AddAsync(newStage);
+            }
+        }
 
         var updateRequests = request.UpdateStages;
         if (updateRequests != null)
@@ -49,7 +65,6 @@ public class StageService(IStageRepository stageRepository) : IStageService
                     throw new ForbidException("Current user is not the owner of the stage");
 
                 stage.Update(updateRequest.Name, updateRequest.Order);
-                stages.Add(stage);
             }
         }
         
@@ -69,8 +84,9 @@ public class StageService(IStageRepository stageRepository) : IStageService
                 stageRepository.Delete(deletedStage);
             }
         }
-        
         await stageRepository.SaveChangesAsync();
+        
+        var stages = await stageRepository.GetAllByMasterAsync(masterId);
         return stages.Select(stage => stage.ToDto()).ToList();
     }
 

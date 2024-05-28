@@ -45,13 +45,13 @@ public class StageController(IStageService stageService) : ControllerBase
     }
 
     [HttpPut]
-    public async Task<ActionResult<IEnumerable<StageDto>>> UpdateRange(UpdateRangeRequest request)
+    public async Task<ActionResult<IEnumerable<StageDto>>> SaveRange(IEnumerable<StageItemRequest> request)
     {
         try
         {
             var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            
-            var stageDtos = await stageService.UpdateRangeAsync(masterId, request);
+
+            var stageDtos = await stageService.SaveRangeAsync(masterId, request);
 
             if (stageDtos == null)
                 return NotFound("Some stage not found");
@@ -61,6 +61,14 @@ public class StageController(IStageService stageService) : ControllerBase
         catch (ForbidException)
         {
             return StatusCode(StatusCodes.Status403Forbidden);
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (BadRequestException e)
+        {
+            return BadRequest(e.Message);
         }
     }
 

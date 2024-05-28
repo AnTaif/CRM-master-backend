@@ -9,7 +9,7 @@ public interface IStageService
 
     public Task<StageDto?> UpdateAsync(string masterId, Guid id, UpdateStageRequest request);
 
-    public Task<List<StageDto>?> UpdateRangeAsync(string masterId, UpdateRangeRequest request);
+    public Task<List<StageDto>?> SaveRangeAsync(string masterId, IEnumerable<StageItemRequest> request);
         
     public Task<bool> TryDeleteAsync(string masterId, Guid id);
 }

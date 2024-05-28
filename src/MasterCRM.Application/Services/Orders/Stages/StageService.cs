@@ -31,62 +31,52 @@ public class StageService(IStageRepository stageRepository) : IStageService
         return stage.ToDto();
     }
 
-    public async Task<List<StageDto>?> UpdateRangeAsync(string masterId, UpdateRangeRequest request)
+    public async Task<List<StageDto>?> SaveRangeAsync(string masterId, IEnumerable<StageItemRequest> request)
     {
-        var addRequests = request.AddStages;
-        if (addRequests != null)
+        var savedStages = request.ToList();
+
+        if (savedStages.Count > 7)
+            throw new BadRequestException("There cannot be more than 7 stages");
+        
+        var stages = await stageRepository.GetAllByMasterAsync(masterId);
+        
+        // DELETE unused stages
+        foreach (var stage in stages)
+            if (savedStages.All(stageReq => stageReq.Id != stage.Id))
+                stageRepository.Delete(stage);
+
+        foreach (var stageReq in savedStages)
         {
-            foreach (var addRequest in addRequests)
+            if (stageReq.Id == null)
             {
                 var newStage = new Stage
                 {
                     Id = Guid.NewGuid(),
                     MasterId = masterId,
-                    Name = addRequest.Name,
+                    Name = stageReq.Name,
                     StageType = StageType.Default,
-                    Order = addRequest.Order
+                    Order = stageReq.Order
                 };
 
                 await stageRepository.AddAsync(newStage);
+                continue;
             }
+
+            var stage = await stageRepository.GetByIdAsync((Guid)stageReq.Id);
+
+            if (stage == null)
+                throw new NotFoundException($"Stage with id: {stageReq.Id} not found");
+            
+            if (stage.MasterId != masterId)
+                throw new ForbidException("Current user is not the owner of the stage");
+            
+            stage.Update(stageReq.Name, stageReq.Order);
         }
 
-        var updateRequests = request.UpdateStages;
-        if (updateRequests != null)
-        {
-            foreach (var updateRequest in updateRequests)
-            {
-                var stage = await stageRepository.GetByIdAsync(updateRequest.Id);
-
-                if (stage == null)
-                    return null;
-                
-                if (stage.MasterId != masterId)
-                    throw new ForbidException("Current user is not the owner of the stage");
-
-                stage.Update(updateRequest.Name, updateRequest.Order);
-            }
-        }
-        
-        var deletedStages = request.DeleteStages;
-        if (deletedStages != null)
-        {
-            foreach (var deletedStageId in deletedStages)
-            {
-                var deletedStage = await stageRepository.GetByIdAsync(deletedStageId);
-
-                if (deletedStage == null)
-                    return null;
-                
-                if (deletedStage.MasterId != masterId)
-                    throw new ForbidException("Current user is not the owner of the stage");
-                
-                stageRepository.Delete(deletedStage);
-            }
-        }
         await stageRepository.SaveChangesAsync();
-        
-        var stages = await stageRepository.GetAllByMasterAsync(masterId);
+
+        stages = await stageRepository.GetAllByMasterAsync(masterId);
+
         return stages.Select(stage => stage.ToDto()).ToList();
     }
 

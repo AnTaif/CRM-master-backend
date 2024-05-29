@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using MasterCRM.Domain.Common;
 using MasterCRM.Domain.Exceptions;
 using MasterCRM.Domain.Interfaces;
@@ -40,9 +41,15 @@ public class RootFileStorage(IOptions<UploadsSettings> uploadsSettings) : IFileS
 
     public async Task<string> UploadWebsiteAsync(Stream stream, string addressName)
     {
-        var filePath = Path.Combine(websitesUploadPath, addressName + ".html");
-        await using var fileStream = new FileStream(filePath, FileMode.Create);
-        await stream.CopyToAsync(fileStream);
+        var folderPath = Path.Combine(websitesUploadPath, addressName);
+        
+        if (!Directory.Exists(folderPath))
+            Directory.CreateDirectory(folderPath);
+        else
+            Directory.Delete(folderPath,true);
+        
+        Directory.CreateDirectory(folderPath);
+        ZipFile.ExtractToDirectory(stream, folderPath);
         
         return GetWebsitesUrl(addressName);
     }

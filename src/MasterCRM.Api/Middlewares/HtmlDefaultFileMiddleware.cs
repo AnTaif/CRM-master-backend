@@ -7,9 +7,7 @@ public class HtmlDefaultFileMiddleware(RequestDelegate next)
         var path = context.Request.Path.Value;
         
         if (!path!.EndsWith("/") && !Path.HasExtension(path))
-        {
-            context.Request.Path = new PathString(path + ".html");
-        }
+            context.Request.Path = new PathString(path + "/index.html");
 
         await next(context);
     }

@@ -35,4 +35,8 @@
       <ProjectReference Include="..\MasterCRM.Infrastructure\MasterCRM.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Uploads\Websites\" />
+    </ItemGroup>
+
 </Project>

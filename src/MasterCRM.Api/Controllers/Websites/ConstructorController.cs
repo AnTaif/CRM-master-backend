@@ -126,8 +126,8 @@ public class ConstructorController(IConstructorService constructorService) : Con
         if (websiteFile.Length == 0)
             return BadRequest("No file uploaded");
 
-        if (Path.GetExtension(websiteFile.FileName).ToLower() != ".html")
-            return BadRequest("Only HTML files are allowed");
+        if (Path.GetExtension(websiteFile.FileName).ToLower() != ".zip")
+            return BadRequest("Only ZIP files are allowed");
 
         var url = await constructorService.SaveWebsiteAsync(masterId, websiteFile.OpenReadStream());
 

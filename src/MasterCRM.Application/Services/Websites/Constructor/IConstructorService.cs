@@ -13,6 +13,8 @@ public interface IConstructorService
 
     public Task<BlockDto?> ChangeBlockAsync(string masterId, Guid id, ChangeBlockRequest request);
 
+    public Task<string> SaveWebsiteAsync(string masterId, Stream stream);
+
     // public Task GetOrderRegistrationSection(string masterId, Guid websiteId);
     //
     // public Task GetProductCardSection(string masterId, Guid websiteId);

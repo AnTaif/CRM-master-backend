@@ -1,11 +1,14 @@
+using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.Websites.PublicWebsite.Requests;
 using MasterCRM.Application.Services.Websites.PublicWebsite.Responses;
 using MasterCRM.Application.Services.Websites.Templates;
+using MasterCRM.Domain.Common;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Websites;
 using MasterCRM.Domain.Exceptions;
 using MasterCRM.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace MasterCRM.Application.Services.Websites.PublicWebsite;
 
@@ -15,7 +18,8 @@ public class WebsiteService(
         IFileStorage fileStorage,
         IConstructorBlockRepository constructorBlockRepository,
         IGlobalStylesRepository globalStylesRepository,
-        UserManager<Master> userManager) : IWebsiteService
+        UserManager<Master> userManager,
+        IOptions<UploadsSettings> uploadSettings) : IWebsiteService
 {
     public async Task<WebsiteDto?> GetWebsiteInfo(string masterId)
     {
@@ -35,7 +39,7 @@ public class WebsiteService(
         if (masterId != website.OwnerId)
             throw new ForbidException("Current user is not the owner of the website");
 
-        return new WebsiteDto(website.Id, website.Title, website.AddressName, website.TemplateId);
+        return website.ToDto(uploadSettings.Value.WebsitesUrl);
     }
 
     public async Task<WebsiteDto?> CreateAsync(string masterId, CreateWebsiteRequest request)
@@ -63,7 +67,7 @@ public class WebsiteService(
         master.WebsiteId = newWebsite.Id;
         await websiteRepository.SaveChangesAsync();
 
-        return new WebsiteDto(newWebsite.Id, newWebsite.Title, newWebsite.AddressName, null);
+        return newWebsite.ToDto(null);
     }
 
     public async Task<bool> TryDeleteAsync(string masterId)
@@ -80,10 +84,14 @@ public class WebsiteService(
 
         if (website == null)
             return false;
+
+        var deletedWebsiteAddress = website.AddressName;
         
         websiteRepository.Delete(website);
         master.WebsiteId = null;
         await websiteRepository.SaveChangesAsync();
+
+        fileStorage.TryDeleteWebsite(deletedWebsiteAddress);
 
         return true;
     }
@@ -204,7 +212,7 @@ public class WebsiteService(
 
         await websiteRepository.SaveChangesAsync();
 
-        return new WebsiteDto(website.Id, website.Title, website.AddressName, website.TemplateId);
+        return website.ToDto(uploadSettings.Value.WebsitesUrl);
     }
 
     public async Task<WebsiteDto?> ChangeWebsiteInfoAsync(string masterId, ChangeWebsiteInfoRequest request)
@@ -228,16 +236,24 @@ public class WebsiteService(
 
         website.Title = request.Title ?? website.Title;
 
+        var oldAddress = "";
+        var isAddressChanged = false;
         if (request.AddressName != null && !website.AddressName.Equals(request.AddressName))
         {
             if (!await websiteRepository.IsAddressUnique(request.AddressName))
                 throw new BadRequestException("Website address name is already in use: " + request.AddressName);
+
+            isAddressChanged = true;
+            oldAddress = website.AddressName;
             website.AddressName = request.AddressName;
         }
 
         websiteRepository.Update(website);
         await websiteRepository.SaveChangesAsync();
+        
+        if (isAddressChanged)
+            fileStorage.RenameWebsite(oldAddress, request.AddressName!);
 
-        return new WebsiteDto(website.Id, website.Title, website.AddressName, website.TemplateId);
+        return website.ToDto(uploadSettings.Value.WebsitesUrl);
     }
 }

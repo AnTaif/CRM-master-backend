@@ -4,12 +4,14 @@ using MasterCRM.Application.Services.Websites.Constructor.Responses;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Websites;
 using MasterCRM.Domain.Exceptions;
+using MasterCRM.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 namespace MasterCRM.Application.Services.Websites.Constructor;
 
 public class ConstructorService(IWebsiteRepository websiteRepository, IGlobalStylesRepository globalStylesRepository,
-    IConstructorBlockRepository blockRepository, UserManager<Master> userManager) : IConstructorService
+    IConstructorBlockRepository blockRepository, UserManager<Master> userManager,
+    IFileStorage fileStorage) : IConstructorService
 {
     public async Task<GlobalStylesDto?> GetGlobalStylesAsync(string masterId)
     {
@@ -165,5 +167,25 @@ public class ConstructorService(IWebsiteRepository websiteRepository, IGlobalSty
         await blockRepository.SaveChangesAsync();
 
         return block.ToDto();
+    }
+
+    public async Task<string> SaveWebsiteAsync(string masterId, Stream stream)
+    {
+        var master = await userManager.FindByIdAsync(masterId);
+
+        if (master == null)
+            throw new Exception("User not found, possible unauthorized");
+
+        if (master.WebsiteId == null)
+            throw new NotFoundException("Master does not have a website");
+
+        var website = await websiteRepository.GetByIdAsync((Guid)master.WebsiteId);
+
+        if (website == null)
+            throw new BadRequestException("Website not found");
+        
+        var url = await fileStorage.UploadWebsiteAsync(stream, website.AddressName);
+        
+        return url;
     }
 }

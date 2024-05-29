@@ -117,6 +117,22 @@ public class ConstructorController(IConstructorService constructorService) : Con
             return NotFound(e.Message);
         }
     }
+
+    [HttpPost("save-website")]
+    public async Task<IActionResult> SaveWebsite(IFormFile websiteFile)
+    {
+        var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        
+        if (websiteFile.Length == 0)
+            return BadRequest("No file uploaded");
+
+        if (Path.GetExtension(websiteFile.FileName).ToLower() != ".html")
+            return BadRequest("Only HTML files are allowed");
+
+        var url = await constructorService.SaveWebsiteAsync(masterId, websiteFile.OpenReadStream());
+
+        return Ok(url);
+    }
     
     // [HttpGet("order")]
     // public async Task GetOrderRegistrationSection()

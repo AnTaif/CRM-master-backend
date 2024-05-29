@@ -55,6 +55,13 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads/templates"
 });
 
+Directory.CreateDirectory(Path.Combine(uploadsPath, "Websites"));
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(uploadsPath, "Websites")),
+    RequestPath = "/website"
+});
+
 app.MapControllers();
 
 app.Run();

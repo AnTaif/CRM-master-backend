@@ -1,3 +1,4 @@
+using MasterCRM.Domain.Common;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;
 using MasterCRM.Domain.Entities.Products;

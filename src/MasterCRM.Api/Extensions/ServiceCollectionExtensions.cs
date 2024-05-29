@@ -12,6 +12,7 @@ using MasterCRM.Application.Services.Websites;
 using MasterCRM.Application.Services.Websites.Constructor;
 using MasterCRM.Application.Services.Websites.PublicWebsite;
 using MasterCRM.Application.Services.Websites.Templates;
+using MasterCRM.Domain.Common;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;
 using MasterCRM.Infrastructure.Data;
@@ -93,6 +94,7 @@ public static class ServiceCollectionExtensions
     {
         services.Configure<UploadsSettings>(options =>
         {
+            options.WebsitesUrl = GetWebsitesUrl();
             options.UploadsPath = uploadsPath;
             options.UploadsUrl = uploadsUrl;
         });
@@ -151,6 +153,9 @@ public static class ServiceCollectionExtensions
             
         return $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
     }
+    
+    private static string GetWebsitesUrl() =>
+        Environment.GetEnvironmentVariable("WEBSITES_URL") ?? "http://localhost:8080/website/";
 
     private static string GetUploadsUrl() => 
         Environment.GetEnvironmentVariable("UPLOADS_URL") ?? "http://localhost:8080/uploads/";

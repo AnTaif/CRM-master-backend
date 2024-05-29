@@ -11,7 +11,7 @@ public static class WebsiteExtensions
             return new WebsiteDto(website.Id, website.Title, website.AddressName, null, website.TemplateId);
         
         var url = new Uri(websitesUrl);
-        url = new Uri(url, website.AddressName + ".html");
+        url = new Uri(url, website.AddressName);
 
         return new WebsiteDto(website.Id, website.Title, website.AddressName, url.ToString(), website.TemplateId);
     }

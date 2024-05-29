@@ -1,6 +1,7 @@
 using System.Globalization;
 using DotNetEnv;
 using MasterCRM.Api.Extensions;
+using MasterCRM.Api.Middlewares;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -56,6 +57,7 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 Directory.CreateDirectory(Path.Combine(uploadsPath, "Websites"));
+app.UseMiddleware<HtmlDefaultFileMiddleware>();
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(uploadsPath, "Websites")),

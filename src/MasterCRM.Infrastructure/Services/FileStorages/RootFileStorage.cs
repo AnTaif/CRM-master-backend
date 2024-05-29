@@ -89,7 +89,7 @@ public class RootFileStorage(IOptions<UploadsSettings> uploadsSettings) : IFileS
     private string GetWebsitesUrl(string addressName)
     {
         var uri = new Uri(websitesUrl);
-        var websiteUri = new Uri(uri, addressName + ".html");
+        var websiteUri = new Uri(uri, addressName);
         
         return websiteUri.ToString();
     }

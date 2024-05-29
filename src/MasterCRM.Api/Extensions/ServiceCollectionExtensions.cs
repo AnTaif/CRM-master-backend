@@ -90,13 +90,14 @@ public static class ServiceCollectionExtensions
     }
     
     public static IServiceCollection AddInfrastructureLayer(
-        this IServiceCollection services, ConfigurationManager configuration, string uploadsPath)
+        this IServiceCollection services, ConfigurationManager configuration, string uploadsPath, string templatesPath)
     {
         services.Configure<UploadsSettings>(options =>
         {
             options.WebsitesUrl = GetWebsitesUrl();
             options.UploadsPath = uploadsPath;
             options.UploadsUrl = uploadsUrl;
+            options.TemplatesPath = templatesPath;
         });
         
         var connectionString = GetConnectionString();

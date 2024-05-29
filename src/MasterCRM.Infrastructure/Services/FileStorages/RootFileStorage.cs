@@ -12,7 +12,7 @@ public class RootFileStorage(IOptions<UploadsSettings> uploadsSettings) : IFileS
     private string websitesUrl => uploadsSettings.Value.WebsitesUrl;
     
     private string publicUploadPath => Path.Combine(uploadsPath, "Public");
-    private string templatesUploadPath => Path.Combine(uploadsPath, "Templates");
+    private string templatesUploadPath => uploadsSettings.Value.TemplatesPath;
     private string websitesUploadPath => Path.Combine(uploadsPath, "Websites");
     
     public async Task<string> UploadAsync(Stream stream, string fileName)

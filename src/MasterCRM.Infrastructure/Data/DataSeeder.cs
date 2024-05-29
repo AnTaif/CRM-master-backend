@@ -74,7 +74,7 @@ public static class DataSeeder
                     Title = "",
                     H1Text = "Душевная мастерская",
                     PText = "Добро пожаловать в нашу handmade мастерскую, где мы создаем уникальные украшения вручную с любовью и вниманием к деталям. Каждый элемент, от колец до ожерелий, сделан из высококачественных материалов, чтобы подчеркнуть вашу индивидуальность и стиль.",
-                    ImageUrl = $"{uploadUrl}/templates/aa214299-cea2-4dbb-9a79-30f07c6bc5f6.png"
+                    ImageUrl = $"{uploadUrl}templates/aa214299-cea2-4dbb-9a79-30f07c6bc5f6.png"
                 },
                 new H1Block
                 {
@@ -84,7 +84,7 @@ public static class DataSeeder
                     H1Text = "H1 text",
                     PText =
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida porta sem, sit amet lobortis nunc rutrum in.",
-                    ImageUrl = $"{uploadUrl}/templates/b655a1db-18cb-47cb-8939-7e2e5f6116d4.png"
+                    ImageUrl = $"{uploadUrl}templates/b655a1db-18cb-47cb-8939-7e2e5f6116d4.png"
                 });
         
         modelBuilder.Entity<CatalogBlock>()

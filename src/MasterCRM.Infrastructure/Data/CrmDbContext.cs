@@ -3,17 +3,15 @@ using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;
 using MasterCRM.Domain.Entities.Products;
 using MasterCRM.Domain.Entities.Websites;
-using MasterCRM.Infrastructure.Services.FileStorages;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Options;
 
 namespace MasterCRM.Infrastructure.Data;
 
 public class CrmDbContext : IdentityDbContext<Master>
 {
-    private readonly string uploadUrl;
-    
     public DbSet<Master> Masters { get; set; } = null!; // Identity model
     
     public DbSet<Product> Products { get; set; } = null!;
@@ -38,14 +36,15 @@ public class CrmDbContext : IdentityDbContext<Master>
 
     public DbSet<GlobalStyles> GlobalStyles { get; set; } = null!;
 
-    public CrmDbContext(IOptions<UploadsSettings> uploadSettings, DbContextOptions<CrmDbContext> options) : base(options)
+    public CrmDbContext(DbContextOptions<CrmDbContext> options) : base(options)
     {
         Database.EnsureCreated();
-        uploadUrl = uploadSettings.Value.UploadsUrl;
     }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var uploadUrl = Database.GetService<IOptions<UploadsSettings>>().Value.UploadsUrl;
+        
         modelBuilder.Entity<Website>()
             .HasIndex(w => w.AddressName)
             .IsUnique();

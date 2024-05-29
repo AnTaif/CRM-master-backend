@@ -24,7 +24,8 @@ builder.Services.AddCustomCors(corsOrigins);
 
 builder.Services.AddCustomAuth();
 
-var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "Uploads");
+var uploadsPath = Environment.GetEnvironmentVariable("FILES_PATH") ??
+                  Path.Combine(builder.Environment.ContentRootPath, "Uploads");
 builder.Services.AddInfrastructureLayer(builder.Configuration, uploadsPath);
 builder.Services.AddApplicationLayer();
 

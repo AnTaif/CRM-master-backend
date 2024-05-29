@@ -17,6 +17,9 @@ services:
       DB_CONTAINER: "mastercrm.db"
       UPLOADS_URL: "http://localhost:8080/uploads/"
       WEBSITES_URL: "http://localhost:8080/website/"
+      FILES_PATH: "/app/uploads"
+    volumes:
+      - backend-files:/app/uploads
   mastercrm.db:
     container_name: mastercrm.db
     image: postgres:latest
@@ -30,3 +33,4 @@ services:
       - postgres-data:/var/lib/postgresql/data
 volumes:
   postgres-data:
+  backend-files:

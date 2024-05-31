@@ -50,6 +50,7 @@ public static class OrderProductExtensions
             ProductId = orderProduct.Product.Id,
             Name = orderProduct.Product.Name,
             Quantity = orderProduct.Quantity,
+            UnitPrice = orderProduct.UnitPrice,
             Photo = orderProduct.Product.Photos.FirstOrDefault()?.Url
         };
     }

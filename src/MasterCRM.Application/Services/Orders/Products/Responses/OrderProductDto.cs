@@ -14,6 +14,8 @@ public record OrderProductDto
     /// </summary>
     public required int Quantity { get; init; }
     
+    public required double UnitPrice { get; init; }
+    
     /// <summary>
     /// Product name
     /// </summary>

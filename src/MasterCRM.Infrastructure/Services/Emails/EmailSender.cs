@@ -1,4 +1,5 @@
 using MailKit.Net.Smtp;
+using MasterCRM.Domain.Common;
 using MasterCRM.Domain.Interfaces;
 using MimeKit;
 
@@ -32,7 +33,7 @@ public class EmailSender : IEmailSender, IDisposable
 
         await smtpClient.SendAsync(message);
     }
-
+    
     public void Dispose()
     {
         smtpClient.Disconnect(true);

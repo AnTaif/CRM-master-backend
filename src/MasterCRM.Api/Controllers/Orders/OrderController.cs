@@ -19,10 +19,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
     {
         var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        if (tab == null)
-            return Ok(await orderService.GetAllByMasterAsync(masterId));
-        
-        return Ok(await orderService.GetWithStageByMasterAsync(masterId, (short)tab));
+        return Ok(await orderService.GetAllByMasterAsync(masterId, tab));
     }
     
     [HttpGet("{id}")]

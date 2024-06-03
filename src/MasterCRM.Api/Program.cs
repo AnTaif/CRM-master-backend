@@ -27,9 +27,10 @@ builder.Services.AddCustomAuth();
 var uploadsContentRootPath = Path.Combine(builder.Environment.ContentRootPath, "Uploads");
 var uploadsPath = Environment.GetEnvironmentVariable("FILES_PATH") ?? uploadsContentRootPath;
 
+builder.Services.AddDomainLayer();
+builder.Services.AddApplicationLayer();
 builder.Services.AddInfrastructureLayer(builder.Configuration, uploadsPath, 
     Path.Combine(uploadsContentRootPath, "Templates"));
-builder.Services.AddApplicationLayer();
 
 var app = builder.Build();
 

@@ -1,4 +1,3 @@
-using System.Text;
 using MasterCRM.Application.MapExtensions;
 using MasterCRM.Application.Services.Clients;
 using MasterCRM.Application.Services.Orders.History;
@@ -11,46 +10,40 @@ using MasterCRM.Application.Services.Websites;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;
 using MasterCRM.Domain.Exceptions;
-using MasterCRM.Domain.Interfaces;
+using MasterCRM.Domain.Services.Notifications;
 
 namespace MasterCRM.Application.Services.Orders;
 
 public class OrderService(
+    INotificationService notificationService,
     IOrderRepository orderRepository, 
     IClientRepository clientRepository,
     IStageRepository stageRepository,
     IProductRepository productRepository,
     IOrderHistoryService historyService,
-    IEmailSender emailSender,
-    IEmailTemplateService emailTemplateService,
     IWebsiteRepository websiteRepository) : IOrderService
 {
-    public async Task<GetOrdersResponse> GetAllByMasterAsync(string masterId)
+    public async Task<GetOrdersResponse> GetAllByMasterAsync(string masterId, short? tab = null)
     {
-        var orders = await orderRepository.GetAllByPredicateAsync(order =>
-            order.MasterId == masterId);
+        IEnumerable<Order> orders;
+
+        if (tab == null)
+            orders = await orderRepository.GetAllByMasterAsync(masterId);
+        else
+            orders = await orderRepository.GetWithStageByMasterAsync(masterId, (short)tab);
 
         var ordersArray = orders.ToArray();
         return new GetOrdersResponse(ordersArray.Length, ordersArray.Select(order => order.ToItemResponse()));
     }
-    
-    public async Task<GetOrdersResponse> GetWithStageByMasterAsync(string masterId, short orderTab)
-    {
-        var activeOrders = await orderRepository.GetAllByPredicateAsync(order =>
-            order.MasterId == masterId && order.Stage.Order == orderTab);
 
-        var orders = activeOrders.ToArray();
-        return new GetOrdersResponse(orders.Length, orders.Select(order => order.ToItemResponse()));
-    }
-
-    public async Task<OrderDto?> GetOrderByIdAsync(string masterid, Guid orderId)
+    public async Task<OrderDto?> GetOrderByIdAsync(string masterId, Guid orderId)
     {
         var order = await orderRepository.GetByIdAsync(orderId);
 
         if (order == null)
             return null;
         
-        if (order.MasterId != masterid)
+        if (order.MasterId != masterId)
             throw new ForbidException("Current user is not the owner of the order");
         
         return order.ToDto();
@@ -58,36 +51,16 @@ public class OrderService(
 
     public async Task<OrderDto> CreateOrderAsync(string masterId, CreateOrderRequest request)
     {
-        var stage = await stageRepository.GetWithTabByMaster(masterId, request.StageTab);
+        var stage = await stageRepository.GetWithTabByMaster(masterId, request.StageTab)
+            ?? throw new NotFoundException($"Stage with tab \"{request.StageTab}\" not found");
 
-        if (stage == null)
-            throw new NotFoundException($"Stage with tab \"{request.StageTab}\" not found");
-
-        var products = new List<OrderProduct>();
-
-        foreach (var productRequest in request.Products)
-        {
-            var product = await productRepository.GetByIdAsync(productRequest.ProductId);
-            
-            if (product == null)
-                throw new NotFoundException("Product not found");
-            
-            if (product.MasterId != masterId)
-                throw new ForbidException($"Product \"{product.Name}\" from another master");
-
-            products.Add(new OrderProduct
-            {
-                ProductId = productRequest.ProductId,
-                Quantity = productRequest.Quantity,
-                UnitPrice = product.Price
-            });
-        }
+        var products = await GetProductsForOrderAsync(masterId, request.Products);
         
         var newOrder = new Order
         {
             Id = Guid.NewGuid(),
             MasterId = masterId,
-            Name = GetOrderName(request.Client.FullName),
+            Name = Client.GetInitials(request.Client.FullName),
             Address = request.Address,
             StageId = stage.Id,
             TotalAmount = request.TotalAmount,
@@ -107,51 +80,27 @@ public class OrderService(
         await orderRepository.SaveChangesAsync();
         var order = await orderRepository.GetByIdAsync(newOrder.Id);
         
-        await NotifyClientOrderCreated(order!, client);
+        await notificationService.NotifyClientOrderCreated(order!, client);
         
         return newOrder.ToDto();
     }
 
     public async Task CreateOrderForWebsiteAsync(string websiteAddress, CreateWebsiteOrderRequest request)
     {
-        var masterId = await websiteRepository.GetOwnerIdAsync(websiteAddress);
-
-        if (masterId == null)
-            throw new NotFoundException("Website not found");
+        var masterId = await websiteRepository.GetOwnerIdAsync(websiteAddress)
+            ?? throw new NotFoundException("Website not found");
         
-        var stage = await stageRepository.GetStartByMasterAsync(masterId);
-
-        if (stage == null)
-            throw new NotFoundException("Start stage not found");
+        var stage = await stageRepository.GetStartByMasterAsync(masterId)
+            ?? throw new NotFoundException("Start stage not found");
         
-        var products = new List<OrderProduct>();
-        var totalAmount = 0.0; 
-
-        foreach (var productRequest in request.Products)
-        {
-            var product = await productRepository.GetByIdAsync(productRequest.ProductId);
-            
-            if (product == null)
-                throw new NotFoundException("Product not found");
-
-            if (product.MasterId != masterId)
-                throw new ForbidException($"Product \"{product.Name}\" from another master");
-
-            products.Add(new OrderProduct
-            {
-                ProductId = productRequest.ProductId,
-                Quantity = productRequest.Quantity,
-                UnitPrice = product.Price
-            });
-
-            totalAmount += product.Price * productRequest.Quantity;
-        }
+        var products = await GetProductsForOrderAsync(masterId, request.Products);
+        var totalAmount = products.Sum(p => p.UnitPrice * p.Quantity);
         
         var newOrder = new Order
         {
             Id = Guid.NewGuid(),
             MasterId = masterId,
-            Name = GetOrderName(request.Client.FullName),
+            Name = Client.GetInitials(request.Client.FullName),
             Address = request.Address,
             StageId = stage.Id,
             TotalAmount = totalAmount,
@@ -171,41 +120,8 @@ public class OrderService(
         await orderRepository.SaveChangesAsync();
         var order = await orderRepository.GetByIdAsync(newOrder.Id);
 
-        await NotifyMasterOrderCreated(order!, client);
-        await NotifyClientOrderCreated(order!, client);
-    }
-
-    private async Task NotifyMasterOrderCreated(Order order, Client client)
-    {
-        if (order.Master.Email != null)
-        {
-            var message = emailTemplateService.GetMasterOrderCreatedTemplate(order, client);
-            await emailSender.SendEmailAsync(order.Master.Email, "У вас новый заказ!", message);
-        }
-    }
-
-    private async Task NotifyClientOrderCreated(Order order, Client client)
-    {
-        var message = emailTemplateService.GetClientOrderCreatedTemplate(order, client);
-        await emailSender.SendEmailAsync(client.Email, "Ваш заказ оформлен", message);
-    }
-    
-    private async Task<Client> CreateOrSetClientAsync(Order order, string fullnameRequest, string emailRequest, string phoneRequest)
-    {
-        var client = await clientRepository.GetByEmailAsync(emailRequest);
-
-        if (client == null)
-        {
-            // Client not found - create new one
-            var newClient = new Client(order.MasterId, fullnameRequest, emailRequest, phoneRequest, order.CreatedAt);
-            await clientRepository.CreateAsync(newClient);
-            order.ClientId = newClient.Id;
-            return newClient;
-        }
-
-        client.Update(fullnameRequest, null, phoneRequest);
-        order.ClientId = client.Id;
-        return client;
+        await notificationService.NotifyMasterOrderCreated(order!, client);
+        await notificationService.NotifyClientOrderCreated(order!, client);
     }
 
     public async Task<OrderDto?> ChangeOrderAsync(string masterId, Guid orderId, ChangeOrderRequest request)
@@ -217,30 +133,71 @@ public class OrderService(
         
         if (order.MasterId != masterId)
             throw new ForbidException("Current user is not the owner of the order");
-        
-        if (request.TotalAmount != null || request.Comment != null || request.Address != null || request.IsCalculationAutomated != null)
-            await ChangeOrderInfoAsync(order, request);
 
-        Stage? newStage = null;
-        if (request.StageTab != null)
-            newStage = await ChangeOrderStageAsync(order, masterId, (short)request.StageTab);
-        
-        if (request.Client != null)
-            await ChangeOrderClientAsync(order, masterId, request.Client);
-        
-        if (request.Products != null)
-            await ChangeOrderProductsAsync(order, request.Products);
-        
-        orderRepository.Update(order);
-        
+        await ChangeOrderDetailsAsync(order, request);
+
         await orderRepository.SaveChangesAsync();
-
-        if (newStage != null)
-            await NotifyOrderStageChangedAsync(order, newStage.Name);
-
         return order.ToDto();
     }
 
+    public async Task<bool> TryDeleteOrderAsync(string masterid, Guid orderId)
+    {
+        var order = await orderRepository.GetByIdAsync(orderId);
+
+        if (order == null)
+            return false;
+
+        if (order.MasterId != masterid)
+            throw new ForbidException("Current user is not the owner of the order");
+
+        var clientId = order.ClientId;
+
+        orderRepository.Delete(order);
+
+        await DeleteClientIfNoOrdersAsync(clientId);
+
+        await orderRepository.SaveChangesAsync();
+        return true;
+    }
+    
+    private async Task<List<OrderProduct>> GetProductsForOrderAsync(string masterId, IEnumerable<OrderProductRequest> productRequests)
+    {
+        var products = new List<OrderProduct>();
+
+        foreach (var productRequest in productRequests)
+        {
+            var product = await productRepository.GetByIdAsync(productRequest.ProductId)
+                          ?? throw new NotFoundException("Product not found");
+
+            if (product.MasterId != masterId)
+                throw new ForbidException($"Product \"{product.Name}\" from another master");
+
+            products.Add(new OrderProduct
+            {
+                ProductId = productRequest.ProductId,
+                Quantity = productRequest.Quantity,
+                UnitPrice = product.Price
+            });
+        }
+
+        return products;
+    }
+
+    private async Task ChangeOrderDetailsAsync(Order order, ChangeOrderRequest request)
+    {
+        if (request.TotalAmount != null || request.Comment != null || request.Address != null || request.IsCalculationAutomated != null)
+            await ChangeOrderInfoAsync(order, request);
+
+        if (request.StageTab != null)
+            await ChangeOrderStageAsync(order, (short)request.StageTab);
+
+        if (request.Client != null)
+            await ChangeOrderClientAsync(order, request.Client);
+
+        if (request.Products != null)
+            await ChangeOrderProductsAsync(order, request.Products);
+    }
+    
     private async Task ChangeOrderInfoAsync(Order order, ChangeOrderRequest request)
     {
         double? changedTotalAmount = null;
@@ -273,33 +230,23 @@ public class OrderService(
             order.Id, changedTotalAmount, changedComment, changedAddress, changedCalculation, DateTime.UtcNow);
     }
 
-    private async Task<Stage?> ChangeOrderStageAsync(Order order, string masterId, short stageTab)
+    private async Task ChangeOrderStageAsync(Order order, short stageTab)
     {
-        var stage = await stageRepository.GetWithTabByMaster(masterId, stageTab);
-            
-        if (stage == null)
-            throw new NotFoundException("Stage not found");
+        var newStage = await stageRepository.GetWithTabByMaster(order.MasterId, stageTab)
+                       ?? throw new NotFoundException("Stage not found");
         
-        if (order.Stage.Order == stageTab)
-            return null;
-            
-        await historyService.AddStageChangedHistoryAsync(
-            order.Id, order.Stage, stage, DateTime.UtcNow);
-            
-        order.StageId = stage.Id;
-        return stage;
-    }
-
-    private async Task NotifyOrderStageChangedAsync(Order order, string newStage)
-    {
-        var message = emailTemplateService.GetOrderStageChangedTemplate(order, newStage);
-        await emailSender.SendEmailAsync(order.Client.Email, "Ваш заказ перешел на следующую стадию!", message);
+        if (order.StageId != newStage.Id)
+        {
+            await historyService.AddStageChangedHistoryAsync(order.Id, order.Stage, newStage, DateTime.UtcNow);
+            order.StageId = newStage.Id;
+            await notificationService.NotifyOrderStageChangedAsync(order, newStage.Name);
+        }
     }
 
     /// <summary>
     /// Updates order's client or create new one
     /// </summary>
-    private async Task ChangeOrderClientAsync(Order order, string masterId, ChangeOrderClientRequest request)
+    private async Task ChangeOrderClientAsync(Order order, ChangeOrderClientRequest request)
     {
         string? changedFullname = null;
         string? changedEmail = null;
@@ -309,18 +256,19 @@ public class OrderService(
         if (request.Email != null && order.Client.Email != request.Email)
         {
             // email changed
+            var oldClientId = order.ClientId;
+            
             changedEmail = request.Email;
             client = await clientRepository.GetByEmailAsync(changedEmail);
 
             if (client == null)
             {
-                // Client not found - create new one
-                client = new Client(masterId, request.FullName!, request.Email, request.Phone!, order.CreatedAt);
+                client = new Client(order.MasterId, request.FullName!, changedEmail, request.Phone!);
                 await clientRepository.CreateAsync(client);
-                order.ClientId = client.Id;
             }
-            else
-                order.ClientId = client.Id;
+            
+            order.ClientId = client.Id;
+            await DeleteClientIfNoOrdersAsync(oldClientId);
         }
         else
             client = order.Client;
@@ -341,6 +289,13 @@ public class OrderService(
         await historyService.AddClientChangedHistoryAsync(
             order.Id, changedFullname, changedEmail, changedPhone, DateTime.UtcNow);
     }
+    
+    private async Task DeleteClientIfNoOrdersAsync(Guid clientId)
+    {
+        var client = await clientRepository.GetByIdAsync(clientId);
+        if (client!.Orders.Count <= 1)
+            clientRepository.Delete(client);
+    }
 
     private async Task ChangeOrderProductsAsync(Order order, IEnumerable<OrderProductRequest> request)
     {
@@ -350,15 +305,13 @@ public class OrderService(
         
         foreach (var productRequest in request)
         {
-            var product = await productRepository.GetByIdAsync(productRequest.ProductId);
+            var product = await productRepository.GetByIdAsync(productRequest.ProductId)
+                ?? throw new NotFoundException("Product not found");
             
-            if (product == null)
-                throw new NotFoundException("Product not found");
-
             if (product.MasterId != order.MasterId)
                 throw new ForbidException($"Product \"{product.Name}\" from another master");
 
-            if (!orderProducts.Any(oProduct =>
+            if (!orderProducts.Any(oProduct => 
                     productRequest.ProductId == product.Id && oProduct.Quantity == productRequest.Quantity))
                 isProductsChanged = true;
 
@@ -375,38 +328,21 @@ public class OrderService(
             
         await historyService.AddOrderProductsChangedHistoryAsync(order.Id, isProductsChanged ? products : null, DateTime.UtcNow);
     }
-
-    public async Task<bool> TryDeleteOrderAsync(string masterid, Guid orderId)
-    {
-        var order = await orderRepository.GetByIdAsync(orderId);
-
-        if (order == null)
-            return false;
-
-        if (order.MasterId != masterid)
-            throw new ForbidException("Current user is not the owner of the order");
-
-        var clientId = order.ClientId;
-
-        orderRepository.Delete(order);
-
-        var client = await clientRepository.GetByIdAsync(clientId);
-        if (client!.Orders.Count <= 1)
-            clientRepository.Delete(client);
-
-        await orderRepository.SaveChangesAsync();
-        return true;
-    }
     
-    private string GetOrderName(string fullname)
+    private async Task<Client> CreateOrSetClientAsync(Order order, string fullname, string email, string phone)
     {
-        var splitFullname = fullname.Split();
-        var name = new StringBuilder();
+        var client = await clientRepository.GetByEmailAsync(email);
+        
+        if (client == null)
+        {
+            // Client not found - create new one
+            client = new Client(order.MasterId, fullname, email, phone);
+            await clientRepository.CreateAsync(client);
+        }
+        else 
+            client.Update(fullname, null, phone);
 
-        name.Append(splitFullname[0]);
-        name.Append($" {splitFullname[1][0]}.");
-        if (splitFullname.Length > 2)
-            name.Append($"{splitFullname[2][0]}.");
-        return name.ToString();
+        order.ClientId = client.Id;
+        return client;
     }
 }

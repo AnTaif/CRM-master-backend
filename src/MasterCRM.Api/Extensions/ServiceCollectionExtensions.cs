@@ -15,6 +15,7 @@ using MasterCRM.Application.Services.Websites.Templates;
 using MasterCRM.Domain.Common;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Interfaces;
+using MasterCRM.Domain.Services.Notifications;
 using MasterCRM.Infrastructure.Data;
 using MasterCRM.Infrastructure.Repositories.Clients;
 using MasterCRM.Infrastructure.Repositories.Orders;
@@ -33,7 +34,7 @@ public static class ServiceCollectionExtensions
 {
     private static string uploadsUrl => GetUploadsUrl();
 
-    public static IServiceCollection AddCustomAuth(this IServiceCollection services)
+    public static void AddCustomAuth(this IServiceCollection services)
     {
         services.AddAuthentication().AddBearerToken();
         services.AddAuthorization();
@@ -50,11 +51,9 @@ public static class ServiceCollectionExtensions
         })
         .AddEntityFrameworkStores<CrmDbContext>()
         .AddDefaultTokenProviders();
-
-        return services;
     }
 
-    public static IServiceCollection AddCustomCors(this IServiceCollection services, string[]? origins)
+    public static void AddCustomCors(this IServiceCollection services, string[]? origins)
     {
         services.AddCors(options =>
         {
@@ -66,11 +65,14 @@ public static class ServiceCollectionExtensions
                     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials();
             });
         });
-
-        return services;
     }
 
-    public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
+    public static void AddDomainLayer(this IServiceCollection services)
+    {
+        services.AddTransient<INotificationService, NotificationService>();
+    }
+
+    public static void AddApplicationLayer(this IServiceCollection services)
     {
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IAuthService, AuthService>();
@@ -85,12 +87,10 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IWebsiteService, WebsiteService>();
         services.AddTransient<IConstructorService, ConstructorService>();
         services.AddTransient<ITemplateService, TemplateService>();
-
-        return services;
     }
     
-    public static IServiceCollection AddInfrastructureLayer(
-        this IServiceCollection services, ConfigurationManager configuration, string uploadsPath, string templatesPath)
+    public static void AddInfrastructureLayer(this IServiceCollection services, ConfigurationManager configuration,
+        string uploadsPath, string templatesPath)
     {
         services.Configure<UploadsSettings>(options =>
         {
@@ -133,8 +133,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IEmailSender, EmailSender>(_ => 
             new EmailSender(smtpSettings, smtpUser, smtpPassword));
         services.AddTransient<IEmailTemplateService, EmailTemplateService>();
-
-        return services;
     }
 
     /// <summary>

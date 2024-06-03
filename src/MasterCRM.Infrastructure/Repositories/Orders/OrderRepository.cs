@@ -10,11 +10,18 @@ public class OrderRepository(CrmDbContext context) : IOrderRepository
 {
     private DbSet<Order> dbSet => context.Orders;
 
-    public async Task<IEnumerable<Order>> GetAllByPredicateAsync(Expression<Func<Order, bool>> predicate) => 
+    public async Task<IEnumerable<Order>> GetAllByMasterAsync(string masterId) =>
         await dbSet
             .Include(order => order.Stage)
             .Include(order => order.Client)
-            .Where(predicate)
+            .Where(order => order.MasterId == masterId)
+            .ToListAsync();
+
+    public async Task<IEnumerable<Order>> GetWithStageByMasterAsync(string masterId, short stageTab) =>
+        await dbSet
+            .Include(order => order.Stage)
+            .Include(order => order.Client)
+            .Where(order => order.MasterId == masterId && order.Stage.Order == stageTab)
             .ToListAsync();
 
     public async Task<Order?> GetByIdAsync(Guid id) =>

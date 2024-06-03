@@ -6,7 +6,9 @@ namespace MasterCRM.Application.Services.Orders;
 
 public interface IOrderRepository
 {
-    public Task<IEnumerable<Order>> GetAllByPredicateAsync(Expression<Func<Order, bool>> predicate);
+    public Task<IEnumerable<Order>> GetAllByMasterAsync(string masterId);
+    
+    public Task<IEnumerable<Order>> GetWithStageByMasterAsync(string masterId, short stageTab);
     
     public Task<Order?> GetByIdAsync(Guid id);
     

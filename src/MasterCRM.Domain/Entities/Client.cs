@@ -1,4 +1,3 @@
-using System.Text;
 using MasterCRM.Domain.Common;
 using MasterCRM.Domain.Entities.Orders;
 
@@ -6,8 +5,9 @@ namespace MasterCRM.Domain.Entities;
 
 public class Client : BaseEntity<Guid>
 {
-    public string MasterId { get; init; }
-    //public virtual Master Master { get; init; }
+    public string MasterId { get; init; } = null!;
+    public virtual Master Master { get; init; } = null!;
+    
     public string FirstName { get; set; } = null!;
 
     public string LastName { get; set; } = null!;
@@ -17,8 +17,8 @@ public class Client : BaseEntity<Guid>
     public string Email { get; set; } = null!;
     
     public string Phone { get; set; } = null!;
-    
-    public virtual List<Order> Orders { get; set; }
+
+    public virtual List<Order> Orders { get; set; } = null!;
     
     public DateTime GetLastOrderDate() => Orders.Max(order => order.CreatedAt);
     
@@ -30,15 +30,6 @@ public class Client : BaseEntity<Guid>
     }
 
     public Client(string masterId, string fullname, string email, string phone)
-    {
-        Id = Guid.NewGuid();
-        MasterId = masterId;
-        SetFullName(fullname);
-        Email = email;
-        Phone = phone;
-    }
-    
-    public Client(string masterId, string fullname, string email, string phone, DateTime orderDate)
     {
         Id = Guid.NewGuid();
         MasterId = masterId;
@@ -84,14 +75,12 @@ public class Client : BaseEntity<Guid>
         MiddleName = names.Length > 2 ? names[2] : null;
     }
 
-    public string GetInitials()
-    {
-        var initials = new StringBuilder();
+    public string GetInitials() => 
+        $"{LastName} {FirstName[0]}." + (MiddleName != null ? $"{MiddleName[0]}." : "");
 
-        initials.Append(LastName);
-        initials.Append($" {FirstName[0]}.");
-        if (MiddleName != null)
-            initials.Append($"{MiddleName[0]}.");
-        return initials.ToString();
+    public static string GetInitials(string fullname)
+    {
+        var names = fullname.Split();
+        return $"{names[0]} {names[1][0]}." + (names.Length > 2 ? $"{names[2][0]}." : "");
     }
 }

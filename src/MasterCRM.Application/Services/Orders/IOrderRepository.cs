@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;
 
 namespace MasterCRM.Application.Services.Orders;

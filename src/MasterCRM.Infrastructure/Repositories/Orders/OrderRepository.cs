@@ -29,9 +29,10 @@ public class OrderRepository(CrmDbContext context) : IOrderRepository
             .Include(order => order.Stage)
             .Include(order => order.Master)
             .Include(order => order.Client)
+                .ThenInclude(client => client.Orders)
             .Include(order => order.OrderProducts)
-            .ThenInclude(orderProduct => orderProduct.Product)
-            .ThenInclude(product => product.Photos)
+                .ThenInclude(orderProduct => orderProduct.Product)
+                .ThenInclude(product => product.Photos)
             .FirstOrDefaultAsync(e => e.Id == id);
 
     public async Task CreateAsync(Order order) => await dbSet.AddAsync(order);

@@ -1,7 +1,6 @@
 using MasterCRM.Application.Services.Orders.Stages;
 using MasterCRM.Domain.Entities;
 using MasterCRM.Domain.Entities.Orders;
-using MasterCRM.Domain.Exceptions;
 using MasterCRM.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,13 +18,28 @@ public class VkAuthService(
     /// otherwise - getting user's profile and register a new user with the received info 
     /// </summary>
     /// <param name="queryPayload">Query payload from VK Id response</param>
-    public async Task<VkLoginResponse?> LoginAsync(string queryPayload)
+    public async Task<VkLoginResponse?> LoginWithPayloadAsync(string queryPayload)
     {
-        var exchangeTokenResponse = await vkontakteService.ExchangeSilentTokenAsync(queryPayload);
+        var exchangeTokenResponse = await vkontakteService.ExchangeSilentTokenWithPayloadAsync(queryPayload);
 
         if (exchangeTokenResponse == null)
-            return null; 
-        
+            return null;
+
+        return await LoginAsync(exchangeTokenResponse);
+    }
+
+    public async Task<VkLoginResponse?> LoginWithRequestAsync(VkLoginRequest request)
+    {
+        var exchangeTokenResponse = await vkontakteService.ExchangeSilentTokenAsync(request.Token, request.Uuid);
+
+        if (exchangeTokenResponse == null)
+            return null;
+
+        return await LoginAsync(exchangeTokenResponse);
+    }
+
+    private async Task<VkLoginResponse?> LoginAsync(ExchangeTokenResponse exchangeTokenResponse)
+    {
         var vkId = exchangeTokenResponse.UserId;
         var email = exchangeTokenResponse.Email;
         var phone = exchangeTokenResponse.Phone;
@@ -66,14 +80,14 @@ public class VkAuthService(
         return new VkLoginResponse(true, null, null, null, null);
     }
 
-    public async Task<string?> LinkAsync(string userId, string queryPayload)
+    public async Task<string?> LinkAsync(string userId, VkLoginRequest request)
     {
         var user = await userManager.FindByIdAsync(userId);
         
         if (user == null)
             throw new Exception("User not found");
         
-        var exchangeTokenResponse = await vkontakteService.ExchangeSilentTokenAsync(queryPayload);
+        var exchangeTokenResponse = await vkontakteService.ExchangeSilentTokenAsync(request.Token, request.Uuid);
 
         if (exchangeTokenResponse == null)
             throw new Exception("VK token exchange failed");

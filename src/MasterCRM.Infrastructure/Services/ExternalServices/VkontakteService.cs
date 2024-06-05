@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+using MasterCRM.Domain.Exceptions;
 using MasterCRM.Domain.Interfaces;
 
 namespace MasterCRM.Infrastructure.Services.ExternalServices;
@@ -7,7 +8,7 @@ public class VkontakteService(string apiVersion, string serviceToken) : IVkontak
 {
     private const string vkApiMethodBase = "https://api.vk.com/method/"; 
     
-    public async Task<ExchangeTokenResponse?> ExchangeSilentTokenAsync(string queryPayload)
+    public async Task<ExchangeTokenResponse?> ExchangeSilentTokenWithPayloadAsync(string queryPayload)
     {
         var payload = JsonNode.Parse(queryPayload);
 
@@ -16,10 +17,15 @@ public class VkontakteService(string apiVersion, string serviceToken) : IVkontak
         
         var silentToken = payload["token"]?.ToString();
         var uuid = payload["uuid"]?.ToString();
-
-        if (silentToken == null || uuid == null)
-            throw new Exception();
         
+        if (silentToken == null || uuid == null)
+            throw new BadRequestException("Invalid query payload");
+
+        return await ExchangeSilentTokenAsync(silentToken, uuid);
+    }
+
+    public async Task<ExchangeTokenResponse?> ExchangeSilentTokenAsync(string silentToken, string uuid)
+    {
         using var client = new HttpClient();
 
         var queryParams = new[]

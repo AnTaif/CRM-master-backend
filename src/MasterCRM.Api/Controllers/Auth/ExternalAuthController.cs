@@ -13,27 +13,6 @@ public class ExternalAuthController(IVkAuthService vkAuthService) : ControllerBa
     /// <summary>
     /// Logs in the user using VK account or creates a new account if it doesn't exist
     /// </summary>
-    [HttpPost("externalLogin/vk")]
-    [ProducesResponseType(typeof(VkLoginResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<VkLoginResponse>> VkLogin()
-    {
-        var payload = HttpContext.Request.Query["payload"].ToString();
-
-        if (string.IsNullOrEmpty(payload))
-            return BadRequest("Payload parameter is null or empty.");
-
-        var response = await vkAuthService.LoginAsync(payload);
-
-        if (response == null)
-            return BadRequest("VK token exchange failed");
-
-        return Ok(response);
-    }
-    
-    /// <summary>
-    /// Logs in the user using VK account or creates a new account if it doesn't exist
-    /// </summary>
     [HttpGet("externalLogin/vk")]
     [ProducesResponseType(typeof(VkLoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -44,8 +23,19 @@ public class ExternalAuthController(IVkAuthService vkAuthService) : ControllerBa
         if (string.IsNullOrEmpty(payload))
             return BadRequest("Payload parameter is null or empty.");
 
-        var response = await vkAuthService.LoginAsync(payload);
+        var response = await vkAuthService.LoginWithPayloadAsync(payload);
 
+        if (response == null)
+            return BadRequest("VK token exchange failed");
+
+        return Ok(response);
+    }
+    
+    [HttpPost("externalLogin/vk")]
+    public async Task<IActionResult> VkIdLogin(VkLoginRequest request)
+    {
+        var response = await vkAuthService.LoginWithRequestAsync(request);
+        
         if (response == null)
             return BadRequest("VK token exchange failed");
 
@@ -55,22 +45,16 @@ public class ExternalAuthController(IVkAuthService vkAuthService) : ControllerBa
     /// <summary>
     /// Links VK account to the current user
     /// </summary>
-    /// <param name="vkQuery">Query payload from VK ID response</param>
     /// <returns>VK id of the linked account</returns>
     [Authorize]
     [HttpPost("link/vk")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<string>> LinkVkAccount([FromQuery] JsonObject vkQuery)
+    public async Task<ActionResult<string>> LinkVkAccount(VkLoginRequest request)
     {
-        var payloadEncoded = vkQuery["payload"]?.ToString();
-        
-        if (string.IsNullOrEmpty(payloadEncoded))
-            return BadRequest("Payload parameter is null or empty.");
-        
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         
-        var vkId = await vkAuthService.LinkAsync(userId, payloadEncoded);
+        var vkId = await vkAuthService.LinkAsync(userId, request);
 
         if (vkId == null)
             return BadRequest("VK ID is already used by another user");
@@ -78,3 +62,4 @@ public class ExternalAuthController(IVkAuthService vkAuthService) : ControllerBa
         return Ok(vkId);
     }
 }
+

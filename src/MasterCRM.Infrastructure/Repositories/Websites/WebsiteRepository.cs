@@ -24,7 +24,14 @@ public class WebsiteRepository(CrmDbContext context) : IWebsiteRepository
             .Include(website => website.Components!)
                 .ThenInclude(component => (component as MultipleTextBlock)!.TextSections)
             .FirstOrDefaultAsync(website => website.Id == id);
-    
+
+    public async Task<Website?> GetByAddressAsync(string address) =>
+        await dbSet
+            .Include(website => website.GlobalStyles!)
+            .Include(website => website.Components!)
+                .ThenInclude(component => (component as MultipleTextBlock)!.TextSections)
+            .FirstOrDefaultAsync(website => website.AddressName == address);
+
     public async Task CreateAsync(Website website) => await dbSet.AddAsync(website);
     
     public async Task<bool> IsAddressUnique(string address) => 

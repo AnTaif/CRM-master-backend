@@ -10,6 +10,8 @@ public interface IWebsiteRepository
     
     public Task<Website?> GetByIdAsync(Guid id);
     
+    public Task<Website?> GetByAddressAsync(string address);
+    
     public Task CreateAsync(Website website);
 
     public Task<bool> IsAddressUnique(string address);

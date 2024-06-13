@@ -1,4 +1,5 @@
 using MasterCRM.Application.MapExtensions;
+using MasterCRM.Application.Services.Websites.Constructor.Responses;
 using MasterCRM.Application.Services.Websites.PublicWebsite.Requests;
 using MasterCRM.Application.Services.Websites.PublicWebsite.Responses;
 using MasterCRM.Application.Services.Websites.Templates;
@@ -21,7 +22,7 @@ public class WebsiteService(
         UserManager<Master> userManager,
         IOptions<UploadsSettings> uploadSettings) : IWebsiteService
 {
-    public async Task<WebsiteDto?> GetWebsiteInfo(string masterId)
+    public async Task<WebsiteDto?> GetWebsiteInfoByMasterAsync(string masterId)
     {
         var master = await userManager.FindByIdAsync(masterId);
 
@@ -40,6 +41,13 @@ public class WebsiteService(
             throw new ForbidException("Current user is not the owner of the website");
 
         return website.ToDto(uploadSettings.Value.WebsitesUrl);
+    }
+
+    public async Task<WebsiteDto?> GetWebsiteInfoAsync(string address)
+    {
+        var website = await websiteRepository.GetByAddressAsync(address);
+
+        return website?.ToDto(uploadSettings.Value.WebsitesUrl);
     }
 
     public async Task<WebsiteDto?> CreateAsync(string masterId, CreateWebsiteRequest request)
@@ -255,5 +263,17 @@ public class WebsiteService(
             fileStorage.RenameWebsite(oldAddress, request.AddressName!);
 
         return website.ToDto(uploadSettings.Value.WebsitesUrl);
+    }
+
+    public async Task<IEnumerable<BlockDto>> GetMainBlocksAsync(string address)
+    {
+        var website = await websiteRepository.GetByAddressAsync(address);
+        
+        if (website == null)
+            throw new NotFoundException("Website not found");
+        
+        var components = await constructorBlockRepository.GetWebsiteComponentsAsync(website.Id);
+
+        return components.Select(block => block.ToDto());
     }
 }

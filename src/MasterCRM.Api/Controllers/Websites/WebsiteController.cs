@@ -5,6 +5,7 @@ using MasterCRM.Application.Services.Products;
 using MasterCRM.Application.Services.Products.Responses;
 using MasterCRM.Application.Services.User;
 using MasterCRM.Application.Services.User.Responses;
+using MasterCRM.Application.Services.Websites.Constructor.Responses;
 using MasterCRM.Application.Services.Websites.PublicWebsite;
 using MasterCRM.Application.Services.Websites.PublicWebsite.Requests;
 using MasterCRM.Application.Services.Websites.PublicWebsite.Responses;
@@ -28,7 +29,7 @@ public class WebsiteController(IWebsiteService websiteService, IProductService p
         try
         {
             var masterId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var response = await websiteService.GetWebsiteInfo(masterId);
+            var response = await websiteService.GetWebsiteInfoByMasterAsync(masterId);
 
             if (response == null)
                 return NotFound("Website not found");
@@ -126,6 +127,38 @@ public class WebsiteController(IWebsiteService websiteService, IProductService p
             if (response == null)
                 return NotFound("Website not found");
             
+            return Ok(response);
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+    }
+    
+    [AllowAnonymous]
+    [HttpGet("{address}/info")]
+    [ProducesResponseType(typeof(WebsiteDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetInfoByAddress([FromRoute] string address)
+    {
+        var response = await websiteService.GetWebsiteInfoAsync(address);
+
+        if (response == null)
+            return NotFound("Website not found");
+        
+        return Ok(response);
+    }
+    
+    [AllowAnonymous]
+    [HttpGet("{address}/blocks/main")]
+    [ProducesResponseType(typeof(IEnumerable<BlockDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<BlockDto>> GetMainBlocks([FromRoute] string address)
+    {
+        try
+        {
+            var response = await websiteService.GetMainBlocksAsync(address);
+
             return Ok(response);
         }
         catch (NotFoundException e)
